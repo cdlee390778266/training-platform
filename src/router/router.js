@@ -40,7 +40,7 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   /* 路由发生变化修改页面title */
-  document.title = to.meta.title || '水域农庄'
+  document.title = to.meta.title || '高校金融实训平台'
   next()
 })
 

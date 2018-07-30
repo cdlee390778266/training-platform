@@ -19,11 +19,17 @@ export default {
 </script>
 
 <style>
-
-
+* {
+  padding: 0;
+  margin: 0;
+}
+a {
+  color: #4e4e4e;
+  text-decoration: none;
+}
 body {
-  color: #3c3c3c;
+  color: #4e4e4e;
   font-size: 14px;
-  background-color: #fafafa;
+  background-color: #f2f6fa;
 }
 </style>
