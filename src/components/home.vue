@@ -3,7 +3,7 @@
 		<ql-head></ql-head>
 		<div class="home-body">
 			<ul id="home-wrapper">
-				<li v-for="item in home" @click="startExe(item)"><img :src="item.icon" class="homeImg">{{item.text}}</li>
+				<li v-for="item in home" @click="startExe(item)"><img :src="item.icon" class="homeImg" width="64px">{{item.text}}</li>
 			</ul>
 		</div>
 	</div>
@@ -48,6 +48,15 @@
 		methods: {
 			startExe(item) {
 				console.log(item);
+				window.cefQuery({
+				    request: JSON.stringify({"v1":1,"v2":2,"v3":{"a":"ffffff"}}),
+				    onSuccess: function(response) {
+				      alert(response);
+				    },
+				    onFailure: function(error_code, error_message) {
+				    	alert(error_code);
+				    }
+				})
 			}
 		},
 		created() {
@@ -75,6 +84,9 @@
 <style scoped lang="scss">
   .home {
   	.home-body {
+		position: relative;
+		padding-top: 200px;
+		height: 260px;
   		ul {
   			text-align: center;
   			li {
@@ -89,5 +101,5 @@
   		}
   	}
   }
-#home-wrapper{position: absolute;bottom: 412px;text-align: center;width: 100%;}
+#home-wrapper{position: absolute;left: 0; right: 0;bottom: 100px;text-align: center;width: 100%;}
 </style>
