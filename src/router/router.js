@@ -1,8 +1,16 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-
 const Home  = () => import('../components/home')
+
+const Wrapper  = () => import('../components/common/wrapper.vue')
+const Competition  = () => import('../components/competition.vue')
+const OptionsMarket  = () => import('../components/optionsmarket.vue')
+const StockMarket  = () => import('../components/stockmarket.vue')
+const StockSelection  = () => import('../components/stockselection.vue')
+const Live  = () => import('../components/live.vue')
+
+const Register  = () => import('../components/register.vue')
 
 Vue.use(Router)
 
@@ -18,6 +26,49 @@ const router = new Router({
       path: '/home',
       name: 'home',
       component: Home
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: Register,
+      meta: { title: '注册'}
+    },
+    {
+      path: '/wrapper',
+      name: 'wrapper',
+      component: Wrapper,
+      children: [
+        {
+          path: '/competition',
+          name: 'competition',
+          component: Competition,
+          meta: { title: '投资竞赛'}
+        },
+        {
+          path: '/optionsmarket',
+          name: 'optionsmarket',
+          component: OptionsMarket,
+          meta: { title: '期权行情'}
+        },
+        {
+          path: '/stockmarket',
+          name: 'stockmarket',
+          component: StockMarket,
+          meta: { title: '股票行情'}
+        },
+        {
+          path: '/stockselection',
+          name: 'stockselection',
+          component: StockSelection,
+          meta: { title: '策略选股'}
+        },
+        {
+          path: '/live',
+          name: 'live',
+          component: Live,
+          meta: { title: '云直播'}
+        },
+      ]
     },
     {
       path: '**',

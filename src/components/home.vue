@@ -85,7 +85,7 @@
   .home {
   	.home-body {
 		position: relative;
-		padding-top: 200px;
+		padding-top: 412px;
 		height: 260px;
   		ul {
   			text-align: center;
