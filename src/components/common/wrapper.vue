@@ -5,10 +5,24 @@
 	        <div class="ql-menu">
 	        	<ul class="ql-menu-ul">
 			        <li v-for="item in menu">
-			        	<router-link :to="item.link">
-			        		<i class="ql-menu-icon" :class="item.iconClass"></i>
-			            	<span>{{item.text}}</span>
-			        	</router-link>
+			        	<template v-if="item.handle =='startExe'">
+				        	<div @click="handle(item)">
+				        		<i class="ql-menu-icon" :class="item.iconClass"></i>
+				            	<span>{{item.text}}</span>
+				            	<el-tooltip class="item" effect="dark" :content="item.text" placement="right">
+							      <el-button></el-button>
+							    </el-tooltip>
+				        	</div>
+			        	</template>
+						<template v-if="item.handle =='jumpToUrl'">
+							<router-link :to="item.handleData">
+				        		<i class="ql-menu-icon" :class="item.iconClass"></i>
+				            	<span>{{item.text}}</span>
+				            	<el-tooltip class="item" effect="dark" :content="item.text" placement="right">
+							      <el-button></el-button>
+							    </el-tooltip>
+				        	</router-link>
+						</template>
 			        </li>
 		        </ul>
 	          <div class="toggleMenu" @click="toggleMenu"><i class="el-icon-arrow-left"></i></div>
@@ -32,31 +46,36 @@
   						id: '0',
   						text: '投资竞赛',
   						iconClass: 'menu-icon1',
-  						link: '/competition'
+  						handle: 'jumpToUrl',
+  						handleData: '/competition'
   					},
 		            {
 		              id: '1',
 		              text: '期权行情',
 		              iconClass: 'menu-icon2',
-		              link: '/optionsmarket'
+		              handle: 'startExe',
+  					  handleData: 'option'
 		            },
 		            {
 		              id: '2',
 		              text: '股票行情',
 		              iconClass: 'menu-icon3',
-		              link: '/stockmarket'
+		              handle: 'startExe',
+  					  handleData: 'shares'
 		            },
 		            {
 		              id: '3',
 		              text: '策略选股',
 		              iconClass: 'menu-icon4',
-		              link: '/stockselection'
+		              handle: 'jumpToUrl',
+  					  handleData: '/stockselection'
 		            },
 		            {
 		              id: '4',
 		              text: '云课堂',
 		              iconClass: 'menu-icon5',
-		              link: '/live'
+		              handle: 'jumpToUrl',
+  					  handleData: '/live'
 		            }
   				],
           		isCollapse: false
@@ -66,7 +85,21 @@
 	        toggleMenu(key, keyPath) {
 	          this.isCollapse = !this.isCollapse;
 	          console.log(key, keyPath);
-	        }
+	        },
+	        handle(item) {
+				if(item.handle == 'jumpToUrl') {
+					this.$router.push(item.handleData)
+				}else if(item.handle == 'startExe') {
+					var json = {
+						method: 'startexe',
+						data: {
+							type:'quotes',
+							exeName: item.handleData
+						}
+					}
+					this.$utils.handleExe(json, function(){}, function(){})
+				}
+			}
       	}
   	}
 </script>
@@ -86,11 +119,13 @@
 			transition: all .4s;
 			.ql-menu-ul {
 				li {
-					a {
+					position: relative;
+					&> div, & > a {
 						display: block;
 						padding-top: 10px;
 						padding-bottom: 10px;
 						transition: all .4s;
+						cursor: pointer;
 						&:hover {
 							background: #f1f1f1;
 						}
@@ -120,6 +155,7 @@
 							}
 						}
 						&.active {
+							background: #f1f4f7;
 							.menu-icon1 {
 								background-position: -45px -3px;
 							}
@@ -136,6 +172,15 @@
 								background-position: -48px -273px;
 							}
 						}
+					}
+					.el-tooltip {
+						display: none;
+						position: absolute;
+						top: 20px;
+						right: 0;
+						bottom: 0;
+						left: 0;
+						opacity: 0;
 					}
 				}
 			}
@@ -164,6 +209,9 @@
 				.ql-menu-ul li {
 					span {
 						display: none;
+					}
+					.el-tooltip {
+						display: block;
 					}
 				}
 				.el-icon-arrow-left {

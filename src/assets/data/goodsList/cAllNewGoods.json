@@ -1,0 +1,48 @@
+{
+    "resultdata":"1",
+    "errordata":"注册成功",
+    "ResData": [
+      {
+        "imgUrl": "/src/assets/images/goods10.png",
+        "title": "野生鲜洋葱",
+        "price": 14.20,
+        "weight": "500g",
+        "gid": 10
+      },
+      {
+        "imgUrl": "/src/assets/images/goods2.png",
+        "title": "EKU香菇",
+        "price": 14.20,
+        "weight": "500g",
+        "gid": 10
+      },
+      {
+        "imgUrl": "/src/assets/images/goods3.png",
+        "title": "巴山有机土青",
+        "price": 14.20,
+        "weight": "500g",
+        "gid": 10
+      },
+      {
+        "imgUrl": "/src/assets/images/goods4.png",
+        "title": "有机从岭藏红鱼",
+        "price": 14.20,
+        "weight": "500g",
+        "gid": 10
+      },
+      {
+        "imgUrl": "/src/assets/images/goods5.png",
+        "title": "有机牛心鸡蛋",
+        "price": 14.20,
+        "weight": "500g",
+        "gid": 10
+      },
+      {
+        "imgUrl": "/src/assets/images/goods6.png",
+        "title": "有机红椒",
+        "price": 14.20,
+        "weight": "500g",
+        "gid": 10
+      }
+    ]
+}

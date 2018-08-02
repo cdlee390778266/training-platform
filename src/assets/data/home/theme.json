@@ -1,0 +1,40 @@
+{
+    "resultdata":"1",
+    "errordata":"注册成功",
+    "ResData": {
+        "iBgClass": "bg3",
+        "title": "最新主题",
+        "titleEn": "theme",
+        "moreLink": "",
+        "theme": [
+          {
+            "src": "/src/assets/images/theme1.png",
+            "fallbackSrc": "/src/assets/images/default.gif",
+            "title": "有\"肌\"生活,健康享\"瘦\"",
+            "desc": "量身定制，合理搭配，让健身餐不再无奈",
+            "tid": "1"
+          },
+          {
+            "src": "/src/assets/images/theme2.png",
+            "fallbackSrc": "/src/assets/images/default.gif",
+            "title": "有机香葵鸡",
+            "desc": "一尝香葵鸡，满口葵籽香",
+            "tid": "2"
+          },
+          {
+            "src": "/src/assets/images/theme3.png",
+            "fallbackSrc": "/src/assets/images/default.gif",
+            "title": "巴山土猪肉",
+            "desc": "一场舌尖上的世纪邂逅",
+            "tid": "3"
+          },
+          {
+            "src": "/src/assets/images/theme4.png",
+            "fallbackSrc": "/src/assets/images/default.gif",
+            "title": "有\"肌\"生活,健康享\"瘦\"",
+            "desc": "量身定制，合理搭配，让健身餐不再无奈",
+            "tid": "4"
+          }
+        ]
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "resultdata":"1",
+    "errordata":"注册成功",
+    "ResData": [
+      {
+        "title": "最新商品",
+        "tabId": "6",
+        "hasMore": true,
+        "goods": []
+      },
+      {
+        "title": "热销商品",
+        "tabId": "1",
+        "hasMore": true,
+        "goods": []
+      },
+      {
+        "title": "时令商品",
+        "tabId": "2",
+        "hasMore": true,
+        "goods": []
+      }
+    ]
+}

@@ -1,0 +1,43 @@
+{
+    "resultdata":"1",
+    "errordata":"注册成功",
+    "ResData": {
+      "iBgClass": "bg1",
+      "title": "商品推荐",
+      "titleEn": "Recommend",
+      "moreLink": "",
+      "goods": [
+        {
+          "imgUrl": "/src/assets/images/goods1.png",
+          "title": "野生鲜洋葱",
+          "gid": "1"
+        },
+        {
+          "imgUrl": "/src/assets/images/goods2.png",
+          "title": "EKU香菇",
+           "gid": "2"
+        },
+        {
+          "imgUrl": "/src/assets/images/goods3.png",
+          "title": "巴山有机土青",
+          "gid": "3"
+        },
+        {
+          "imgUrl": "/src/assets/images/goods4.png",
+          "title": "有机从岭藏红鱼",
+          "gid": "4"
+        },
+        {
+          "imgUrl": "/src/assets/images/goods5.png",
+          "title": "有机牛心鸡蛋",
+          "gid": "5"
+        },
+        {
+          "imgUrl": "/src/assets/images/goods6.png",
+          "title": "有机红椒",
+          "gid": "6"
+        }
+      ]
+    }
+    
+}

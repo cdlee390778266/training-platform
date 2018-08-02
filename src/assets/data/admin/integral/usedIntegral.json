@@ -1,0 +1,62 @@
+{
+    "resultdata":"1",
+    "errordata":"注册成功",
+    "ResData": [
+    	{
+            "gid": 20,
+            "name": "巴山有机土猪后腿肉500g",
+            "price": 45000,
+            "num": 20,
+            "imgUrl": "/src/assets/images/goods4.png",
+            "date": "2015-12-25     16:38"
+        },
+        {
+            "gid": 20,
+            "name": "巴山有机土猪后腿肉500g",
+            "price": 45000,
+            "num": 20,
+            "imgUrl": "/src/assets/images/goods4.png",
+            "date": "2015-12-25     16:38"
+        },
+        {
+            "gid": 20,
+            "name": "巴山有机土猪后腿肉500g",
+            "price": 45000,
+            "num": 20,
+            "imgUrl": "/src/assets/images/goods4.png",
+            "date": "2015-12-25     16:38"
+        },
+        {
+            "gid": 20,
+            "name": "巴山有机土猪后腿肉500g",
+            "price": 45000,
+            "num": 20,
+            "imgUrl": "/src/assets/images/goods4.png",
+            "date": "2015-12-25     16:38"
+        },
+        {
+            "gid": 20,
+            "name": "巴山有机土猪后腿肉500g",
+            "price": 45000,
+            "num": 20,
+            "imgUrl": "/src/assets/images/goods4.png",
+            "date": "2015-12-25     16:38"
+        },
+        {
+            "gid": 20,
+            "name": "巴山有机土猪后腿肉500g",
+            "price": 45000,
+            "num": 20,
+            "imgUrl": "/src/assets/images/goods4.png",
+            "date": "2015-12-25     16:38"
+        },
+        {
+            "gid": 20,
+            "name": "巴山有机土猪后腿肉500g",
+            "price": 45000,
+            "num": 20,
+            "imgUrl": "/src/assets/images/goods4.png",
+            "date": "2015-12-25     16:38"
+        }
+    ]
+}

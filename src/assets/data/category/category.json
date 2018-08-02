@@ -1,0 +1,498 @@
+{
+    "resultdata":"1",
+    "errordata":"注册成功",
+    "ResData": [
+          {
+            "id": "100",
+            "name": "新鲜蔬菜",
+            "goods": [
+              {
+                "id": "0",
+                "name": "巴山土猪e发大水发生打发",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪e发大水发生打发",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪e发大水发生打发",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪e发大水发生打发",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              }
+            ]
+          },
+          {
+            "id": "1",
+            "name": "时令水果",
+            "goods": [
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              }
+            ]
+          },
+          {
+            "id": "2",
+            "name": "肉禽蛋类",
+            "goods": [
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              }
+            ]
+          },
+          {
+            "id": "3",
+            "name": "水产海鲜",
+            "goods": [
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              }
+            ]
+          },
+          {
+            "id": "4",
+            "name": "粮油干杂",
+            "goods": [
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              }
+            ]
+          },
+          {
+            "id": "5",
+            "name": "酒水茶饮",
+            "goods": [
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              }
+            ]
+          },
+          {
+            "id": "6",
+            "name": "新鲜蔬菜",
+            "goods": [
+              {
+                "id": "0",
+                "name": "巴山土猪e发大水发生打发",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪e发大水发生打发",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪e发大水发生打发",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪e发大水发生打发",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              }
+            ]
+          },
+          {
+            "id": "7",
+            "name": "时令水果",
+            "goods": [
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              }
+            ]
+          },
+          {
+            "id": "8",
+            "name": "肉禽蛋类",
+            "goods": [
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              }
+            ]
+          },
+          {
+            "id": "9",
+            "name": "水产海鲜",
+            "goods": [
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              }
+            ]
+          },
+          {
+            "id": "10",
+            "name": "粮油干杂",
+            "goods": [
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              }
+            ]
+          },
+          {
+            "id": "11",
+            "name": "酒水茶饮",
+            "goods": [
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              },
+              {
+                "id": "0",
+                "name": "巴山土猪",
+                "imgUrl": "/src/assets/images/goods1.png"
+              }
+            ]
+          }
+        ]
+}

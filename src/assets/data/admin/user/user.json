@@ -1,0 +1,11 @@
+{
+    "resultdata":"1",
+    "errordata":"注册成功",
+    "ResData": {
+      "userId": 1001,
+      "name": "乖宝宝",
+      "integral": 600,
+      "usedIntegral": 1025,
+      "imgUrl": "/src/assets/images/face.png"
+    }
+}

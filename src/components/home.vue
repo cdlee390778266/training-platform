@@ -3,7 +3,7 @@
 		<ql-head></ql-head>
 		<div class="home-body">
 			<ul id="home-wrapper">
-				<li v-for="item in home" @click="startExe(item)"><img :src="item.icon" class="homeImg" width="64px">{{item.text}}</li>
+				<li v-for="item in home" @click="handle(item)"><img :src="item.icon" class="homeImg" width="64px">{{item.text}}</li>
 			</ul>
 		</div>
 	</div>
@@ -20,43 +20,50 @@
   					{
   						text: '投资竞赛',
   						icon: require('../assets/images/icons/exe-icon1.png'),
-  						link: '/'
+  						handle: 'jumpToUrl',
+  						handleData: '/competition' 
   					},
   					{
   						text: '期权行情',
   						icon: require('../assets/images/icons/exe-icon2.png'),
-  						link: '/'
+  						handle: 'startExe',
+  						handleData: 'option'
   					},
   					{
   						text: '股票行情',
   						icon: require('../assets/images/icons/exe-icon3.png'),
-  						link: '/'
+  						handle: 'startExe',
+  						handleData: 'shares'
   					},
   					{
   						text: '策略选股',
   						icon: require('../assets/images/icons/exe-icon4.png'),
-  						link: '/'
+  						handle: 'jumpToUrl',
+  						handleData: '/stockselection' 
   					},
   					{
   						text: '云课堂',
   						icon: require('../assets/images/icons/exe-icon5.png'),
-  						link: '/'
+  						handle: 'jumpToUrl',
+  						handleData: '/live' 
   					}
   				]
 			}
 		},
 		methods: {
-			startExe(item) {
-				console.log(item);
-				window.cefQuery({
-				    request: JSON.stringify({"v1":1,"v2":2,"v3":{"a":"ffffff"}}),
-				    onSuccess: function(response) {
-				      alert(response);
-				    },
-				    onFailure: function(error_code, error_message) {
-				    	alert(error_code);
-				    }
-				})
+			handle(item) {
+				if(item.handle == 'jumpToUrl') {
+					this.$router.push(item.handleData)
+				}else if(item.handle == 'startExe') {
+					var json = {
+						method: 'startexe',
+						data: {
+							type:'quotes',
+							exeName: item.handleData
+						}
+					}
+					this.$utils.handleExe(json, function(){}, function(){})
+				}
 			}
 		},
 		created() {

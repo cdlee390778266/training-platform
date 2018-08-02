@@ -1,0 +1,54 @@
+{
+    "resultdata":"1",
+    "errordata":"注册成功",
+    "ResData": [
+      {
+        "id": 6841592644,
+        "num": 20,
+        "totalPrice": 1420,
+        "imgUrl": "/src/assets/images/goods2.png"
+      },
+      {
+        "id": 6841592645,
+        "num": 20,
+        "totalPrice": 1420,
+        "imgUrl": "/src/assets/images/goods2.png"
+      },
+      {
+        "id": 6841592646,
+        "num": 20,
+        "totalPrice": 1420,
+        "imgUrl": "/src/assets/images/goods2.png"
+      },
+      {
+        "id": 6841592647,
+        "num": 20,
+        "totalPrice": 1420,
+        "imgUrl": "/src/assets/images/goods2.png"
+      },
+      {
+        "id": 6841592648,
+        "num": 20,
+        "totalPrice": 1420,
+        "imgUrl": "/src/assets/images/goods2.png"
+      },
+      {
+        "id": 6841592649,
+        "num": 20,
+        "totalPrice": 1420,
+        "imgUrl": "/src/assets/images/goods2.png"
+      },
+      {
+        "id": 68415926410,
+        "num": 20,
+        "totalPrice": 1420,
+        "imgUrl": "/src/assets/images/goods2.png"
+      },
+      {
+        "id": 68415926411,
+        "num": 20,
+        "totalPrice": 1420,
+        "imgUrl": "/src/assets/images/goods2.png"
+      }
+    ]
+}
