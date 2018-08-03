@@ -21,31 +21,36 @@
   						text: '投资竞赛',
   						icon: require('../assets/images/icons/exe-icon1.png'),
   						handle: 'jumpToUrl',
-  						handleData: '/competition' 
+  						handleData: '/competition',
+  						isExternalLink: false
   					},
   					{
   						text: '期权行情',
   						icon: require('../assets/images/icons/exe-icon2.png'),
   						handle: 'startExe',
-  						handleData: 'option'
+  						handleData: 'option',
+  						isExternalLink: false
   					},
   					{
   						text: '股票行情',
   						icon: require('../assets/images/icons/exe-icon3.png'),
   						handle: 'startExe',
-  						handleData: 'shares'
+  						handleData: 'shares',
+  						isExternalLink: false
   					},
   					{
   						text: '策略选股',
   						icon: require('../assets/images/icons/exe-icon4.png'),
   						handle: 'jumpToUrl',
-  						handleData: '/stockselection' 
+  						handleData: '/stockselection' ,
+  						isExternalLink: false
   					},
   					{
   						text: '云课堂',
   						icon: require('../assets/images/icons/exe-icon5.png'),
   						handle: 'jumpToUrl',
-  						handleData: '/live' 
+  						handleData: 'http://yanggang112.51vip.biz:40001/' ,
+  						isExternalLink: true
   					}
   				]
 			}
@@ -53,7 +58,11 @@
 		methods: {
 			handle(item) {
 				if(item.handle == 'jumpToUrl') {
-					this.$router.push(item.handleData)
+					if(item.isExternalLink) {
+						window.location.href = item.handleData;
+					}else {
+						this.$router.push(item.handleData)
+					}
 				}else if(item.handle == 'startExe') {
 					var json = {
 						method: 'startexe',

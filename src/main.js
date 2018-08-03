@@ -3,6 +3,7 @@
 import Vue from 'vue'
 import router from './router/router'
 import ElementUI from 'element-ui';
+import VeLine from 'v-charts/lib/line.common'
 import 'element-ui/lib/theme-chalk/index.css';
 import App from './App'
 
@@ -12,6 +13,7 @@ Vue.prototype.$utils = Utils
 
 Vue.config.productionTip = false
 
+Vue.component(VeLine.name, VeLine)
 Vue.use(ElementUI);
 
 /* eslint-disable no-new */

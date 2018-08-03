@@ -2,7 +2,26 @@
   	<div class="header">
   		<ul>
   			<li v-for="item in header">
-  				<router-link :to="item.link"><img :src="item.icon"/>{{item.text}}</router-link>
+          <template v-if="item.isLink">
+  				    <router-link :to="item.data"><img :src="item.icon"/>{{item.text}}</router-link>
+          </template>
+          <template v-if="!item.isLink">
+              <el-dropdown>
+                <span class="el-dropdown-link">
+                  <img :src="item.icon"/>{{item.text}}
+                </span>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item v-for="data in item.data">
+                    <template v-if="data.isLink">
+                      <router-link :to="data.data">{{data.text}}</router-link>
+                    </template>
+                    <template v-if="!data.isLink">
+                      <span>{{data.text}}</span>
+                    </template>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+          </template>
   			</li>
   		</ul>
   	</div>
@@ -13,14 +32,32 @@
   			return {
   				header: [
   					{
-  						text: '个人中心',
+  						text: '我的消息',
   						icon: require('../../assets/images/icons/head-icon1.png'),
-  						link: '/'
+  						data: '/msgcenter',
+              isLink: true
   					},
   					{
-  						text: '我的消息',
+  						text: '个人中心',
   						icon: require('../../assets/images/icons/head-icon2.png'),
-  						link: '/'
+  						data: [
+                {
+                  text: '个人信息',
+                  data:'/admin/user',
+                  isLink: true
+                },
+                {
+                  text: '账号设置',
+                  data:'/admin/setting',
+                  isLink: true
+                },
+                {
+                  text: '退出',
+                  data:'',
+                  isLink: false
+                }
+              ],
+              isLink: false
   					}
   				]
   			}

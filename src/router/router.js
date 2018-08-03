@@ -10,6 +10,10 @@ const StockMarket  = () => import('../components/stockmarket.vue')
 const StockSelection  = () => import('../components/stockselection.vue')
 const Live  = () => import('../components/live.vue')
 
+const AdminWrapper  = () => import('../components/admin/adminWrapper.vue')
+const User  = () => import('../components/admin/user.vue')
+const Setting  = () => import('../components/admin/setting.vue')
+
 const Register  = () => import('../components/register.vue')
 
 Vue.use(Router)
@@ -67,6 +71,29 @@ const router = new Router({
           name: 'live',
           component: Live,
           meta: { title: '云直播'}
+        },
+      ]
+    },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: AdminWrapper,
+      children: [
+        {
+          path: 'user',
+          name: 'user',
+          component: User,
+          meta: { title: '个人中心'}
+        },
+        {
+          path: 'setting',
+          name: 'setting',
+          component: Setting,
+          meta: { title: '个人设置'}
+        },
+        {
+          path: '**',
+          redirect: '/admin/user'
         },
       ]
     },

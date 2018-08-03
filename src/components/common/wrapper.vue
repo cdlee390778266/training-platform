@@ -15,13 +15,20 @@
 				        	</div>
 			        	</template>
 						<template v-if="item.handle =='jumpToUrl'">
-							<router-link :to="item.handleData">
+							<router-link :to="item.handleData" v-if="!item.isExternalLink">
 				        		<i class="ql-menu-icon" :class="item.iconClass"></i>
 				            	<span>{{item.text}}</span>
 				            	<el-tooltip class="item" effect="dark" :content="item.text" placement="right">
 							      <el-button></el-button>
 							    </el-tooltip>
 				        	</router-link>
+				        	<a :href="item.handleData" v-else>
+				        		<i class="ql-menu-icon" :class="item.iconClass"></i>
+				            	<span>{{item.text}}</span>
+				            	<el-tooltip class="item" effect="dark" :content="item.text" placement="right">
+							      <el-button></el-button>
+							    </el-tooltip>
+				        	</a>
 						</template>
 			        </li>
 		        </ul>
@@ -47,35 +54,40 @@
   						text: '投资竞赛',
   						iconClass: 'menu-icon1',
   						handle: 'jumpToUrl',
-  						handleData: '/competition'
+  						handleData: '/competition',
+  						isExternalLink: false
   					},
 		            {
 		              id: '1',
 		              text: '期权行情',
 		              iconClass: 'menu-icon2',
 		              handle: 'startExe',
-  					  handleData: 'option'
+  					  handleData: 'option',
+  					  isExternalLink: false
 		            },
 		            {
 		              id: '2',
 		              text: '股票行情',
 		              iconClass: 'menu-icon3',
 		              handle: 'startExe',
-  					  handleData: 'shares'
+  					  handleData: 'shares',
+  					  isExternalLink: false
 		            },
 		            {
 		              id: '3',
 		              text: '策略选股',
 		              iconClass: 'menu-icon4',
 		              handle: 'jumpToUrl',
-  					  handleData: '/stockselection'
+  					  handleData: '/stockselection',
+  					  isExternalLink: false
 		            },
 		            {
 		              id: '4',
 		              text: '云课堂',
 		              iconClass: 'menu-icon5',
 		              handle: 'jumpToUrl',
-  					  handleData: '/live'
+  					  handleData: 'http://yanggang112.51vip.biz:40001/',
+  					  isExternalLink: true
 		            }
   				],
           		isCollapse: false
