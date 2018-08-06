@@ -24,11 +24,17 @@ export default {
 * {
   padding: 0;
   margin: 0;
+  list-style: none;
   box-sizing: border-box;
 }
 a {
   color: #4e4e4e;
   text-decoration: none;
+}
+.ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 body {
   color: #4e4e4e;
@@ -41,6 +47,11 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
+}
+.ql-wrapper {
+  width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .fade-enter-active, .fade-leave-active {
   transition: opacity .5s;

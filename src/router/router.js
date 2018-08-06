@@ -11,7 +11,7 @@ const StockSelection  = () => import('../components/stockselection.vue')
 const Live  = () => import('../components/live.vue')
 
 const AdminWrapper  = () => import('../components/admin/adminWrapper.vue')
-const User  = () => import('../components/admin/user.vue')
+const AdminHome  = () => import('../components/admin/adminHome.vue')
 const Setting  = () => import('../components/admin/setting.vue')
 
 const Register  = () => import('../components/register.vue')
@@ -23,7 +23,6 @@ const router = new Router({
   routes: [
     {
       path: '/',
-      name: 'home',
       redirect: '/home'
     },
     {
@@ -80,9 +79,9 @@ const router = new Router({
       component: AdminWrapper,
       children: [
         {
-          path: 'user',
-          name: 'user',
-          component: User,
+          path: 'home',
+          name: 'adminHome',
+          component: AdminHome,
           meta: { title: '个人中心'}
         },
         {
@@ -93,7 +92,7 @@ const router = new Router({
         },
         {
           path: '**',
-          redirect: '/admin/user'
+          redirect: '/admin/home'
         },
       ]
     },
