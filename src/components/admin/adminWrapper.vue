@@ -82,6 +82,5 @@
 <style lang="scss">
 	.admin {
 		position: relative;
-		margin-top: 37px;
 	}
 </style>

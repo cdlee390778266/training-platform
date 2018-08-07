@@ -3,11 +3,27 @@
 		<div class="ql-wrapper">
 			<div class="ahome-top">
 				<div class="ahome-left">
-					<ve-line
-						:data="chartData"
-					    :grid="grid"
-					    :visual-map="visualMap">
-					</ve-line>
+					<el-select v-model="account" placeholder="请选择" size="small">
+					    <el-option
+					      v-for="item in accountList"
+					      :key="item.value"
+					      :label="item.label"
+					      :value="item.value">
+					    </el-option>
+					</el-select>
+					<div class="chart-wrapper">
+						<ve-line
+							height="300px"
+							:title="chartOpts.title"
+							:yAxis="chartOpts.yAxis"
+							:legend="chartOpts.legend"
+							:data="chartOpts.data"
+						    :colors="chartOpts.colors"
+						    :data-zoom="chartOpts.dataZoom"
+						    :tooltip="chartOpts.tooltip"
+						    >
+						</ve-line>
+					</div>
 				</div>
 				<div class="ahome-right">
 					<h1>账户信息</h1>
@@ -25,34 +41,49 @@
 			</div>
 			<div class="ahome-body">
 				<div class="ahome-left">
-					<el-tabs v-model="activeName" @tab-click="handleClick" class="ahome-tabs">
-					    <el-tab-pane label="我的资产" name="assets">
-					    	<div class="tab-head">
-					    		<el-form :inline="true" :model="formInline" class="demo-form-inline">
-								  <el-form-item class="tabs-checkbox">
-								    <el-checkbox label="成交历史" name="type"></el-checkbox>
-								    <el-checkbox label="历史委托" name="type"></el-checkbox>
-								  </el-form-item>
-								  <el-form-item label="时间">
-								    <el-date-picker
-								      v-model="daterange"
-								      type="daterange"
-								      align="center"
-								      unlink-panels
-								      range-separator="至"
-								      start-placeholder="起始时间"
-								      end-placeholder="终止时间"
-								      :picker-options="dateRangeOptions">
-								    </el-date-picker>
-								  </el-form-item>
-								  <el-form-item>
-								    <el-button type="primary" @click="onSubmit">查询</el-button>
-								  </el-form-item>
-								</el-form>
+					<el-tabs v-model="activeTab" @tab-click="handleClick" class="ahome-tabs">
+					    <el-tab-pane label="我的资产" name="assets" class="assets">
+					    	<el-table
+						      :data="table"
+						      :span-method="objectSpanMethod"
+						      :show-header="false"
+						      border
+						      style="width: 100%; margin-top: 20px" v-for="(table, index) in tabs.assets.data" :key="index">
+						      <el-table-column
+						        prop="text"
+						        label=""
+						        class-name="assets-title"
+						        width="180">
+						      </el-table-column>
+						      <el-table-column
+						        prop="profit"
+						        label="当日盈利率">
+						      </el-table-column>
+						      <el-table-column
+						        prop="loss"
+						        label="当日盈亏">
+						      </el-table-column>
+						      <el-table-column
+						        prop="assets"
+						        label="昨日资产">
+						      </el-table-column>
+						      <el-table-column
+						        prop="increase"
+						        label="当日上证涨幅">
+						      </el-table-column>
+						    </el-table>
+					    </el-tab-pane>
+					    <el-tab-pane label="我的持仓" name="holdPos">
+					    	<div class="tab-chart">
+					    		<ve-ring :data="tabs.holdPos.chart.chartData"  ref="veRing" :legend="tabs.holdPos.chart.options.legend"></ve-ring>
+					    	</div>
+					    	<div class="holdPos-bar">
+					    		持仓个股
+					    		<router-link>去交易</router-link>
 					    	</div>
 					    	<div class="tab-body">
 					    		<el-table
-							    :data="tableData"
+							    :data="tabs.holdPos.tableData"
 							    style="width: 100%"
 							    :default-sort = "{prop: 'date', order: 'descending'}"
 							    >
@@ -70,26 +101,32 @@
 								    </el-table-column>
 								    <el-table-column
 								      prop="increase"
+								      sortable
 								      label="幅度%">
 								    </el-table-column>
 								    <el-table-column
 								      prop="newest"
+								      sortable
 								      label="最新">
 								    </el-table-column>
 								    <el-table-column
 								      prop="riseAndFall"
+								      sortable
 								      label="涨跌">
 								    </el-table-column>
 								    <el-table-column
 								      prop="total"
+								      sortable
 								      label="总量">
 								    </el-table-column>
 								    <el-table-column
 								      prop="turnoverRate"
+								      sortable
 								      label="换手率%">
 								    </el-table-column>
 								    <el-table-column
 								      prop="marketValue"
+								      sortable
 								      label="流通市值">
 								    </el-table-column>
 							  	</el-table>
@@ -100,22 +137,100 @@
 								</el-pagination>
 					    	</div>
 					    </el-tab-pane>
-					    <el-tab-pane label="我的持仓" name="holdPos">我的持仓</el-tab-pane>
-					    <el-tab-pane label="我的交易记录" name="history">我的交易记录</el-tab-pane>
+					    <el-tab-pane label="我的交易记录" name="history">
+					    	<div class="tab-head">
+					    		<el-form :inline="true" :model="tabs.history.formInline" class="demo-form-inline">
+								  <el-form-item class="tabs-checkbox">
+								    <el-checkbox label="成交历史" name="type"></el-checkbox>
+								    <el-checkbox label="历史委托" name="type"></el-checkbox>
+								  </el-form-item>
+								  <el-form-item label="时间">
+								    <el-date-picker
+								      v-model="tabs.history.daterange"
+								      type="daterange"
+								      align="center"
+								      unlink-panels
+								      range-separator="至"
+								      start-placeholder="起始时间"
+								      end-placeholder="终止时间"
+								      :picker-options="tabs.history.dateRangeOptions">
+								    </el-date-picker>
+								  </el-form-item>
+								  <el-form-item>
+								    <el-button type="primary" @click="onSubmit">查询</el-button>
+								  </el-form-item>
+								</el-form>
+					    	</div>
+					    	<div class="tab-body">
+					    		<el-table
+							    :data="tabs.history.tableData"
+							    style="width: 100%"
+							    :default-sort = "{prop: 'date', order: 'descending'}"
+							    >
+								    <el-table-column
+								      prop="code"
+								      label="股票代码"
+								      sortable
+								      width="180">
+								    </el-table-column>
+								    <el-table-column
+								      prop="name"
+								      label="股票名称"
+								      sortable
+								      width="180">
+								    </el-table-column>
+								    <el-table-column
+								      prop="increase"
+								      sortable
+								      label="幅度%">
+								    </el-table-column>
+								    <el-table-column
+								      prop="newest"
+								      sortable
+								      label="最新">
+								    </el-table-column>
+								    <el-table-column
+								      prop="riseAndFall"
+								      sortable
+								      label="涨跌">
+								    </el-table-column>
+								    <el-table-column
+								      prop="total"
+								      sortable
+								      label="总量">
+								    </el-table-column>
+								    <el-table-column
+								      prop="turnoverRate"
+								      sortable
+								      label="换手率%">
+								    </el-table-column>
+								    <el-table-column
+								      prop="marketValue"
+								      sortable
+								      label="流通市值">
+								    </el-table-column>
+							  	</el-table>
+							  	<el-pagination
+								  background
+								  layout="prev, pager, next"
+								  :total="1000">
+								</el-pagination>
+					    	</div>
+					    </el-tab-pane>
 					    <el-tab-pane label="赛事排名" name="sort">赛事排名</el-tab-pane>
 					</el-tabs>
 				</div>
 				<div class="ahome-right">
 					<h1>教师点评</h1>
 					<ul class="comment">
-						<li v-for="(item, index) in comment">
+						<li v-for="(item, index) in tabs.history.comment">
 							<div class="comment-head">
 								<span :style="'background-image: url(' + item.faceUrl + ')'"></span>
 								<strong>{{item.name}}</strong>
 								{{item.date}}
 							</div>
 							<div class="comment-body">
-								<span>{{item.content}}</span>
+								<span>{{item.content | strLen(36)}}</span>
 							</div>
 							<div class="comment-foot">
 								<router-link :to="'/amdin/reply/' + item.id">回复</router-link>
@@ -129,170 +244,440 @@
 </template>
 <script>
 	import 'echarts/lib/component/visualMap'
+	import 'echarts/lib/component/dataZoom'
+	import 'echarts/lib/component/title'
+	import 'echarts/lib/component/tooltip'
 	export default {
     data () {
-      this.visualMap = [
-        {
-          type: 'piecewise',
-          splitNumber: 3,
-          min: -0.4,
-          max: 0.4,
-          right: 0,
-          top: 50
-        }
-      ]
-      this.grid = {
-        right: 60
-      }
       return {
-        chartData: {
-          columns: ['日期', '我的收益', '沪深300', '沪深500'],
-          rows: [
-            { '日期': '1月1日', '我的收益': 0.1, '沪深300': 0.05, '沪深500': -0.05},
-            { '日期': '1月2日', '我的收益': 0.2, '沪深300': 0.25, '沪深500': 0.2},
-            { '日期': '1月3日', '我的收益': 0.3888, '沪深300': -0.1, '沪深500': -0.3},
-            { '日期': '1月4日', '我的收益': -0.15, '沪深300': -0.32, '沪深500': -0.2},
-            { '日期': '1月5日', '我的收益': -0.01, '沪深300': 0.3, '沪深500': -0.05},
-            { '日期': '1月6日', '我的收益': -0.4, '沪深300': -0.55, '沪深500': -0.5}
-          ]
-        },
-        activeName: 'assets',
-        formInline: {
-          user: '',
-          region: ''
-        },
-        dateRangeOptions: {
-          shortcuts: [{
-            text: '最近一周',
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit('pick', [start, end]);
-            }
-          }, {
-            text: '最近一个月',
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              picker.$emit('pick', [start, end]);
-            }
-          }, {
-            text: '最近三个月',
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-              picker.$emit('pick', [start, end]);
-            }
-          }]
-        },
-        daterange: '',
-        tableData: [
-	        {
-	          code: '000658',
-	          name: '王小虎',
-	          increase: -0.64,
-	          newest: 44.38,
-	          riseAndFall: 1.38,
-	          total: 44.38,
-	          turnoverRate: 75064,
-	          marketValue: 0.35
+      	account: '',
+      	accountList: [
+	      	{
+	          value: '0',
+	          label: '期权账户0'
 	        },
 	        {
-	          code: '000621',
-	          name: '王小虎',
-	          increase: -0.64,
-	          newest: 44.38,
-	          riseAndFall: 1.38,
-	          total: 44.38,
-	          turnoverRate: 75064,
-	          marketValue: 0.35
+	          value: '1',
+	          label: '期权账户1'
 	        },
 	        {
-	          code: '000654',
-	          name: '王小虎',
-	          increase: -0.64,
-	          newest: 44.38,
-	          riseAndFall: 1.38,
-	          total: 44.38,
-	          turnoverRate: 75064,
-	          marketValue: 0.35
+	          value: '2',
+	          label: '期权账户2'
 	        },
 	        {
-	          code: '000654',
-	          name: '王小虎',
-	          increase: -0.64,
-	          newest: 44.38,
-	          riseAndFall: 1.38,
-	          total: 44.38,
-	          turnoverRate: 75064,
-	          marketValue: 0.35
+	          value: '3',
+	          label: '期权账户3'
 	        },
 	        {
-	          code: '000654',
-	          name: '王小虎',
-	          increase: -0.64,
-	          newest: 44.38,
-	          riseAndFall: 1.38,
-	          total: 44.38,
-	          turnoverRate: 75064,
-	          marketValue: 0.35
+	          value: '4',
+	          label: '期权账户4'
 	        },
+	        {
+	          value: '5',
+	          label: '期权账户5'
+	        }
         ],
-        comment: [
-        	{
-        		id: '1',
-        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
-        		name: '张老师',
-        		date: '2018-07-02',
-        		content: '王同学的选股能力还是很不错的，加油!'
-        	},
-        	{
-        		id: '2',
-        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
-        		name: '张老师',
-        		date: '2018-07-02',
-        		content: '王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油!'
-        	},
-        	{
-        		id: '3',
-        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
-        		name: '张老师',
-        		date: '2018-07-02',
-        		content: '王同学的选股能力还是很不错的，加油!'
-        	},
-        	{
-        		id: '',
-        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
-        		name: '张老师',
-        		date: '2018-07-02',
-        		content: '王同学的选股能力还是很不错的，加油!'
-        	},
-        	{
-        		id: '4',
-        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
-        		name: '张老师',
-        		date: '2018-07-02',
-        		content: '王同学的选股能力还是很不错的，加油!'
-        	},
-        	{
-        		id: '5',
-        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
-        		name: '张老师',
-        		date: '2018-07-02',
-        		content: '王同学的选股能力还是很不错的，加油!'
-        	},
-        ]
+        chartOpts: {
+    		title: {
+			  	text: '收益率走势图  (创建于2018.08.08)',
+			  	left: 40,
+			  	textStyle: {
+			  		color: '#7d858d',
+			  		fontWeight: 'normal',
+			  		fontSize: '16'
+			  	}
+		    },
+		    yAxis : [{ 
+	            axisLabel: {
+	                formatter: function(value) {
+	                	return value*100 + '%';
+	                }
+	            }
+	        }],
+		    legend: {
+		    	right: 50
+		    },
+		    colors: ['#ff486f', '#5091fa', '#f0b310'],
+		    dataZoom: [
+		        {
+		          type: 'slider',
+		          start: 0,
+		          end: 50
+		        }
+		    ],
+		    tooltip: {
+		    	formatter: function(params) {
+		    		console.log(params);
+                	return params.name + '<br/>' + params.marker + params.seriesName + ': ' + params.data[1]*100 + '%' ;
+                }
+		    },
+		    data: {
+	          columns: ['日期', '我的收益', '沪深300', '沪深500'],
+	          rows: [
+	            { '日期': '2015-12-21', '我的收益': 0.1, '沪深300': 0.05, '沪深500': -0.05},
+	            { '日期': '2015-12-22', '我的收益': 0.2, '沪深300': 0.25, '沪深500': 0.2},
+	            { '日期': '2015-12-23', '我的收益': 0.3888, '沪深300': -0.1, '沪深500': -0.3},
+	            { '日期': '2015-12-24', '我的收益': -0.15, '沪深300': -0.32, '沪深500': -0.2},
+	            { '日期': '2015-12-25', '我的收益': -0.01, '沪深300': 0.3, '沪深500': -0.05},
+	            { '日期': '2015-12-26', '我的收益': -0.4, '沪深300': -0.55, '沪深500': -0.5}
+	          ]
+	        }
+    	},
+    	activeTab: 'assets',
+    	tabs: {
+    		assets: {
+    			data: {
+    				day: [
+	    				{
+	    				  text: '当日账户',
+				          profit: '-1.10%',
+				          loss: '-2.22%',
+				          assets: '10000',
+				          increase: '10%'
+				        },
+				        {
+				          profit: '-1.10%',
+				          loss: '-2.22%',
+				          assets: '10000',
+				          increase: '10%'
+				        }
+			        ],
+			        week: [
+	    				{
+	    				  text: '本周账户',
+				          profit: '-1.10%',
+				          loss: '-2.22%',
+				          assets: '10000',
+				          increase: '10%'
+				        },
+				        {
+				          profit: '-1.10%',
+				          loss: '-2.22%',
+				          assets: '10000',
+				          increase: '10%'
+				        }
+			        ],
+			        month: [
+	    				{
+	    				  text: '本月账户',
+				          profit: '-1.10%',
+				          loss: '-2.22%',
+				          assets: '10000',
+				          increase: '10%'
+				        },
+				        {
+				          profit: '-1.10%',
+				          loss: '-2.22%',
+				          assets: '10000',
+				          increase: '10%'
+				        }
+			        ],
+			        assets: [
+	    				{
+	    				  text: '资产',
+				          profit: '-1.10%',
+				          loss: '-2.22%',
+				          assets: '10000',
+				          increase: '10%'
+				        },
+				        {
+				          profit: '-1.10%',
+				          loss: '-2.22%',
+				          assets: '10000',
+				          increase: '10%'
+				        }
+			        ]
+    			}
+    		},
+    		holdPos: {
+    			chart: {
+    				options: {
+    					legend: {
+							orient: 'vertical',
+							right: 200,
+							top: '35%',
+							textStyle: {
+								color: '#666'
+							}
+						}
+    				},
+    				chartData: {
+						columns: ['name', 'count'],
+						rows: [
+							{ 'name': '现金', 'count': 1393 },
+							{ 'name': '白云山', 'count': 3530 },
+							{ 'name': '安琪酵母', 'count': 2923 },
+							{ 'name': '泰格医药', 'count': 1723 },
+							{ 'name': '其余股票', 'count': 3792 }
+						]
+					}
+    			},
+		        tableData: [
+			        {
+			          code: '0006558',
+			          name: '王小虎',
+			          increase: -0.64,
+			          newest: 44.38,
+			          riseAndFall: 1.38,
+			          total: 44.38,
+			          turnoverRate: 75064,
+			          marketValue: 0.35
+			        },
+			        {
+			          code: '000621',
+			          name: '王小虎',
+			          increase: -0.64,
+			          newest: 44.38,
+			          riseAndFall: 1.38,
+			          total: 44.38,
+			          turnoverRate: 75064,
+			          marketValue: 0.35
+			        },
+			        {
+			          code: '000654',
+			          name: '王小虎',
+			          increase: -0.64,
+			          newest: 44.38,
+			          riseAndFall: 1.38,
+			          total: 44.38,
+			          turnoverRate: 75064,
+			          marketValue: 0.35
+			        },
+			        {
+			          code: '000654',
+			          name: '王小虎',
+			          increase: -0.64,
+			          newest: 44.38,
+			          riseAndFall: 1.38,
+			          total: 44.38,
+			          turnoverRate: 75064,
+			          marketValue: 0.35
+			        },
+			        {
+			          code: '000654',
+			          name: '王小虎',
+			          increase: -0.64,
+			          newest: 44.38,
+			          riseAndFall: 1.38,
+			          total: 44.38,
+			          turnoverRate: 75064,
+			          marketValue: 0.35
+			        },
+		        ],
+		        comment: [
+		        	{
+		        		id: '1',
+		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		name: '张老师',
+		        		date: '2018-07-02',
+		        		content: '王同学的选股能力还是很不错的，加油!'
+		        	},
+		        	{
+		        		id: '2',
+		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		name: '张老师',
+		        		date: '2018-07-02',
+		        		content: '王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油!'
+		        	},
+		        	{
+		        		id: '3',
+		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		name: '张老师',
+		        		date: '2018-07-02',
+		        		content: '王同学的选股能力还是很不错的，加油!'
+		        	},
+		        	{
+		        		id: '',
+		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		name: '张老师',
+		        		date: '2018-07-02',
+		        		content: '王同学的选股能力还是很不错的，加油!'
+		        	},
+		        	{
+		        		id: '4',
+		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		name: '张老师',
+		        		date: '2018-07-02',
+		        		content: '王同学的选股能力还是很不错的，加油!'
+		        	},
+		        	{
+		        		id: '5',
+		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		name: '张老师',
+		        		date: '2018-07-02',
+		        		content: '王同学的选股能力还是很不错的，加油!'
+		        	}
+		        ]
+    		},
+    		history: {
+		        formInline: {
+		          user: '',
+		          region: ''
+		        },
+		        dateRangeOptions: {
+		          shortcuts: [{
+		            text: '最近一周',
+		            onClick(picker) {
+		              const end = new Date();
+		              const start = new Date();
+		              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+		              picker.$emit('pick', [start, end]);
+		            }
+		          }, {
+		            text: '最近一个月',
+		            onClick(picker) {
+		              const end = new Date();
+		              const start = new Date();
+		              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+		              picker.$emit('pick', [start, end]);
+		            }
+		          }, {
+		            text: '最近三个月',
+		            onClick(picker) {
+		              const end = new Date();
+		              const start = new Date();
+		              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+		              picker.$emit('pick', [start, end]);
+		            }
+		          }]
+		        },
+		        daterange: '',
+		        tableData: [
+			        {
+			          code: '000658',
+			          name: '王小虎',
+			          increase: -0.64,
+			          newest: 44.38,
+			          riseAndFall: 1.38,
+			          total: 44.38,
+			          turnoverRate: 75064,
+			          marketValue: 0.35
+			        },
+			        {
+			          code: '000621',
+			          name: '王小虎',
+			          increase: -0.64,
+			          newest: 44.38,
+			          riseAndFall: 1.38,
+			          total: 44.38,
+			          turnoverRate: 75064,
+			          marketValue: 0.35
+			        },
+			        {
+			          code: '000654',
+			          name: '王小虎',
+			          increase: -0.64,
+			          newest: 44.38,
+			          riseAndFall: 1.38,
+			          total: 44.38,
+			          turnoverRate: 75064,
+			          marketValue: 0.35
+			        },
+			        {
+			          code: '000654',
+			          name: '王小虎',
+			          increase: -0.64,
+			          newest: 44.38,
+			          riseAndFall: 1.38,
+			          total: 44.38,
+			          turnoverRate: 75064,
+			          marketValue: 0.35
+			        },
+			        {
+			          code: '000654',
+			          name: '王小虎',
+			          increase: -0.64,
+			          newest: 44.38,
+			          riseAndFall: 1.38,
+			          total: 44.38,
+			          turnoverRate: 75064,
+			          marketValue: 0.35
+			        },
+		        ],
+		        comment: [
+		        	{
+		        		id: '1',
+		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		name: '张老师',
+		        		date: '2018-07-02',
+		        		content: '王同学的选股能力还是很不错的，加油!'
+		        	},
+		        	{
+		        		id: '2',
+		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		name: '张老师',
+		        		date: '2018-07-02',
+		        		content: '王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油!'
+		        	},
+		        	{
+		        		id: '3',
+		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		name: '张老师',
+		        		date: '2018-07-02',
+		        		content: '王同学的选股能力还是很不错的，加油!'
+		        	},
+		        	{
+		        		id: '',
+		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		name: '张老师',
+		        		date: '2018-07-02',
+		        		content: '王同学的选股能力还是很不错的，加油!'
+		        	},
+		        	{
+		        		id: '4',
+		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		name: '张老师',
+		        		date: '2018-07-02',
+		        		content: '王同学的选股能力还是很不错的，加油!'
+		        	},
+		        	{
+		        		id: '5',
+		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		name: '张老师',
+		        		date: '2018-07-02',
+		        		content: '王同学的选股能力还是很不错的，加油!'
+		        	}
+		        ]
+    		}
+    	},
+        
       }
     },
     methods: {
-      handleClick(tab, event) {
-        console.log(tab, event);
-      },
-      onSubmit() {
-        console.log('submit!');
+    	objectSpanMethod({ row, column, rowIndex, columnIndex }) {
+	        if (columnIndex === 0) {
+	          if (rowIndex % 2 === 0) {
+	            return {
+	              rowspan: 2,
+	              colspan: 1
+	            };
+	          } else {
+	            return {
+	              rowspan: 0,
+	              colspan: 0
+	            };
+	          }
+	        }
+	    },
+		handleClick(tab, event) {
+			console.log(tab, event);
+		},
+		onSubmit() {
+			console.log('submit!');
+		}
+    },
+    filters: {
+	  strLen: function (str, maxLength) {
+	    if (!str) return ''
+	    str = str.toString()
+	    return str.length >= maxLength ? str.substr(0, maxLength) + '...' : str;
+	  }
+	},
+	watch: {
+      activeTab (v) {
+        this.$nextTick(_ => {
+          this.$refs['veRing'].echarts.resize()
+        })
       }
     }
   }
@@ -301,6 +686,15 @@
 	.ahome {
 		.ahome-top {
 			height: 374px;
+			margin-top: 20px;
+			.ahome-left {
+				padding: 15px 5px;
+				.el-select {
+					margin-top: 5px;
+					margin-bottom: 20px;
+					margin-left: 30px;
+				}
+			}
 			.ahome-right {
 				.info-body {
 					padding: 25px;
@@ -349,15 +743,28 @@
 			}
 		}
 		.ahome-body {
+			color: #7d858d;
 			.ahome-tabs {
 				.el-tabs__nav-wrap::after {
 					background-color: transparent;
 				}
 				.el-tabs__header {
-					margin-top: 10px;
+					margin-top: 20px;
 					margin-left: 40px;
 				}
+				.el-tabs__active-bar {
+					background-color: #e30129;
+				}
+				.el-tabs__item.is-active {
+					color: #7d858d;
+				}
+				.el-tabs__item {
+					font-weight: bold;
+					color: #7d858d;
+				}
 				.tab-head {
+					margin-top: 10px;
+					margin-bottom: 10px;
 					text-align: center;
 					form {
 						display: inline-block;
@@ -368,9 +775,25 @@
 							margin-left: 10px;
 						}
 					}
+					.el-form-item__label, .el-checkbox {
+						color: #7d858d;
+					}
 					.el-date-editor .el-range-separator {
 						width: 7%;
 					}
+					.el-button--primary {
+						margin-left: 20px;
+						padding-top: 10px;
+						padding-bottom: 10px;
+						background: #5091fa;
+					}
+					.el-range-separator {
+						color: #7d858d;
+					}
+				}
+				.el-table {
+					text-align: center;
+					color: #5c5c5c;
 				}
 				.el-pagination {
 					text-align: center;
@@ -378,7 +801,22 @@
 				}
 				.has-gutter {
 					tr, th {
+						color: #5c5c5c;
 						background: #f7f9fb;
+						font-weight: normal;
+						text-align: center;
+					}
+				}
+				.assets {
+					padding: 20px 20px 100px 20px;
+					td {
+						background: #f8f8f8;
+					}
+					.assets-title {
+						background: #ff486f;
+						color: #fff;
+						font-size: 18px;
+						font-weight: bold;
 					}
 				}
 			}
@@ -407,11 +845,10 @@
 				.comment-body {
 					span {
 						display: block;
-						padding-left: 20px;
-						padding-right: 20px;
+						padding: 10px 20px;
 						border: 1px solid #b6d1fd;
 						border-radius: 20px;
-						line-height: 28px;
+						line-height: 20px;
 						color: #7d7f82;
 						position: relative;
 						&:after {

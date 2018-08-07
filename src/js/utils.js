@@ -84,6 +84,27 @@ Utils.handleExe = function(data, success, error) {
 }
 
 /**
+ * Gets the taken.获取令牌
+ *
+ * @param      {Function}  success  The success
+ * @param      {Function}  error    The error
+ */
+Utils.getTaken = function(success, error) {
+	console.log("taken");
+	if(window.cefQuery) {
+		window.cefQuery({
+		    request: 'taken',
+		    onSuccess: function(response) {
+		      if(typeof success == 'function')  success(response);
+		    },
+		    onFailure: function(error_code, error_message) {
+		      if(typeof error == 'function')  error(response);
+		    }
+		})
+	}
+}
+
+/**
  * Gets the json. 获取json数据
  *
  * @param      {<type>}    url      url

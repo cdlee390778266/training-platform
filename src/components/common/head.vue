@@ -162,6 +162,7 @@
               & + span {
                 position: relative;
                 top: -7px;
+                color: #969595;
               }
 
               &.menu-icon1 {

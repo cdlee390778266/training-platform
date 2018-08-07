@@ -15,7 +15,11 @@ export default {
   	}
   },
   created() {
-  	
+  	this.$utils.getTaken(function(res) {
+      alert(res);
+    }, function(error) {
+      alert(error);
+    })
   }
 }
 </script>
