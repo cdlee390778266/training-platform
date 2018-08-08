@@ -12,6 +12,8 @@ const Live  = () => import('../components/live.vue')
 
 const AdminWrapper  = () => import('../components/admin/adminWrapper.vue')
 const AdminHome  = () => import('../components/admin/adminHome.vue')
+const Reply  = () => import('../components/admin/reply.vue')
+const UserInfo  = () => import('../components/admin/userInfo.vue')
 const Setting  = () => import('../components/admin/setting.vue')
 
 const Register  = () => import('../components/register.vue')
@@ -83,6 +85,18 @@ const router = new Router({
           name: 'adminHome',
           component: AdminHome,
           meta: { title: '个人中心'}
+        },
+        {
+          path: 'reply/:id',
+          name: 'reply',
+          component: Reply,
+          meta: { title: '教师点评'}
+        },
+        {
+          path: 'userinfo',
+          name: 'userinfo',
+          component: UserInfo,
+          meta: { title: '个人信息'}
         },
         {
           path: 'setting',

@@ -93,7 +93,28 @@ Utils.getTaken = function(success, error) {
 	console.log("taken");
 	if(window.cefQuery) {
 		window.cefQuery({
-		    request: 'taken',
+		    request: 'getCurrentToken',
+		    onSuccess: function(response) {
+		      if(typeof success == 'function')  success(response);
+		    },
+		    onFailure: function(error_code, error_message) {
+		      if(typeof error == 'function')  error(response);
+		    }
+		})
+	}
+}
+
+/**
+ * Gets the login data.获取登录信息
+ *
+ * @param      {Function}  success  The success
+ * @param      {Function}  error    The error
+ */
+Utils.getLoginData = function(success, error) {
+	console.log("login");
+	if(window.cefQuery) {
+		window.cefQuery({
+		    request: 'getLoginData',
 		    onSuccess: function(response) {
 		      if(typeof success == 'function')  success(response);
 		    },

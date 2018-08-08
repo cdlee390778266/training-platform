@@ -13,7 +13,7 @@
               <template v-if="item.handle =='jumpToUrl'">
                 <router-link :to="item.handleData" v-if="!item.isExternalLink">
                   <i class="ql-nav-icon" :class="item.iconClass"></i>
-                        <span>{{item.text}}</span>
+                      <span>{{item.text}}</span>
                 </router-link>
                 <a :href="item.handleData" v-else>
                   <i class="ql-nav-icon" :class="item.iconClass"></i>
@@ -39,7 +39,12 @@
                         <router-link :to="data.data">{{data.text}}</router-link>
                       </template>
                       <template v-if="!data.isLink">
-                        <span>{{data.text}}</span>
+                        <template v-if="data.isBindEmail">
+                          <span @click="email.dialogFormVisible = true">{{data.text}}</span>
+                        </template>
+                        <template v-else>
+                          <span>{{data.text}}</span>
+                        </template>
                       </template>
                     </el-dropdown-item>
                   </el-dropdown-menu>
@@ -48,11 +53,36 @@
     			</li>
     		</ul>
       </div>
+      <!-- 绑定邮箱弹窗 -->
+      <el-dialog title="绑定邮箱" :visible.sync="email.dialogFormVisible" class="bindEmail" width="600px">
+        <el-form :model="email.emailForm" :rules="email.emailRules" ref="bindEmailForm">
+          <el-form-item label="邮箱" :label-width="email.formLabelWidth" prop="email">
+            <el-input v-model="email.emailForm.email" placeholder="请输入邮箱地址" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="验证码" prop="code" class="code" :label-width="email.formLabelWidth">
+            <el-input v-model="email.emailForm.code" placeholder="请输入验证码"></el-input>
+            <el-button type="danger" size="small" class="codeBtn">获取验证码</el-button>
+          </el-form-item>
+          <el-form-item :label-width="email.formLabelWidth">
+            <el-button type="primary" @click="submitForm('bindEmailForm')">确定</el-button>
+          </el-form-item>
+        </el-form>
+      </el-dialog>
   	</div>
 </template>
 <script>
   	export default {
   		data() {
+        var checkCode = (rule, value, callback) => {
+          if (!value) {
+            return callback(new Error('请输入正确验证码'));
+          }
+          if(value != '10000'){
+            callback(new Error('验证码不正确'));
+          } else {
+            callback();
+          }
+        };
   			return {
   				header: [
   					{
@@ -68,23 +98,42 @@
   						data: [
                 {
                   text: '个人信息',
-                  data:'/admin/user',
+                  data:'/admin/userinfo',
                   isLink: true
                 },
                 {
                   text: '绑定邮箱',
-                  data:'/admin/email',
-                  isLink: true
+                  data:'/admin/setting/email',
+                  isBindEmail: true,
+                  isLink: false
                 },
                 {
-                  text: '个人设置',
+                  text: '账号设置',
                   data:'/admin/setting',
                   isLink: true
                 }
               ],
               isLink: false
   					}
-  				]
+  				],
+          email: {
+            dialogFormVisible: false,
+            formLabelWidth: '120px',
+            emailForm: {
+              email: '',
+              code: '',
+            },
+            emailRules: {
+              email: [
+                { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+                { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change']}
+              ],
+              code: [
+                { required: true, message: '请输入验证码', trigger: 'blur' },
+                { validator: checkCode, trigger: 'blur' }
+              ]
+            }
+          }
   			}
   		},
       props: ['nav'],
@@ -102,11 +151,21 @@
               }
               this.$utils.handleExe(json, function(){}, function(){})
             }
+          },
+          submitForm(formName) {
+            this.$refs[formName].validate((valid) => {
+              if (valid) {
+                alert('submit!');
+              } else {
+                console.log('error submit!!');
+                return false;
+              }
+            });
           }
       }
   	}
 </script>
-<style scoped lang="scss">
+<style lang="scss">
     .header {
       height: 36px;
       line-height: 36px;
@@ -200,6 +259,29 @@
               }
             }
           }
+        }
+      }
+    }
+    .bindEmail {
+      .el-dialog__header {
+        text-align: left;
+      }
+      .el-form {
+        width: 490px;
+        margin: 20px auto;
+        margin-bottom: 60px;
+        .codeBtn {
+          position: absolute;
+          top: 4px;
+          right: 5px;
+          background: #e30129;
+        }
+        .el-button--primary {
+          width: 100%;
+          margin-top: 20px;
+        }
+        .el-form-item {
+          margin-bottom: 25px;
         }
       }
     }

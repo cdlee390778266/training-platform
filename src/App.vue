@@ -15,16 +15,24 @@ export default {
   	}
   },
   created() {
+
   	this.$utils.getTaken(function(res) {
       alert(res);
     }, function(error) {
       alert(error);
     })
+
+    this.$utils.getLoginData(function(res) {
+      alert(res);
+    }, function(error) {
+      alert(error);
+    })
+
   }
 }
 </script>
 
-<style>
+<style lang="scss">
 * {
   padding: 0;
   margin: 0;
@@ -56,6 +64,17 @@ body {
   width: 1400px;
   margin-left: auto;
   margin-right: auto;
+  &.ql-wrapper-common {
+    margin-top: 60px;
+    padding-bottom: 200px;
+    background: #fff;
+    h1 {
+      color: #969595;
+      font-size: 16px;
+      padding: 30px 15px;
+      margin-left: 20px;
+    }
+  }
 }
 .fade-enter-active, .fade-leave-active {
   transition: opacity .5s;
