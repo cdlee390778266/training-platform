@@ -5,6 +5,7 @@ const Home  = () => import('../components/home')
 
 const Wrapper  = () => import('../components/common/wrapper.vue')
 const Competition  = () => import('../components/competition.vue')
+const CompetitionDeail  = () => import('../components/competitionDetail.vue')
 const OptionsMarket  = () => import('../components/optionsmarket.vue')
 const StockMarket  = () => import('../components/stockmarket.vue')
 const StockSelection  = () => import('../components/stockselection.vue')
@@ -50,6 +51,12 @@ const router = new Router({
           meta: { title: '投资竞赛'}
         },
         {
+          path: '/competition/detail/:type/:id',
+          name: 'competitionDetail',
+          component: CompetitionDeail,
+          meta: { title: '投资竞赛'}
+        },
+        {
           path: '/optionsmarket',
           name: 'optionsmarket',
           component: OptionsMarket,
@@ -81,12 +88,6 @@ const router = new Router({
       component: AdminWrapper,
       children: [
         {
-          path: 'home',
-          name: 'adminHome',
-          component: AdminHome,
-          meta: { title: '个人中心'}
-        },
-        {
           path: 'reply/:id',
           name: 'reply',
           component: Reply,
@@ -103,12 +104,14 @@ const router = new Router({
           name: 'setting',
           component: Setting,
           meta: { title: '个人设置'}
-        },
-        {
-          path: '**',
-          redirect: '/admin/home'
-        },
+        }
       ]
+    },
+    {
+      path: '/admin/home',
+      name: 'adminHome',
+      component: AdminHome,
+      meta: { title: '个人中心'}
     },
     {
       path: '**',

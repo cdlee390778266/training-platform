@@ -1,5 +1,6 @@
 <template>
 	<div class="ahome">
+		<ql-head :nav="nav"></ql-head>
 		<div class="ql-wrapper">
 			<div class="ahome-top">
 				<div class="ahome-left">
@@ -299,7 +300,8 @@
 					<ul class="comment">
 						<li v-for="(item, index) in tabs.history.comment">
 							<div class="comment-head">
-								<span :style="'background-image: url(' + item.faceUrl + ')'"></span>
+								<span :style="'background-image: url(' + item.faceUrl + ')'" v-if="item.faceUrl"></span>
+								<span :style="'background-image: url(' + defaultFaceUrl + ')'" v-else></span>
 								<strong>{{item.name}}</strong>
 								{{item.date}}
 							</div>
@@ -321,10 +323,58 @@
 	import 'echarts/lib/component/dataZoom'
 	import 'echarts/lib/component/title'
 	import 'echarts/lib/component/tooltip'
+	import CONFIG from '../../js/config'
+	import qlHead from '../common/head.vue'
 	export default {
+	components: {
+		qlHead
+	},
     data () {
       return {
+      	nav: [
+				{
+					id: '0',
+					text: '投资竞赛',
+					iconClass: 'menu-icon1',
+					handle: 'jumpToUrl',
+					handleData: '/competition',
+					isExternalLink: false
+				},
+            {
+              id: '1',
+              text: '期权行情',
+              iconClass: 'menu-icon2',
+              handle: 'startExe',
+				  handleData: 'option',
+				  isExternalLink: false
+            },
+            {
+              id: '2',
+              text: '股票行情',
+              iconClass: 'menu-icon3',
+              handle: 'startExe',
+				  handleData: 'shares',
+				  isExternalLink: false
+            },
+            {
+              id: '3',
+              text: '策略选股',
+              iconClass: 'menu-icon4',
+              handle: 'jumpToUrl',
+				  handleData: '/stockselection',
+				  isExternalLink: false
+            },
+            {
+              id: '4',
+              text: '云课堂',
+              iconClass: 'menu-icon5',
+              handle: 'jumpToUrl',
+				  handleData: 'http://yanggang112.51vip.biz:40001/',
+				  isExternalLink: true
+            }
+		],
       	account: '',
+      	defaultFaceUrl: CONFIG.defaultFaceUrl,
       	accountList: [
 	      	{
 	          value: '0',
@@ -551,42 +601,42 @@
 		        comment: [
 		        	{
 		        		id: '1',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '2',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '3',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '4',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '5',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
@@ -681,42 +731,42 @@
 		        comment: [
 		        	{
 		        		id: '1',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '2',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '3',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '4',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '5',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
@@ -814,42 +864,42 @@
 		        comment: [
 		        	{
 		        		id: '1',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '2',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '3',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '4',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '5',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
@@ -900,8 +950,13 @@
   }
 </script>
 <style lang="scss">
-
 	.ahome {
+		.header {
+			min-width: 1400px;
+		}
+		.ql-wrapper {
+			width: 1400px;
+		}
 		.ahome-top {
 			height: 374px;
 			margin-top: 20px;
@@ -1054,11 +1109,6 @@
 					margin-top: 0px;
 					margin-bottom: 20px;
 					margin-right: 50px;
-				}
-				.sort {
-					.tab-body {
-						
-					}
 				}
 			}
 			.comment {

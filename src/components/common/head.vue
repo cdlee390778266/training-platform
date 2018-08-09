@@ -169,10 +169,11 @@
     .header {
       height: 36px;
       line-height: 36px;
-      min-width: 1400px;
+      min-width: 1200px;
       border-bottom: 1px solid #e1e4e8;
       text-align: right;
       background: #f7fbff;
+      overflow: hidden;
       ul {
         li {
           display: inline-block;

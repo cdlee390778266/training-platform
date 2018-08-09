@@ -48,6 +48,14 @@ a {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+.img-responsive {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.mt10 {
+  margin-top: 10px;
+}
 body {
   color: #4e4e4e;
   font-size: 14px;
@@ -61,13 +69,15 @@ body {
   bottom: 0;
 }
 .ql-wrapper {
-  width: 1400px;
+  width: 1200px;
   margin-left: auto;
   margin-right: auto;
   &.ql-wrapper-common {
     margin-top: 60px;
+    margin-bottom: 60px;
     padding-bottom: 200px;
     background: #fff;
+    border: 1px solid #dde1e6;
     h1 {
       color: #969595;
       font-size: 16px;
