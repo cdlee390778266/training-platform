@@ -1,11 +1,139 @@
 <template>
-	<div class="competition">
+	<div class="competitionDetail">
 		<swiper :options="swiperOption" ref="mySwiper">
 		    <swiper-slide v-for="(item, index) in ads" :key="index">
 		    	<img :src="item.url" class="img-responsive">
 		    </swiper-slide>
 		</swiper>
 		<div class="ql-wrapper">
+			<div class="competitionDetail-body">
+				<el-tabs v-model="tabs.activeTab">
+				    <el-tab-pane :label="tabs.tabs.detail.name" name="detail" class="detail">
+				    	<div class="detail-body">
+					    	<div class="detail-item">
+					    		<h2>比赛介绍</h2>
+					    		<div v-html="tabs.tabs.detail.data.desc"></div>
+					    	</div>
+					    	<div class="detail-item">
+					    		<h2>赛程安排</h2>
+					    		<div v-html="tabs.tabs.detail.data.arrange"></div>
+					    	</div>
+					    	<div class="detail-item">
+					    		<h2>比赛规则</h2>
+					    		<div v-html="tabs.tabs.detail.data.rule"></div>
+					    	</div>
+					    	<div class="detail-item">
+					    		<h2>主办方</h2>
+					    		<div v-html="tabs.tabs.detail.data.host"></div>
+					    	</div>
+					    	<div class="detail-item">
+					    		<h2>当前状态</h2>
+					    		<div v-html="tabs.tabs.detail.data.status"></div>
+					    	</div>
+					    	<div class="detail-item">
+					    		<h2>注意事项</h2>
+					    		<div v-html="tabs.tabs.detail.data.care"></div>
+					    	</div>
+					    	<div class="detail-item">
+					    		<el-button type="primary">立即报名</el-button>
+					    	</div>
+					    </div>
+				    </el-tab-pane>
+				    <el-tab-pane :label="tabs.tabs.sort.name" name="sort" class="sort">
+				    	<div class="sort-head">
+						    <el-select v-model="tabs.tabs.sort.selectVal" placeholder="请选择">
+							    <el-option
+							      v-for="item in tabs.tabs.sort.selectOpts"
+							      :key="item.value"
+							      :label="item.label"
+							      :value="item.value">
+							    </el-option>
+							</el-select>
+				    	</div>
+				    	<div class="tab-body">
+				    		<el-table
+						    :data="tabs.tabs.sort.tableData"
+						    style="width: 100%"
+						    :default-sort = "{prop: 'date', order: 'descending'}"
+						    >
+							    <el-table-column
+							      prop="sort"
+							      label="排名"
+							    >
+							    </el-table-column>
+							    <el-table-column
+							      prop="name"
+							      label="用户名"
+							  >
+							    </el-table-column>
+							    <el-table-column
+							      prop="dayRate"
+							      label="日涨跌幅">
+							    </el-table-column>
+							    <el-table-column
+							      prop="weekRate"
+							      label="周收益率">
+							    </el-table-column>
+							    <el-table-column
+							      prop="monthRate"
+							      label="月收益率">
+							    </el-table-column>
+							    <el-table-column
+							      prop="totalRate"
+							      label="总收益率">
+							    </el-table-column>
+							    <el-table-column
+							      prop="total"
+							      label="总收益">
+							    </el-table-column>
+							    <el-table-column
+							      prop="marketValue"
+							      label="单位净值">
+							    </el-table-column>
+							    <el-table-column
+							      prop="marketValue"
+							      label="操作次数">
+							    </el-table-column>
+							    <el-table-column
+							      prop="marketValue"
+							      label="持仓市值">
+							    </el-table-column>
+						  	</el-table>
+						  	<el-pagination
+							  background
+							  layout="prev, pager, next"
+							  :total="1000">
+							</el-pagination>
+				    	</div>
+				    </el-tab-pane>
+				    <el-tab-pane :label="tabs.tabs.notice.name" name="notice" class="notice">
+				    	<div class="notice-body">
+				    		<el-table
+						    :data="tabs.tabs.notice.dataList"
+						    style="width: 100%"
+						    >
+							    <el-table-column
+							      prop="name"
+							      label="公告名称">
+							    </el-table-column>
+							    <el-table-column
+							      prop="type"
+							      label="分类">
+							    </el-table-column>
+							    <el-table-column
+							      prop="date"
+							      label="发布时间">
+							    </el-table-column>
+						  	</el-table>
+						  	<el-pagination
+							  background
+							  layout="prev, pager, next"
+							  :total="1000">
+							</el-pagination>
+				    	</div>
+				    </el-tab-pane>
+				</el-tabs>
+			</div>
 		</div>
 	</div>
 </template>
@@ -40,274 +168,217 @@
 						link: ''
 					}
 				],
-				activity: [
-					{
-						id: '0',
-						name: '人脸识别迎重磅利好 2股望受益',
-						url: require('../assets/images/img1.png'),
-						link: ''
-					},
-					{
-						id: '1',
-						name: '人脸识别迎重磅利好 2股望受益',
-						url: require('../assets/images/img1.png'),
-						link: ''
-					},
-					{
-						id: '2',
-						name: '人脸识别迎重磅利好 2股望受益',
-						url: require('../assets/images/img1.png'),
-						link: ''
-					},
-					{
-						id: '3',
-						name: '人脸识别迎重磅利好 2股望受益',
-						url: require('../assets/images/img1.png'),
-						link: ''
-					}
-				],
-				lattice: [
-					{
-						id: '0',
-						name: '上证指数',
-						value: '2773.62   -13.64   (-0.49%)'
-					},
-					{
-						id: '1',
-						name: '深证指数',
-						value: '2773.62   -13.64   (-0.49%)'
-					},
-					{
-						id: '2',
-						name: '创业板指',
-						value: '2773.62   -13.64   (-0.49%)'
-					},
-					{
-						id: '3',
-						name: '沪深300',
-						value: '2773.62   -13.64   (-0.49%)'
-					}
-				],
 				tabs: {
-					activeTab: 'list',
+					activeTab: 'detail',
 					tabs: {
-						simulation: {
-							name: '我的模拟赛事',
-							dataList: [
-								{
-									id: '0',
-									name: '2018四川模拟炒股大赛',
-									url: require('../assets/images/img3.png'),
-									day: '-0.49%',
-									yesterday: '-15.023%',
-									total: '11.3125',
-									level: 25
-								},
-								{
-									id: '0',
-									name: '2018四川模拟炒股大赛',
-									url: require('../assets/images/img3.png'),
-									day: '-0.49%',
-									yesterday: '-15.023%',
-									total: '11.3125',
-									level: 25
-								},
-								{
-									id: '0',
-									name: '2018四川模拟炒股大赛',
-									url: require('../assets/images/img3.png'),
-									day: '-0.49%',
-									yesterday: '-15.023%',
-									total: '11.3125',
-									level: 25
-								}
-							]
+						detail: {
+							name: '赛事详情',
+							data: {
+								id: 0,
+								desc: '实盘大赛：<br/>钱坤杯·凤凰实盘炒股大赛是由凤凰网财经频道主办、钱坤投资赞助、东方证券提供交易服务的A股投资比赛。参赛选手需是凤凰网注册用户，且在东方证券开立证券账户方可完成报名。大赛旨在挖掘民间“草',
+								arrange: '实盘大赛：<br/>钱坤杯·凤凰实盘炒股大赛是由凤凰网财经频道主办、钱坤投资赞助、东方证券提供交易服务的A股投资比赛。参赛选手需是凤凰网注册用户，且在东方证券开立证券账户方可完成报名。大赛旨在挖掘民间“草参赛选手需是凤凰网注册用户，且在东方证券开立证券账户方可完成报名。大赛旨在挖掘民间“草',
+								rule: '起始资金： 200,000.00元 <br/>起始资金： 200,000.00元',
+								host: '四川省教育厅',
+								status: '比赛中',
+								care: '只能四川省高校学生才能参加，前十名会有奖励'
+							}
 						},
-						list: {
-							name: '赛事列表',
-							search: {
-								searchVal: '',
-								condition: [
-									{
-										name: '市场类型',
-										value: 0,
-										list: [
-											{
-												name: '全部',
-												value: '00'
-											},
-											{
-												name: '股票',
-												value: '01'
-											},
-											{
-												name: '期权',
-												value: '02'
-											}
-										]
-									},
-									{
-										name: '参赛人数',
-										value: 1,
-										list: [
-											{
-												name: '全部',
-												value: '10'
-											},
-											{
-												name: '100以内',
-												value: '11'
-											},
-											{
-												name: '100-500',
-												value: '12'
-											},
-											{
-												name: '1000以上',
-												value: '13'
-											}
-										]
-									},
-									{
-										name: '赛事状态',
-										value: 2,
-										list: [
-											{
-												name: '全部',
-												value: '20'
-											},
-											{
-												name: '报名中',
-												value: '21'
-											},
-											{
-												name: '比赛中',
-												value: '22'
-											},
-											{
-												name: '已结束',
-												value: '23'
-											}
-										]
-									}
-								]
-							},
-							dataList: [
-								{
-									id: '0',
-									url: require('../assets/images/img2.png'),
-									name: '西南财经大学模拟炒股大赛',
-									host: '西南财经大学',
-									type: '公开赛',
-									signUpStatus: '进行中',
-									matchDateStatus: '报名中',
-									signUpDate: '2018-06-28--2018-09-10',
-									matchDate: '2018-06-28--2018-09-10'
-								},
-								{
-									id: '0',
-									url: require('../assets/images/img2.png'),
-									name: '西南财经大学模拟炒股大赛',
-									host: '西南财经大学',
-									type: '公开赛',
-									signUpStatus: '进行中',
-									matchDateStatus: '报名中',
-									signUpDate: '2018-06-28--2018-09-10',
-									matchDate: '2018-06-28--2018-09-10'
-								},
-								{
-									id: '0',
-									url: require('../assets/images/img2.png'),
-									name: '西南财经大学模拟炒股大赛',
-									host: '西南财经大学',
-									type: '公开赛',
-									signUpStatus: '进行中',
-									matchDateStatus: '报名中',
-									sort: 100,
-									signUpDate: '2018-06-28--2018-09-10',
-									matchDate: '2018-06-28--2018-09-10'
-								},
-								{
-									id: '0',
-									url: require('../assets/images/img2.png'),
-									name: '西南财经大学模拟炒股大赛',
-									host: '西南财经大学',
-									type: '公开赛',
-									signUpStatus: '进行中',
-									matchDateStatus: '报名中',
-									signUpDate: '2018-06-28--2018-09-10',
-									matchDate: '2018-06-28--2018-09-10'
-								},
-								{
-									id: '0',
-									url: require('../assets/images/img2.png'),
-									name: '西南财经大学模拟炒股大赛',
-									host: '西南财经大学',
-									type: '公开赛',
-									signUpStatus: '进行中',
-									matchDateStatus: '报名中',
-									signUpDate: '2018-06-28--2018-09-10',
-									matchDate: '2018-06-28--2018-09-10'
-								}
-							]
-						}
+						sort: {
+							name: '赛事排名',
+			    			selectVal: [],
+					        selectOpts: [
+						      	{
+						          value: '0',
+						          label: '日涨跌幅'
+						        },
+						        {
+						          value: '1',
+						          label: '周收益率'
+						        },
+						        {
+						          value: '2',
+						          label: '月收益率'
+						        },
+						        {
+						          value: '3',
+						          label: '总收益率'
+						        },
+						        {
+						          value: '4',
+						          label: '总收益'
+						        },
+						        {
+						          value: '5',
+						          label: '单位净值'
+						        },
+						        {
+						          value: '6',
+						          label: '操作次数'
+						        },
+						        {
+						          value: '7',
+						          label: '持仓市值'
+						        }
+					        ],
+					        tableData: [
+						        {
+						          sort: '1',
+						          name: '豌豆荚',
+						          dayRate: '+0.64%',
+						          weekRate: '+0.64%',
+						          monthRate: '0.00%',
+						          totalRate: '-44.38%',
+						          total: 25648.33,
+						          marketValue: 32568799.33
+						        },
+						        {
+						          sort: '2',
+						          name: '豌豆荚',
+						          dayRate: '+0.64%',
+						          weekRate: '+0.64%',
+						          monthRate: '0.00%',
+						          totalRate: '-44.38%',
+						          total: 25648.33,
+						          marketValue: 32568799.33
+						        },
+						        {
+						          sort: '3',
+						          name: '豌豆荚',
+						          dayRate: '+0.64%',
+						          weekRate: '+0.64%',
+						          monthRate: '0.00%',
+						          totalRate: '-44.38%',
+						          total: 25648.33,
+						          marketValue: 32568799.33
+						        },
+						        {
+						          sort: '4',
+						          name: '豌豆荚',
+						          dayRate: '+0.64%',
+						          weekRate: '+0.64%',
+						          monthRate: '0.00%',
+						          totalRate: '-44.38%',
+						          total: 25648.33,
+						          marketValue: 32568799.33
+						        },
+						        {
+						          sort: '5',
+						          name: '豌豆荚',
+						          dayRate: '+0.64%',
+						          weekRate: '+0.64%',
+						          monthRate: '0.00%',
+						          totalRate: '-44.38%',
+						          total: 25648.33,
+						          marketValue: 32568799.33
+						        }
+					        ],
+					        comment: [
+					        	{
+					        		id: '1',
+					        		faceUrl: '',
+					        		name: '张老师',
+					        		date: '2018-07-02',
+					        		content: '王同学的选股能力还是很不错的，加油!'
+					        	},
+					        	{
+					        		id: '2',
+					        		faceUrl: '',
+					        		name: '张老师',
+					        		date: '2018-07-02',
+					        		content: '王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油!'
+					        	},
+					        	{
+					        		id: '3',
+					        		faceUrl: '',
+					        		name: '张老师',
+					        		date: '2018-07-02',
+					        		content: '王同学的选股能力还是很不错的，加油!'
+					        	},
+					        	{
+					        		id: '',
+					        		faceUrl: '',
+					        		name: '张老师',
+					        		date: '2018-07-02',
+					        		content: '王同学的选股能力还是很不错的，加油!'
+					        	},
+					        	{
+					        		id: '4',
+					        		faceUrl: '',
+					        		name: '张老师',
+					        		date: '2018-07-02',
+					        		content: '王同学的选股能力还是很不错的，加油!'
+					        	},
+					        	{
+					        		id: '5',
+					        		faceUrl: '',
+					        		name: '张老师',
+					        		date: '2018-07-02',
+					        		content: '王同学的选股能力还是很不错的，加油!'
+					        	}
+					        ]
+			    		},
+			    		notice: {
+							name: '赛事公告',
+					        dataList: [
+						        {
+						          id: 1,
+						          name: '四川省模拟炒股大赛火热报名中',
+						          type: '赛事信息',
+						          date: '2018-06-07'
+						        },
+						        {
+						          id: 1,
+						          name: '四川省模拟炒股大赛火热报名中',
+						          type: '赛事信息',
+						          date: '2018-06-07'
+						        },
+						        {
+						          id: 1,
+						          name: '四川省模拟炒股大赛火热报名中',
+						          type: '赛事信息',
+						          date: '2018-06-07'
+						        },
+						        {
+						          id: 1,
+						          name: '四川省模拟炒股大赛火热报名中',
+						          type: '赛事信息',
+						          date: '2018-06-07'
+						        },
+						        {
+						          id: 1,
+						          name: '四川省模拟炒股大赛火热报名中',
+						          type: '赛事信息',
+						          date: '2018-06-07'
+						        }
+					        ]
+			    		}
 					}
 				}
+			}
+		},
+		methods: {
+
+		},
+		created() {
+			if(this.$route.params.type) {
+				this.tabs.activeTab = this.$route.params.type;
 			}
 		}
 	}
 </script>
 <style lang="scss">
-	.competition {
+	.competitionDetail {
 		padding-top: 0;
 		.swiper-container {
 			width: 100%;
 			min-width: 1200px;
 		}
-		.activity {
-			margin-top: 10px;
-			.el-col {
-				position: relative;
-				height: 196px;
-				background-size: cover;
-				span {
-					position: absolute;
-					left: 0;
-					bottom: 0;
-					right: 0;
-					height: 50px;
-					line-height: 50px;
-					padding: 0 10px;
-					color: #fff;
-					font-size: 16px;
-					background: rgba(27, 27, 27, .6);
-				}
-			}
-		}
-		.lattice {
-			margin-top: 20px;
-			.el-col {
-				position: relative;
-				height: 140px;
-				div {
-					height: 140px;
-					padding: 30px;
-					background: #fff;
-					border: 1px solid #dde1e6;
-					h2 {
-						font-size: 18px;
-						font-weight: normal;
-						margin-bottom: 30px;
-					}
-					strong {
-						font-size: 14px;
-						color: #e20026;
-					}
-				}
-			}
-		}
-		.competition-body {
+		.competitionDetail-body {
 			margin-bottom: 100px;
+			.el-pagination {
+				text-align: center;
+				margin: 40px auto;
+			}
 			.el-tabs {
 				margin: 20px 0;
 				.el-tabs__nav {
@@ -324,178 +395,72 @@
 					background-color: #e30129;
 				}
 			}
-			.simulation-item {
-				height: 450px;
-				padding: 20px;
+			.detail-body {
 				margin-top: 20px;
-				border: 1px solid #dde1e6;
-				background-color: #fff;
-				.simulation-bar {
-					font-size: 16px;
-					color: #4e4e4e;
-					margin-top: 10px;
-					a {
-						font-size: 12px;
-						color: #5091fa;
-						float: right;
-					}
-				}
-				.simulation-img {
-					margin: 20px 0;
-					height: 210px;
-					background-size: cover;
-				}
-				.simulation-text {
-					strong {
-						display: block;
-						padding: 0 15px;
-						font-size: 18px;
-						margin-bottom: 10px;
-					}
-					.simulation-text-type1 {
-						color: #e20026;
-					}
-					.simulation-text-type2 {
-						color: #6bca24;
-					}
-					.simulation-text-type3 {
-						color: #e20026;
-					}
-					span {
-						padding: 0 15px;
-						font-size: 14px;
-						color: #4e4e4e;
-					}
-				}
-				.simulation-trade {
-					height: 40px;
-					line-height: 40px;
-					margin-top: 30px;
-					.el-button--danger {
-						float: right;
-						background: #e30129;
-					}
-				}
-			}
-			.search {
-				display: flex;
-				height: 350px;
-				padding: 0 40px;
-				margin-top: 20px;
-				border: 1px solid #dde1e6;
+				padding-top: 30px;
+				padding-bottom: 200px;
 				background: #fff;
-				.search-l {
-					flex: 1;
-					padding: 40px 20px 0 40px;
-					.search-item {
-						display: flex;
-						margin-bottom: 40px;
-						.search-item-type {
-							width: 88px;
-							font-weight: bold;
-							color: #4e4e4e;
-						}
-						.search-item-list {
-							flex: 1;
-							span {
-								display: inline-block;
-								width: 88px;
-								&.active {
-									font-weight: bold;
-								}
-							}
-							form {
-								.el-form-item {
-									width: 430px;
-									.el-button {
-										position: absolute;
-										top: 0;
-										right: 0;
-										bottom: 0;
-										width: 100px;
-										border-top-left-radius: 0;
-										border-bottom-left-radius: 0;
-										background: #5091fa;
-										span {
-											width: auto;
-										}
-									}
-								}
-							}
-						}
+				border: 1px solid #dde1e6;
+				.detail-item {
+					padding: 25px 50px;
+					color: #7d858d;
+					line-height: 24px;
+					font-size: 12px;
+					border-bottom: 1px solid #dde1e6;
+					&:last-child {
+						border-bottom: none;
 					}
-				}
-				.search-r {
-					width: 240px;
-					text-align: center;
-					border-left: 1px solid #dde1e6;
-					strong {
-						display: block;
-						margin-top: 110px;
-						text-align: center;
-						font-size: 60px;
-						color: #e30129;
+					h2 {
+						font-size: 12px;
+						margin-bottom: 20px;
 					}
-					span {
-						font-size: 14px;
-						font-weight: bold;
-						color: #4e4e4e;
+					.el-button--primary {
+						font-size: 12px;
+						background-color: #6ea5ff;
 					}
 				}
 			}
-			.list {
+			.sort {
 				margin-top: 20px;
-				.list-item {
-					display: flex;
-					height: 256px;
-					margin-top: 10px;
-					padding: 20px;
-					border: 1px solid #dde1e6;
+				padding-top: 30px;
+				padding-bottom: 200px;
+				background: #fff;
+				border: 1px solid #dde1e6;
+				.sort-head {
+					text-align: right;
+					margin-top: 0px;
+					margin-bottom: 20px;
+					margin-right: 50px;
+				}
+				.el-table {
+					text-align: center;
+				}
+				.has-gutter {
+					tr, th {
+						color: #5c5c5c;
+						background: #f7f9fb;
+						font-weight: normal;
+						text-align: center;
+					}
+				}
+			}
+			.notice {
+				text-align: center;
+				.notice-body {
+					margin-top: 20px;
+					padding-bottom: 200px;
 					background: #fff;
-					.list-item-l {
-						width: 320px;
-						background-size: cover;
-					}
-					.list-item-c {
-						padding-left: 20px;
-						line-height: 26px;
-						color: #747474;
-						flex: 1;
-						strong {
-							font-weight: normal;
-						}
-						h2 {
-							font-size: 18px;
-							color: #747474;
-							margin-bottom: 10px;
-						}
-					}
-					.list-item-r {
-						width: 140px;
-						a {
-							display: inline-block;
-							width: 110px;
-							height: 40px;
-							line-height: 40px;
-							text-align: center;
-							margin-bottom: 10px;
-							color: #fff;
-							border-radius: 4px;
-							font-size: 12px;
-						}
-						.bt1 {
-							background: #6ea5ff;
-						}
-						.bt2 {
-							background: #18ded2;
-						}
-						.bt3 {
-							background: #5091fa;
-						}
-						.bt4 {
-							background: #e30129;
-						}
-					}
+					border: 1px solid #dde1e6;
+				}
+				.el-table td, .el-table th {
+					color: #969595;
+					padding: 25px 0;
+					font-weight: normal;
+					text-align: center;
+					font-size: 12px;
+				}
+				.el-table th {
+					font-size: 16px;
 				}
 			}
 		}

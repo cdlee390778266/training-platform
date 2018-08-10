@@ -20,6 +20,24 @@
                     <span>{{item.text}}</span>
                 </a>
               </template>
+              <template v-if="item.handle == 'dropdown'">
+                <el-dropdown>
+                  <span class="el-dropdown-link">
+                    <i class="ql-nav-icon" :class="item.iconClass"></i>
+                    <strong>{{item.text}}<i class="el-icon-arrow-down el-icon-caret-bottom"></i></strong>
+                  </span>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item v-for="(data, index) in item.handleData" :key="index">
+                      <router-link :to="data.handleData" v-if="!data.isExternalLink">
+                          <span>{{data.text}}</span>
+                      </router-link>
+                      <a :href="data.handleData" v-else>
+                          <span>{{data.text}}</span>
+                      </a>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+              </template>
             </li>
           </ul>
         </div>
@@ -259,6 +277,15 @@
                 background-position: -48px -273px;
               }
             }
+          }
+        }
+        .el-dropdown-link {
+          display: block;
+          height: 36px;
+          strong {
+            position: relative;
+            top: -7px;
+            color: #969595;
           }
         }
       }
