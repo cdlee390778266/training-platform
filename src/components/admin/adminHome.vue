@@ -372,8 +372,8 @@
 			  handleData: [
 			  	{
 			  		text: '财经直播',
-			  		handleData: 'http://yanggang112.51vip.biz:40001/',
-			  		isExternalLink: true
+			  		handleData: '/live',
+			  		isExternalLink: false
 			  	},
 			  	{
 			  		text: '知识库',
@@ -381,6 +381,14 @@
 			  		isExternalLink: false
 			  	}
 			  ],
+			  isExternalLink: false
+            },
+            {
+              id: '5',
+              text: '教学课程',
+              iconClass: 'menu-icon6',
+              handle: 'jumpToUrl',
+			  handleData: '/curriculum',
 			  isExternalLink: false
             }
 		],

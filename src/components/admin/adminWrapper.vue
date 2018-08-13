@@ -67,7 +67,15 @@
 					  	}
 					  ],
 					  isExternalLink: false
-		            }
+		            },
+		            {
+		              id: '5',
+		              text: '教学课程',
+		              iconClass: 'menu-icon5',
+		              handle: 'jumpToUrl',
+					  handleData: '/curriculum',
+					  isExternalLink: false
+		            },
   				],
 				adminNav: [
 					{

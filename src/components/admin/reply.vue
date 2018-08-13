@@ -1,7 +1,7 @@
 <template>
 	<div class="reply">
 		<div class="ql-wrapper ql-wrapper-common">
-			<h1>当前位置：教师点评</h1>
+			<h1>当前位置：<router-link to="/admin/home">个人中心</router-link><span class="gray">»</span><span>教师点评</span></h1>
 			<div class="reply-body">
 				<div class="reply-bar">
 					<div>
@@ -106,6 +106,15 @@
 </script>
 <style lang="scss">
 	.reply {
+		h1 {
+			a {
+				color: #666;
+			}
+			span {
+				color: #666;
+				margin-left: 5px;
+			}
+		}
 		.reply-body {
 			padding: 40px 100px 200px 100px;
 			font-size: 14px;

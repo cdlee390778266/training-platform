@@ -56,6 +56,9 @@ a {
 .mt10 {
   margin-top: 10px;
 }
+.border {
+  border: 1px solid #dde1e6;
+}
 body {
   color: #4e4e4e;
   font-size: 14px;
@@ -85,6 +88,10 @@ body {
       margin-left: 20px;
     }
   }
+}
+.el-pagination {
+  text-align: center;
+  margin: 40px auto;
 }
 .fade-enter-active, .fade-leave-active {
   transition: opacity .5s;

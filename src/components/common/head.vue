@@ -258,6 +258,9 @@
               &.menu-icon5 {
                 background-position: -5px -273px;
               }
+              &.menu-icon6 {
+                background-position: -5px -337px;
+              }
             }
             &.active {
               background: #f1f4f7;
@@ -275,6 +278,12 @@
               }
               .menu-icon5 {
                 background-position: -48px -273px;
+              }
+              .menu-icon6 {
+                background-position: -48px -337px;
+              }
+              span {
+                color: #e92a34 !important;
               }
             }
           }

@@ -496,9 +496,15 @@
 							flex: 1;
 							span {
 								display: inline-block;
-								width: 88px;
+								width: 80px;
+								height: 30px;
+								line-height: 30px;
+								margin-right: 10px;
+								text-align: center;
 								&.active {
-									font-weight: bold;
+									color: #fff;
+									border-radius: 20px;
+									background: #5091fa;
 								}
 							}
 							form {

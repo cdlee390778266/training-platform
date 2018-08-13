@@ -6,12 +6,13 @@ const Home  = () => import('../components/home')
 const Wrapper  = () => import('../components/common/wrapper.vue')
 const Competition  = () => import('../components/competition.vue')
 const CompetitionDeail  = () => import('../components/competitionDetail.vue')
-const OptionsMarket  = () => import('../components/optionsmarket.vue')
-const StockMarket  = () => import('../components/stockmarket.vue')
 const StockSelection  = () => import('../components/stockselection.vue')
 const Live  = () => import('../components/live.vue')
+const Curriculum  = () => import('../components/curriculum.vue')
+const CurriculumDetail  = () => import('../components/curriculumDetail.vue')
 
 const AdminWrapper  = () => import('../components/admin/adminWrapper.vue')
+const MsgCenter  = () => import('../components/msgCenter.vue')
 const AdminHome  = () => import('../components/admin/adminHome.vue')
 const Reply  = () => import('../components/admin/reply.vue')
 const UserInfo  = () => import('../components/admin/userInfo.vue')
@@ -57,18 +58,6 @@ const router = new Router({
           meta: { title: '投资竞赛'}
         },
         {
-          path: '/optionsmarket',
-          name: 'optionsmarket',
-          component: OptionsMarket,
-          meta: { title: '期权行情'}
-        },
-        {
-          path: '/stockmarket',
-          name: 'stockmarket',
-          component: StockMarket,
-          meta: { title: '股票行情'}
-        },
-        {
           path: '/stockselection',
           name: 'stockselection',
           component: StockSelection,
@@ -78,7 +67,25 @@ const router = new Router({
           path: '/live',
           name: 'live',
           component: Live,
-          meta: { title: '云直播'}
+          meta: { title: '财经直播'}
+        },
+        {
+          path: '/curriculum',
+          name: 'curriculum',
+          component: Curriculum,
+          meta: { title: '教学课程'}
+        },
+        {
+          path: '/curriculum/detail/:type/:id',
+          name: 'curriculumDetail',
+          component: CurriculumDetail,
+          meta: { title: '教学课程'}
+        },
+        {
+          path: '/msgCenter',
+          name: 'msgCenter',
+          component: MsgCenter,
+          meta: { title: '消息中心'}
         },
       ]
     },
