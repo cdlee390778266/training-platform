@@ -79,7 +79,15 @@
           </el-form-item>
           <el-form-item label="验证码" prop="code" class="code" :label-width="email.formLabelWidth">
             <el-input v-model="email.emailForm.code" placeholder="请输入验证码"></el-input>
-            <el-button type="danger" size="small" class="codeBtn">获取验证码</el-button>
+            <el-button @click="getCode" :disabled="isShowCountDown" type="danger" size="small" class="codeBtn">
+              <template v-if="!isShowCountDown">
+                <span v-if="isCodeLoading"><i class="el-icon-loading"></i>加载中</span>
+                <span v-else>获取验证码</span>
+              </template>
+              <template v-else>
+                {{count}}s
+              </template>
+          </el-button>
           </el-form-item>
           <el-form-item :label-width="email.formLabelWidth">
             <el-button type="primary" @click="submitForm('bindEmailForm')">确定</el-button>
@@ -89,13 +97,14 @@
   	</div>
 </template>
 <script>
+    var saveCode = '';
   	export default {
   		data() {
         var checkCode = (rule, value, callback) => {
           if (!value) {
             return callback(new Error('请输入正确验证码'));
           }
-          if(value != '10000'){
+          if(value != saveCode){
             callback(new Error('验证码不正确'));
           } else {
             callback();
@@ -134,6 +143,10 @@
               isLink: false
   					}
   				],
+          isShowCountDown: false,
+          isCodeLoading: false,
+          count: '',
+          timer: null,
           email: {
             dialogFormVisible: false,
             formLabelWidth: '120px',
@@ -179,7 +192,65 @@
                 return false;
               }
             });
-          }
+          },
+          getCode() {
+            if (!this.email.emailForm.email) {
+              this.$utils.showTip('error', 'error', '-1020');
+              return;
+            }
+            if(this.isCodeLoading) {
+              return;
+            }
+            this.isCodeLoading = true;
+            var that = this;
+            var timeCount = this.$utils.CONFIG.codeTime;
+            that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
+              if(res.succflag == 0) {
+                saveCode = res.data;
+                if (!that.timer) {
+                  that.count = timeCount;
+                  that.isShowCountDown = true;
+                  that.timer = setInterval(() => {
+                    if (that.count > 0 && that.count <= timeCount) {
+                    that.count--;
+                    } else {
+                      that.isShowCountDown = false;
+                      clearInterval(that.timer);
+                      that.timer = null;
+                    }
+                  }, 1000)
+                }
+              }else {
+                this.$utils.showTip('error', 'error', '-1022');
+              }
+              that.isCodeLoading = false;
+            }, function() {
+              that.isCodeLoading = false;
+            }, {objectid: that.getPwdForm.phone, type: "2"}, false)
+          },
+          submitForm(formName) {
+            var that = this;
+            this.$refs[formName].validate((valid) => {
+              if (valid) {
+                var getPwdData = {
+                  universitycode: that.$utils.CONFIG.universitycode,
+                  userid: that.getPwdForm.phone,
+                  verifycode: that.getPwdForm.code,
+                  password: that.$utils.sha1(that.getPwdForm.pass)
+                }
+                that.$utils.getJson(that.$utils.CONFIG.api.getPwd, function(res) {
+                  if(res.succflag == 0) {
+                    this.$utils.showTip('error', '', '', '', res.message);
+                    this.$refs['getPwdForm'].resetFields();
+                  }else {
+                    this.$utils.showTip('error', '', '', '', res.message);
+                  }
+                }, function() {}, getPwdData)
+              } else {
+                return false;
+              }
+            });
+          },
       }
   	}
 </script>
@@ -190,7 +261,7 @@
       min-width: 1200px;
       border-bottom: 1px solid #e1e4e8;
       text-align: right;
-      background: #f7fbff;
+      background: #fff;
       overflow: hidden;
       ul {
         li {
@@ -221,6 +292,8 @@
           overflow: hidden;
           &> div, & > a {
             display: block;
+            padding-left: 5px;
+            padding-right: 12px;
             transition: all .4s;
             cursor: pointer;
             &:hover {

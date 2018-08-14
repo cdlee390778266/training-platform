@@ -19,6 +19,8 @@ const UserInfo  = () => import('../components/admin/userInfo.vue')
 const Setting  = () => import('../components/admin/setting.vue')
 
 const Register  = () => import('../components/register.vue')
+const GetPwd  = () => import('../components/getPwd.vue')
+const ActiveAccount  = () => import('../components/activeAccount.vue')
 
 Vue.use(Router)
 
@@ -39,6 +41,18 @@ const router = new Router({
       name: 'register',
       component: Register,
       meta: { title: '注册'}
+    },
+    {
+      path: '/getpwd',
+      name: 'getpwd',
+      component: GetPwd,
+      meta: { title: '找回密码'}
+    },
+    {
+      path: '/activeaccount',
+      name: 'activeaccount',
+      component: ActiveAccount,
+      meta: { title: '激活账号'}
     },
     {
       path: '/wrapper',

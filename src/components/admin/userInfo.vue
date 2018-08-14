@@ -2,14 +2,42 @@
 	<div class="userinfo">
 		<div class="ql-wrapper">
 			<h1>个人信息</h1>
-			<div class="userInfo-top">
+			<!-- <div class="userInfo-top">
 				个人头像： <span><i :style="'background-image: url(' + userinfo.faceUrl + ');'"></i></span>
-			</div>
+			</div> -->
 			<div class="userInfo-body">
 				<ul>
-					<li v-for="(item, index) in userinfo.dataList" :key="index">
-						<strong>{{item.key}}:</strong>
-						<span>{{item.value}}</span>
+					<li>
+						<strong>学号:</strong>
+						<span class="ellipsis">{{userinfo.data.studentid}}</span>
+					</li>
+					<li>
+						<strong>真实姓名:</strong>
+						<span class="ellipsis">{{userinfo.data.name}}</span>
+					</li>
+					<li>
+						<strong>学院:</strong>
+						<span class="ellipsis">{{userinfo.data.college}}</span>
+					</li>
+					<li>
+						<strong>学系:</strong>
+						<span class="ellipsis">{{userinfo.data.depart}}</span>
+					</li>
+					<li>
+						<strong>年级:</strong>
+						<span class="ellipsis">{{userinfo.data.grade}}</span>
+					</li>
+					<li>
+						<strong>专业方向:</strong>
+						<span class="ellipsis">{{userinfo.data.major}}</span>
+					</li>
+					<li>
+						<strong>邮箱:</strong>
+						<span class="ellipsis">{{userinfo.data.email}}</span>
+					</li>
+					<li>
+						<strong>手机号码:</strong>
+						<span class="ellipsis">{{userinfo.data.tel}}</span>
 					</li>
 				</ul>
 			</div>
@@ -22,38 +50,29 @@
 			return {
 				userinfo: {
 					faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
-					dataList: [
-						{
-							key: '学号',
-							value: '0023'
-						},
-						{
-							key: '真实姓名',
-							value: '张三'
-						},
-						{
-							key: '学校',
-							value: '西南财经'
-						},
-						{
-							key: '学院',
-							value: '计算机系'
-						},
-						{
-							key: '专业方向',
-							value: '2015级'
-						},
-						{
-							key: '邮箱',
-							value: '000@qq.com'
-						},
-						{
-							key: '手机号码',
-							value: '12345678901'
-						}
-					]
+					data: {
+						studentid: '',
+						name: '',
+						college: 'ee范德萨发生大撒旦法撒旦法圣达菲DSA法撒旦发生大法撒旦法撒旦法撒旦法撒旦发生大',
+						depart: '',
+						major: '',
+						grade: '',
+						class: '',
+						tel: '',
+						email: ''
+					 }
 				}
 			}
+		},
+		created() {
+			var that = this;
+			that.$utils.getJson(that.$utils.CONFIG.api.getUserInfo, function(res) {
+				if(res.succflag == 0) {
+					that.userinfo.data = res.data;
+				}else {
+					this.$utils.showTip('error', '', '', '', res.message);
+				}
+			}, function() {}, {token: that.$utils.CONFIG.token})
 		}
 	}
 </script>
@@ -101,8 +120,9 @@
 				width: 500px;
 				margin: 60px auto;
 				li {
+					display: flex;
 					line-height: 50px;
-					margin-bottom: 25px;
+					margin-bottom: 40px;
 					strong {
 						display: inline-block;
 						width: 100px;
@@ -111,6 +131,8 @@
 					span {
 						display: inline-block;
 						width: 360px;
+						height: 52px;
+						line-height: 52px;
 						padding-left: 30px;
 						padding-right: 30px;
 						margin-left: 30px;

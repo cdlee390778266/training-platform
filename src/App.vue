@@ -15,17 +15,24 @@ export default {
   	}
   },
   created() {
-
+    var that = this;
   	this.$utils.getTaken(function(res) {
-      alert(res);
+        alert(res);
     }, function(error) {
-      alert(error);
+        alert(error);
     })
 
     this.$utils.getLoginData(function(res) {
-      alert(res);
+        alert(res);
+        that.$utils.CONFIG.token = res;
     }, function(error) {
-      alert(error);
+        alert(error);
+    })
+
+    this.$utils.getUniversityCode(function(res) {
+        that.$utils.CONFIG.universitycode = res;
+    }, function(error) {
+        alert(error);
     })
 
   }

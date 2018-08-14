@@ -49,8 +49,8 @@
   						text: '云课堂',
   						icon: require('../assets/images/icons/exe-icon5.png'),
   						handle: 'jumpToUrl',
-  						handleData: 'http://yanggang112.51vip.biz:40001/' ,
-  						isExternalLink: true
+  						handleData: '/live' ,
+  						isExternalLink: false
   					}
   				]
 			}
