@@ -4,7 +4,7 @@ const CONFIG = {
 	cookieKey: 'user',
 	universitycode: '', //院校代码
 	token: '99', //令牌
-	codeTime: 60,	//验证码倒计时时间
+	codeTime: 5,	//验证码倒计时时间
 	api: {
 		code: baseUrl + 'jk.php', //验证码接口
 		//code: baseUrl + 'comm/obtainVerifycode.do', //验证码
@@ -12,7 +12,14 @@ const CONFIG = {
 		getPwd: baseUrl + 'comm/passwordself.do', //找回密码
 		activeAccount: baseUrl + 'comm/activeaccount.do', //找回密码
 		getUserInfo: baseUrl + 'my/queryinfo.do', //个人信息
+		editPassword: baseUrl + 'my/editpassword.do', //修改密码
 		editEmail: baseUrl + 'my/editemail.do', //修改邮箱
+		editTel: baseUrl + 'my/edittel.do', //修改手机号
+
+		hq: 'http://192.168.1.213:9080/quotescenter/service', //行情
+		myRacelist: baseUrl + 'competition/myracelist.do', //模拟赛列表
+		competitionList: baseUrl + 'competition/list.do', //赛事列表
+		competitionDetail: baseUrl + 'competition/racedetail.do', //赛事详情
 	},
 	defaultFaceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
 	ajaxCount: 0,

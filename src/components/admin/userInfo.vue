@@ -53,7 +53,7 @@
 					data: {
 						studentid: '',
 						name: '',
-						college: 'ee范德萨发生大撒旦法撒旦法圣达菲DSA法撒旦发生大法撒旦法撒旦法撒旦法撒旦发生大',
+						college: '',
 						depart: '',
 						major: '',
 						grade: '',
@@ -72,7 +72,7 @@
 				}else {
 					this.$utils.showTip('error', '', '', '', res.message);
 				}
-			}, function() {}, {token: that.$utils.CONFIG.token})
+			}, function() {}, {}, true, {token: that.$utils.CONFIG.token})
 		}
 	}
 </script>

@@ -158,7 +158,7 @@ Utils.getLoginData = function(success, error) {
  * @param      {Function}  error    失败回调
  * @param      {string}    params   参数
  */
-Utils.getJson = function(url, success, error, params = {}, isShowPop=true) {
+Utils.getJson = function(url, success, error, params = {}, isShowPop=true, urlParams) {
 	if(!url) return;
 	var loadingInstance;
 	if(isShowPop) {
@@ -168,7 +168,12 @@ Utils.getJson = function(url, success, error, params = {}, isShowPop=true) {
 		});
 	}
 	Utils.ajaxCount++;
-	Utils.$http.get(url, {params: params})
+	Utils.$http({
+			method: 'post',
+			url: url,
+			data: params,
+			params: urlParams
+		})
 		.then(function(res){
 			if(!(--Utils.ajaxCount) && isShowPop) {
 				loadingInstance.close()

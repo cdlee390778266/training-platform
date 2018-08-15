@@ -110,6 +110,16 @@
             callback();
           }
         };
+        var checkEmail = (rule, value, callback) => {
+          if (!value) {
+            return callback(new Error('请输入邮箱地址'));
+          }
+          if(!(/^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/.test(value))){
+            callback(new Error('邮箱地址错误'));
+          } else {
+            callback();
+          }
+        };
   			return {
   				header: [
   					{
@@ -157,7 +167,7 @@
             emailRules: {
               email: [
                 { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-                { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change']}
+                { validator: checkEmail, trigger: 'blur' }
               ],
               code: [
                 { required: true, message: '请输入验证码', trigger: 'blur' },
@@ -198,6 +208,10 @@
               this.$utils.showTip('error', 'error', '-1020');
               return;
             }
+            if(!(/^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/.test(this.email.emailForm.email))){
+              this.$utils.showTip('error', 'error', '-1011');
+              return;
+            }
             if(this.isCodeLoading) {
               return;
             }
@@ -221,31 +235,30 @@
                   }, 1000)
                 }
               }else {
-                this.$utils.showTip('error', 'error', '-1022');
+                that.$utils.showTip('error', 'error', '-1022');
               }
               that.isCodeLoading = false;
             }, function() {
               that.isCodeLoading = false;
-            }, {objectid: that.getPwdForm.phone, type: "2"}, false)
+            }, {objectid: that.email.emailForm.email, type: "2"}, false)
           },
           submitForm(formName) {
             var that = this;
             this.$refs[formName].validate((valid) => {
               if (valid) {
-                var getPwdData = {
+                var editEmailData = {
                   universitycode: that.$utils.CONFIG.universitycode,
-                  userid: that.getPwdForm.phone,
-                  verifycode: that.getPwdForm.code,
-                  password: that.$utils.sha1(that.getPwdForm.pass)
+                  verifycode: that.email.emailForm.code,
+                  email: that.email.emailForm.email
                 }
-                that.$utils.getJson(that.$utils.CONFIG.api.getPwd, function(res) {
+                that.$utils.getJson(that.$utils.CONFIG.api.editEmail, function(res) {
                   if(res.succflag == 0) {
-                    this.$utils.showTip('error', '', '', '', res.message);
-                    this.$refs['getPwdForm'].resetFields();
+                    that.$utils.showTip('error', '', '', '', res.message);
+                    that.$refs['bindEmailForm'].resetFields();
                   }else {
-                    this.$utils.showTip('error', '', '', '', res.message);
+                    that.$utils.showTip('error', '', '', '', res.message);
                   }
-                }, function() {}, getPwdData)
+                }, function() {}, editEmailData)
               } else {
                 return false;
               }
@@ -381,6 +394,7 @@
         margin: 20px auto;
         margin-bottom: 60px;
         .codeBtn {
+          width: 92px;
           position: absolute;
           top: 4px;
           right: 5px;

@@ -25,27 +25,35 @@
 				    	<el-row :gutter="20">
 							<el-col :span="12" v-for="(item, index) in tabs.tabs.simulation.dataList" :key="index">
 								<div class="simulation-item">
-									<div class="simulation-bar">{{item.name}} <router-link :to="'/competition/detail/detail/' + item.id">查看详情</router-link></div>
+									<div class="simulation-bar">{{item.racename  | strLen(32)}} <router-link :to="'/competition/detail/detail/' + item.usagecode">查看详情</router-link></div>
 								
 									<div class="simulation-img" :style="'background-image: url(' + item.url + ');'"></div>
 									<el-row :gutter="20" class="simulation-text">
-										<el-col :span="8">
-											<strong class="simulation-text-type1">{{item.day}}</strong>
-											<span>日涨跌幅</span>
-										</el-col>
-										<el-col :span="8" >
-											<strong class="simulation-text-type2">{{item.yesterday}}</strong>
-											<span>昨日收益</span>
-										</el-col>
-										<el-col :span="8">
-											<strong class="simulation-text-type3">{{item.total}}</strong>
-											<span>总收益</span>
-										</el-col>
+										<template v-if="item.racestatus != 41">
+											<el-col :span="8">
+												<strong class="simulation-text-type1">{{item.dayupdown}}</strong>
+												<span>日涨跌幅</span>
+											</el-col>
+											<el-col :span="8" >
+												<strong class="simulation-text-type2">{{item.dayincome}}</strong>
+												<span>昨日收益</span>
+											</el-col>
+											<el-col :span="8">
+												<strong class="simulation-text-type3">{{item.totalincomerate}}</strong>
+												<span>总收益</span>
+											</el-col>
+										</template>
+										<template v-else>
+											<el-col :span="24">
+												<p>{{item.raceDesc | strLen(115)}}</p>
+											</el-col>
+										</template>
 									</el-row>
 									<div class="simulation-trade">
-										当前排名： 
-										<router-link :to="'f'">查看排行榜</router-link>
-										<el-button type="danger">去交易</el-button>
+										当前排名：<span>{{item.ranking}}</span>
+										<router-link :to="'/competition/detail/sort/' + item.usagecode">查看排行榜</router-link>
+										<el-button type="danger">期权交易</el-button>
+										<el-button type="danger">竞赛交易</el-button>
 									</div>
 								</div>
 							</el-col>
@@ -110,6 +118,7 @@
 	export default {
 		data() {
 			return {
+				timer: '',
 				swiperOption: {
 			        centeredSlides: true,
 			        loop: true,
@@ -167,56 +176,51 @@
 					{
 						id: '0',
 						name: '上证指数',
-						value: '2773.62   -13.64   (-0.49%)'
+						value: '--   --   (--)'
 					},
 					{
 						id: '1',
 						name: '深证指数',
-						value: '2773.62   -13.64   (-0.49%)'
+						value: '--   --   (--)'
 					},
 					{
 						id: '2',
 						name: '创业板指',
-						value: '2773.62   -13.64   (-0.49%)'
+						value: '--   --   (--)'
 					},
 					{
 						id: '3',
 						name: '沪深300',
-						value: '2773.62   -13.64   (-0.49%)'
+						value: '--   --   (--)'
 					}
 				],
 				tabs: {
-					activeTab: 'simulation',
+					activeTab: 'list',
 					tabs: {
 						simulation: {
 							name: '我的模拟赛事',
 							dataList: [
 								{
-									id: '0',
-									name: '2018四川模拟炒股大赛',
+									usagecode: '1',
+									racename: '2018四川模拟炒股大赛2018四川模拟炒股大赛2018四川模拟炒股大赛2018四川模拟炒股大赛2018四川模拟炒股大赛',
 									url: require('../assets/images/img3.png'),
-									day: '-0.49%',
-									yesterday: '-15.023%',
-									total: '11.3125',
-									level: 25
+									racestatus: 0,
+									dayupdown: '-0.49%',
+									dayincome: '15.22',
+									totalincomerate: '11.3125',
+									ranking: 25,
+									raceDesc: '只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加'
 								},
 								{
-									id: '0',
-									name: '2018四川模拟炒股大赛',
+									usagecode: '1',
+									racename: '2018四川模拟炒股大赛2018四川模拟炒股大赛2018四川模拟炒股大赛2018四川模拟炒股大赛2018四川模拟炒股大赛',
 									url: require('../assets/images/img3.png'),
-									day: '-0.49%',
-									yesterday: '-15.023%',
-									total: '11.3125',
-									level: 25
-								},
-								{
-									id: '0',
-									name: '2018四川模拟炒股大赛',
-									url: require('../assets/images/img3.png'),
-									day: '-0.49%',
-									yesterday: '-15.023%',
-									total: '11.3125',
-									level: 25
+									racestatus: 41,
+									dayupdown: '-0.49%',
+									dayincome: '15.22',
+									totalincomerate: '11.3125',
+									ranking: 25,
+									raceDesc: '只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加'
 								}
 							]
 						},
@@ -351,6 +355,103 @@
 					}
 				}
 			}
+		},
+		method: {
+
+		},
+		created() {
+			var that = this;
+			//上证指数、沪深300 行情 
+			var shHqPostData = {
+			 	serviceid: "snapshot",
+				body: {
+				  	marketid: "0",
+				  	stockcode: ["000001","000300"]
+			 	}
+			}
+			that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
+             	if(res.status == 0) {
+                	res.data.forEach( function(e, i) {
+                		if(shHqPostData.body.stockcode[0] === e.code) {
+                			that.lattice[0].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+                		}
+                		if(shHqPostData.body.stockcode[1] === e.code) {
+                			that.lattice[3].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+                		}
+                	});
+              	}
+            }, function() {}, shHqPostData, false)
+
+            //深证指数、创业板指 行情
+			var scHqPostData = {
+			 	serviceid: "snapshot",
+				 	body: {
+				  	marketid: "1",
+				  	stockcode: ["399001","399006"]
+			 	}
+			}
+			that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
+             	if(res.status == 0) {
+                	res.data.forEach( function(e, i) {
+                		if(scHqPostData.body.stockcode[0] === e.code) {
+                			that.lattice[1].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+                		}
+                		if(scHqPostData.body.stockcode[1] === e.code) {
+                			that.lattice[2].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+                		}
+                	});
+              	}
+            }, function() {}, scHqPostData, false)
+
+            that.timer = setInterval(function() {
+            	that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
+	             	if(res.status == 0) {
+	                	res.data.forEach( function(e, i) {
+	                		if(shHqPostData.body.stockcode[0] === e.code) {
+	                			that.lattice[0].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+	                		}
+	                		if(shHqPostData.body.stockcode[1] === e.code) {
+	                			that.lattice[3].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+	                		}
+	                	});
+	              	}
+	            }, function() {}, shHqPostData, false)
+
+	            that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
+	             	if(res.status == 0) {
+	                	res.data.forEach( function(e, i) {
+	                		if(scHqPostData.body.stockcode[0] === e.code) {
+	                			that.lattice[1].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+	                		}
+	                		if(scHqPostData.body.stockcode[1] === e.code) {
+	                			that.lattice[2].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+	                		}
+	                	});
+	              	}
+	            }, function() {}, scHqPostData, false)
+
+            }, 3000)
+
+            //模拟赛
+            that.$utils.getJson(that.$utils.CONFIG.api.myRacelist, function(res) {
+             	if(res.succflag == 0) {
+                	that.tabs.tabs.simulation.dataList = res.data;
+              	}else {
+              		that.$utils.showTip('error', '', '', '', res.message);
+              	}
+            }, function() {}, {token: that.$utils.CONFIG.token})
+
+            //赛事列表
+            that.$utils.getJson(that.$utils.CONFIG.api.competitionList, function(res) {
+             	if(res.succflag == 0) {
+                	that.tabs.tabs.list.dataList = res.data;
+              	}else {
+              		that.$utils.showTip('error', '', '', '', res.message);
+              	}
+            }, function() {}, {token: that.$utils.CONFIG.token})
+		},
+		destroyed: function () {
+			clearInterval(this.timer)
 		}
 	}
 </script>
@@ -443,6 +544,7 @@
 					background-size: cover;
 				}
 				.simulation-text {
+					height: 53px;
 					strong {
 						display: block;
 						padding: 0 15px;
@@ -468,9 +570,21 @@
 					height: 40px;
 					line-height: 40px;
 					margin-top: 30px;
+					color: #4e4e4e;
+					span {
+						color: #e30129;
+					}
+					a {
+						color: #5091fa;
+						margin-left: 20px;
+					}
 					.el-button--danger {
 						float: right;
+						margin-left: 20px;
 						background: #e30129;
+						span {
+							color: #fff;
+						}
 					}
 				}
 			}

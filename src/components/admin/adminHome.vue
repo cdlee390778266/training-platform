@@ -22,6 +22,7 @@
 						    :colors="chartOpts.colors"
 						    :data-zoom="chartOpts.dataZoom"
 						    :tooltip="chartOpts.tooltip"
+						    :settings="chartOpts.chartSettings"
 						    >
 						</ve-line>
 					</div>
@@ -422,7 +423,7 @@
         ],
         chartOpts: {
     		title: {
-			  	text: '收益率走势图  (创建于2018.08.08)',
+			  	text: '--',
 			  	left: 40,
 			  	textStyle: {
 			  		color: '#7d858d',
@@ -454,15 +455,23 @@
                 	return params.name + '<br/>' + params.marker + params.seriesName + ': ' + params.data[1]*100 + '%' ;
                 }
 		    },
+		    chartSettings: {
+			    labelMap: {
+		          'profit': '我的收益',
+		          'hs300': '沪深300',
+		          'hs500': '沪深500'
+		        }
+		    },
 		    data: {
-	          columns: ['日期', '我的收益', '沪深300', '沪深500'],
+	          columns: ['date', 'profit', 'hs300', 'hs500'],
+	          title: '收益率走势图  (创建于2018.08.08)',
 	          rows: [
-	            { '日期': '2015-12-21', '我的收益': 0.1, '沪深300': 0.05, '沪深500': -0.05},
-	            { '日期': '2015-12-22', '我的收益': 0.2, '沪深300': 0.25, '沪深500': 0.2},
-	            { '日期': '2015-12-23', '我的收益': 0.3888, '沪深300': -0.1, '沪深500': -0.3},
-	            { '日期': '2015-12-24', '我的收益': -0.15, '沪深300': -0.32, '沪深500': -0.2},
-	            { '日期': '2015-12-25', '我的收益': -0.01, '沪深300': 0.3, '沪深500': -0.05},
-	            { '日期': '2015-12-26', '我的收益': -0.4, '沪深300': -0.55, '沪深500': -0.5}
+	            { 'date': '2015-12-21', 'profit': 0.1, 'hs300': 0.05, 'hs500': -0.05},
+	            { 'date': '2015-12-22', 'profit': 0.2, 'hs300': 0.25, 'hs500': 0.2},
+	            { 'date': '2015-12-23', 'profit': 0.3888, 'hs300': -0.1, 'hs500': -0.3},
+	            { 'date': '2015-12-24', 'profit': -0.15, 'hs300': -0.32, 'hs500': -0.2},
+	            { 'date': '2015-12-25', 'profit': -0.01, 'hs300': 0.3, 'hs500': -0.05},
+	            { 'date': '2015-12-26', 'profit': -0.4, 'hs300': -0.55, 'hs500': -0.5}
 	          ]
 	        }
     	},
@@ -952,19 +961,15 @@
 			console.log('submit!');
 		}
     },
-    filters: {
-	  strLen: function (str, maxLength) {
-	    if (!str) return ''
-	    str = str.toString()
-	    return str.length >= maxLength ? str.substr(0, maxLength) + '...' : str;
-	  }
-	},
 	watch: {
       activeTab (v) {
         this.$nextTick(_ => {
           this.$refs['veRing'].echarts.resize()
         })
       }
+    },
+    created() {
+    	this.chartOpts.title.text = '收益率走势图  (创建于2018.08.08)'
     }
   }
 </script>

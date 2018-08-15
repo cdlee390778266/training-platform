@@ -363,6 +363,17 @@
 			if(this.$route.params.type) {
 				this.tabs.activeTab = this.$route.params.type;
 			}
+
+			if(this.$route.params.id == undefined) return;
+
+			var that = this;
+			that.$utils.getJson(that.$utils.CONFIG.api.competitionDetail, function(res) {
+              	if(res.succflag == 0) {
+                	
+              	}else {
+                	that.$utils.showTip('error', '', '', '', res.message);
+              	}
+            }, function() {}, {raceid: that.$route.params.id}, true, {token: that.$utils.CONFIG.token})
 		}
 	}
 </script>

@@ -21,6 +21,12 @@ Vue.component(VeRing.name, VeRing)
 Vue.use(ElementUI);
 Vue.use(VueAwesomeSwiper);
 
+Vue.filter('strLen', function (str, maxLength) {
+	if (!str) return ''
+    str = str.toString()
+    return str.length >= maxLength ? str.substr(0, maxLength) + '...' : str;
+})
+
 /* eslint-disable no-new */
 new Vue({
     el: '#app',

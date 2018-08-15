@@ -152,7 +152,7 @@
 							}, 1000)
 						}
 					}else {
-						this.$utils.showTip('error', 'error', '-1012');
+						that.$utils.showTip('error', 'error', '-1012');
 					}
 					that.isCodeLoading = false;
 				}, function() {
@@ -174,10 +174,10 @@
 						}
 						that.$utils.getJson(that.$utils.CONFIG.api.register, function(res) {
 							if(res.succflag == 0) {
-								this.$utils.showTip('success', '', '', res.message);
-								this.$refs['registerForm'].resetFields();
+								that.$utils.showTip('success', '', '', res.message);
+								that.$refs['registerForm'].resetFields();
 							}else {
-								this.$utils.showTip('error', '', '', res.message);
+								that.$utils.showTip('error', '', '', res.message);
 							}
 						}, function() {
 

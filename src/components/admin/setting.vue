@@ -4,7 +4,7 @@
 			<h1>账号设置</h1>
 			<div class="setting-body">
 				<el-tabs v-model="activeName">
-				    <el-tab-pane label="修改头像" name="face">
+				    <!-- <el-tab-pane label="修改头像" name="face">
 				    	<el-upload
 						  class="avatar-uploader"
 						  ref="face"
@@ -16,7 +16,7 @@
 						  <el-button slot="trigger" size="small" type="primary">上传头像</el-button>
   						  <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">保存</el-button>
 						</el-upload>
-				    </el-tab-pane>
+				    </el-tab-pane> -->
 				    <el-tab-pane label="修改密码" name="pwd">
 				    	<el-form :model="tabs.pwd.pwdForm" status-icon :rules="tabs.pwd.pwdRules" ref="pwdForm" label-width="100px" class="demo-ruleForm">
 				    	  <el-form-item label="原密码" prop="oldPwd">
@@ -40,7 +40,7 @@
 						  </el-form-item>
 						  <el-form-item label="验证码" prop="code" class="code">
 						    <el-input v-model="tabs.email.emailForm.code" placeholder="请输入验证码"></el-input>
-						    <el-button type="danger" size="small" class="codeBtn">获取验证码</el-button>
+						    <el-button type="danger" size="small" class="codeBtn" @click="getCode('emailForm')">获取验证码</el-button>
 						  </el-form-item>
 						  <el-form-item>
 						    <el-button type="primary" @click="submitForm('emailForm')">提交</el-button>
@@ -54,7 +54,7 @@
 						  </el-form-item>
 						  <el-form-item label="验证码" prop="code" class="code">
 						    <el-input v-model="tabs.phone.phoneForm.code" placeholder="请输入验证码"></el-input>
-						    <el-button type="danger" size="small" class="codeBtn">获取验证码</el-button>
+						    <el-button type="danger" size="small" class="codeBtn" @click="getCode('phoneForm')">获取验证码</el-button>
 						  </el-form-item>
 						  <el-form-item>
 						    <el-button type="primary" @click="submitForm('phoneForm')">提交</el-button>
@@ -67,6 +67,8 @@
 	</div>
 </template>
 <script>
+	var saveEmailCode = '';
+	var savePhoneCode = '';
 	export default {
 		data () {
 		      var validatePass = (rule, value, callback) => {
@@ -88,16 +90,36 @@
 		          callback();
 		        }
 		      };
-		      var checkCode = (rule, value, callback) => {
+		      var checkEmailCode = (rule, value, callback) => {
 		        if (!value) {
 		          return callback(new Error('请输入正确验证码'));
 		        }
-		        if(value != '10000'){
+		        if(value != saveEmailCode){
 				  callback(new Error('验证码不正确'));
 				} else {
 				  callback();
 				}
 		      };
+		      var checkPhoneCode = (rule, value, callback) => {
+		        if (!value) {
+		          return callback(new Error('请输入正确验证码'));
+		        }
+		        if(value != savePhoneCode){
+				  callback(new Error('验证码不正确'));
+				} else {
+				  callback();
+				}
+		      };
+		      var checkEmail = (rule, value, callback) => {
+	          	if (!value) {
+		            return callback(new Error('请输入邮箱地址'));
+		          }
+		          if(!(/^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/.test(value))){
+		            callback(new Error('邮箱地址错误'));
+		          } else {
+		            callback();
+	          	}
+	          };
 		      var checkPhone = (rule, value, callback) => {
 		        if (!value) {
 		          return callback();
@@ -109,7 +131,7 @@
 				}
 		      };
 			return {
-				activeName: 'face',
+				activeName: 'pwd',
 				tabs: {
 					face: {
 						faceUrl: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
@@ -146,11 +168,11 @@
 				        emailRules: {
 				          email: [
 				            { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-						    { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change']}
+						    { validator: checkEmail, trigger: 'blur' }
 						  ],
 						  code: [
 						    { required: true, message: '请输入验证码', trigger: 'blur' },
-						    { validator: checkCode, trigger: 'blur' }
+						    { validator: checkEmailCode, trigger: 'blur' }
 						  ]
 				        }
 					},
@@ -166,7 +188,7 @@
 						  ],
 						  code: [
 						    { required: true, message: '请输入验证码', trigger: 'blur' },
-						    { validator: checkCode, trigger: 'blur' }
+						    { validator: checkPhoneCode, trigger: 'blur' }
 						  ]
 				        }
 					}
@@ -193,10 +215,114 @@
 	        }
 	        return isLt2M;
 	      },
+	      getCode(formName) {
+	      	var that = this;
+			var timeCount = that.$utils.CONFIG.codeTime;
+			var postData = {};
+      		switch (formName) {
+          		case 'emailForm':
+          			// 邮箱
+          			if (!that.tabs.email.emailForm.email) {
+						that.$utils.showTip('error', 'error', '-1020');
+						return;
+					}
+					if(!(/^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/.test(that.tabs.email.emailForm.email))){
+						that.$utils.showTip('error', 'error', '-1021');
+						return;
+					}
+          			postData = {
+          				objectid: that.tabs.email.emailForm.email, 
+          				type: "2"
+          			}
+          			break;
+          		case 'phoneForm':
+          			// 手机号
+          			if (!that.tabs.phone.phoneForm.phone) {
+						that.$utils.showTip('error', 'error', '-1010');
+						return;
+					}
+					if(!(/^1[3|4|5|8][0-9]\d{8}$/.test(that.tabs.phone.phoneForm.phone))){
+						that.$utils.showTip('error', 'error', '-1011');
+						return;
+					}
+          			postData = {
+          				objectid: that.tabs.phone.phoneForm.phone, 
+          				type: "1"
+          			}
+          			break;
+          		}
+				if(that.isCodeLoading) {
+					return;
+				}
+				that.isCodeLoading = true;
+				that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
+					if(res.succflag == 0) {
+						formName == 'emailForm' ? saveEmailCode = res.data : savePhoneCode = res.data;
+						if (!that.timer) {
+							that.count = timeCount;
+							that.isShowCountDown = true;
+							that.timer = setInterval(() => {
+								if (that.count > 0 && that.count <= timeCount) {
+								that.count--;
+								} else {
+									that.isShowCountDown = false;
+									clearInterval(that.timer);
+									that.timer = null;
+								}
+							}, 1000)
+						}
+					}else {
+						that.$utils.showTip('error', 'error', '-1012');
+					}
+					that.isCodeLoading = false;
+				}, function() {
+					that.isCodeLoading = false;
+				}, postData, false)
+		  },
 	      submitForm(formName) {
+	      	var that = this;
+	      	var modifyApi = '';
+	      	var postData = {};
 	        this.$refs[formName].validate((valid) => {
 	          if (valid) {
-	            alert('submit!');
+	          	switch (formName) {
+	          		case 'pwdForm':
+	          			// 修改密码
+	          			modifyApi = that.$utils.CONFIG.api.editPassword;
+	          			postData = {
+	          				universitycode: that.$utils.CONFIG.universitycode,
+							oldpassword: that.$utils.sha1(that.tabs.pwd.pwdForm.oldPass),
+							newpassword: that.$utils.sha1(that.tabs.pwd.pwdForm.pass)
+	          			}
+	          			break;
+	          		case 'emailForm':
+	          			// 修改邮箱
+	          			modifyApi = that.$utils.CONFIG.api.editEmail;
+	          			postData = {
+	          				universitycode: that.$utils.CONFIG.universitycode,
+							verifycode: that.tabs.email.emailForm.code,
+ 							email: that.tabs.email.emailForm.email
+	          			}
+	          			break;
+	          		case 'phoneForm':
+	          			// 修改手机号
+	          			modifyApi = that.$utils.CONFIG.api.editTel;
+	          			postData = {
+	          				universitycode: that.$utils.CONFIG.universitycode,
+							verifycode: that.tabs.phone.phoneForm.code,
+ 							tel: that.tabs.phone.phoneForm.phone
+	          			}
+	          			break;
+	          		}
+
+	          		that.$utils.getJson(modifyApi, function(res) {
+						if(res.succflag == 0) {
+							that.$utils.showTip('error', '', '', '', res.message);
+							that.$refs[formName].resetFields();
+						}else {
+							that.$utils.showTip('error', '', '', '', res.message);
+						}
+					}, function() {}, postData, true, {token: that.$utils.CONFIG.token})
 	          } else {
 	            console.log('error submit!!');
 	            return false;
