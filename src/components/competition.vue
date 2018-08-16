@@ -52,8 +52,8 @@
 									<div class="simulation-trade">
 										当前排名：<span>{{item.ranking}}</span>
 										<router-link :to="'/competition/detail/sort/' + item.usagecode">查看排行榜</router-link>
-										<el-button type="danger">期权交易</el-button>
-										<el-button type="danger">竞赛交易</el-button>
+
+										<el-button type="danger" v-for="(acct, index) in item.fuacct" :key="index" @click="trade(item, acct)">{{acct.fuaccttype == 1 ? '竞赛交易' : '期权交易'}}</el-button>
 									</div>
 								</div>
 							</el-col>
@@ -67,7 +67,7 @@
 				    					{{item.name}}
 				    				</div>
 				    				<div class="search-item-list">
-				    					<span v-for="(data, index) in item.list">{{data.name}}</span>
+				    					<span v-for="(data, index) in item.list" @click="changeCondition(data, item.list)" :class="{active: data.isActive}">{{data.name}}</span>
 				    				</div>
 				    			</div>
 								<div class="search-item">
@@ -209,7 +209,17 @@
 									dayincome: '15.22',
 									totalincomerate: '11.3125',
 									ranking: 25,
-									raceDesc: '只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加'
+									raceDesc: '只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加',
+									fuacct:[
+										{
+											fuaccttype: "1",
+											fuacct: "1000103600"
+										},
+										{
+											fuaccttype: "2",
+											fuacct: "1000103600"
+										}
+									]
 								},
 								{
 									usagecode: '1',
@@ -220,14 +230,24 @@
 									dayincome: '15.22',
 									totalincomerate: '11.3125',
 									ranking: 25,
-									raceDesc: '只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加'
+									raceDesc: '只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加',
+									fuacct:[
+										{
+											fuaccttype: "2",
+											fuacct: "1000103600"
+										}
+									]
 								}
 							]
 						},
 						list: {
 							name: '赛事列表',
+							pageSize: 10,
 							search: {
-								searchVal: '',
+								markettype: '',
+								visitamount: '',
+								status: '',
+								racename: '',
 								condition: [
 									{
 										name: '市场类型',
@@ -235,15 +255,21 @@
 										list: [
 											{
 												name: '全部',
-												value: '00'
+												value: '',
+												type: 'markettype',
+												isActive: false
 											},
 											{
 												name: '股票',
-												value: '01'
+												value: '0',
+												type: 'markettype',
+												isActive: false
 											},
 											{
 												name: '期权',
-												value: '02'
+												value: '1',
+												type: 'markettype',
+												isActive: false
 											}
 										]
 									},
@@ -253,19 +279,33 @@
 										list: [
 											{
 												name: '全部',
-												value: '10'
+												value: '',
+												type: 'visitamount',
+												isActive: false
 											},
 											{
 												name: '100以内',
-												value: '11'
+												value: '-100',
+												type: 'visitamount',
+												isActive: false
 											},
 											{
 												name: '100-500',
-												value: '12'
+												value: '100-500',
+												type: 'visitamount',
+												isActive: false
+											},
+											{
+												name: '500-1000',
+												value: '500-1000',
+												type: 'visitamount',
+												isActive: false
 											},
 											{
 												name: '1000以上',
-												value: '13'
+												value: '1000-',
+												type: 'visitamount',
+												isActive: false
 											}
 										]
 									},
@@ -275,19 +315,27 @@
 										list: [
 											{
 												name: '全部',
-												value: '20'
+												value: '',
+												type: 'status',
+												isActive: false
 											},
 											{
 												name: '报名中',
-												value: '21'
+												value: '0',
+												type: 'status',
+												isActive: false
 											},
 											{
 												name: '比赛中',
-												value: '22'
+												value: '1',
+												type: 'status',
+												isActive: false
 											},
 											{
 												name: '已结束',
-												value: '23'
+												value: '2',
+												type: 'status',
+												isActive: false
 											}
 										]
 									}
@@ -356,8 +404,22 @@
 				}
 			}
 		},
-		method: {
-
+		methods: {
+			trade(item, acct) {
+				console.log(item);
+			},
+			changeCondition(data, item) {
+				if(data.isActive) return;
+				item.forEach(function(e, i) {
+					if(data.value == e.value) {
+						e.isActive = true;
+					}else {
+						e.isActive = false;
+					}
+				})
+				this.tabs.tabs.list.search[data.type] = data.value;
+				console.log(this.tabs.tabs.list.search[data.type])
+			}
 		},
 		created() {
 			var that = this;
@@ -442,6 +504,16 @@
             }, function() {}, {token: that.$utils.CONFIG.token})
 
             //赛事列表
+            var postData = {
+				"markettype": "",
+				"visitamount": "",
+				"page": {
+					"start": "1",
+					"size": that.tabs.tabs.list.pageSize
+				},
+				"status": "",
+				"racename": ""
+			}
             that.$utils.getJson(that.$utils.CONFIG.api.competitionList, function(res) {
              	if(res.succflag == 0) {
                 	that.tabs.tabs.list.dataList = res.data;
@@ -603,6 +675,7 @@
 						margin-bottom: 40px;
 						.search-item-type {
 							width: 88px;
+							line-height: 30px;
 							font-weight: bold;
 							color: #4e4e4e;
 						}

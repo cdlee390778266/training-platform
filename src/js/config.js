@@ -20,6 +20,10 @@ const CONFIG = {
 		myRacelist: baseUrl + 'competition/myracelist.do', //模拟赛列表
 		competitionList: baseUrl + 'competition/list.do', //赛事列表
 		competitionDetail: baseUrl + 'competition/racedetail.do', //赛事详情
+
+		msgTypeList: baseUrl + 'msgcenter/typelist.do', //消息类型列表
+		msglist: baseUrl + 'msgcenter/list.do', //消息列表
+		msg: baseUrl + 'msgcenter/message.do', //消息详情
 	},
 	defaultFaceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
 	ajaxCount: 0,
