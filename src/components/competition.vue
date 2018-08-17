@@ -26,7 +26,6 @@
 							<el-col :span="12" v-for="(item, index) in tabs.tabs.simulation.dataList" :key="index">
 								<div class="simulation-item">
 									<div class="simulation-bar">{{item.racename  | strLen(32)}} <router-link :to="'/competition/detail/detail/' + item.usagecode">查看详情</router-link></div>
-								
 									<div class="simulation-img" :style="'background-image: url(' + item.url + ');'"></div>
 									<el-row :gutter="20" class="simulation-text">
 										<template v-if="item.racestatus != 41">
@@ -75,39 +74,102 @@
 				    				<div class="search-item-list">
 								        <el-form>
 								          <el-form-item>
-								            <el-input placeholder="输入比赛名称"></el-input>
-								            <el-button type="primary" size="small" class="codeBtn">搜索</el-button>
+								            <el-input placeholder="输入比赛名称" v-model="searchVal.racename"></el-input>
+								            <el-button type="primary" size="small" class="codeBtn" @click="search">搜索</el-button>
 								          </el-form-item>
 								        </el-form>
 				    				</div>
 				    			</div>
 				    		</div>
 				    		<div class="search-r">
-				    			<strong>16</strong>
+				    			<strong>{{tabs.tabs.list.data.page.responsetotal}}</strong>
 				    			<span>比赛总数</span>
 				    		</div>
 				    	</div>
 				    	<div class="list">
-				    		<div class="list-item" v-for="(item, index) in tabs.tabs.list.dataList">
+				    		<div class="list-item" v-for="(item, index) in tabs.tabs.list.data.list" @click="jump(item, 'detail')">
 				    			<div class="list-item-l" :style="'background-image: url(' + item.url + ');'"></div>
 				    			<div class="list-item-c">
-				    				<h2>{{item.name}}</h2>
-				    				<p><strong>主办方：</strong>{{item.host}}</p>
+				    				<h2>{{item.racename}}</h2>
+				    				<p><strong>主办方：</strong>{{item.hostunit}}</p>
 				    				<p><strong>比赛性质：</strong>{{item.type}}</p>
-				    				<p><strong>报名状态：</strong>{{item.signUpStatus}}</p>
-				    				<p><strong>比赛状态：</strong>{{item.matchDateStatus}}</p>
-				    				<p v-if="item.sort"><strong>当前排名：</strong>{{item.sort}}</p>
-				    				<p class="mt10"><strong>报名时间：</strong>{{item.signUpDate}}</p>
-				    				<p><strong>比赛时间：</strong>{{item.matchDate}}</p>
+				    				<p>
+				    					<strong>报名状态：</strong>
+				    					<template v-if="item.entrystatus == 41">
+				    						报名中
+				    					</template>
+				    					<template v-else-if="item.entrystatus == 40">
+				    						临时禁止报名
+				    					</template>
+				    					<template v-else-if="item.entrystatus == 4999">
+				    						报名结束
+				    					</template>
+				    					<template v-else>
+				    						其他状态
+				    					</template>
+				    				</p>
+				    				<p>
+				    					<strong>比赛状态：</strong>
+										<template v-if="item.racestatus == 41">
+				    						比赛中
+				    					</template>
+				    					<template v-else-if="item.racestatus == 40">
+				    						临时闭赛
+				    					</template>
+				    					<template v-else-if="item.racestatus == 4999">
+				    						比赛结束
+				    					</template>
+				    					<template v-else>
+				    						其他状态（等待开赛）
+				    					</template>
+				    				</p>
+				    				<p v-if="item.stustatus != 10">
+				    					<strong>我的状态：</strong>
+				    					<template v-if="item.stustatus == 0">
+				    						未报名
+				    					</template>
+				    					<template v-else-if="item.stustatus == 1">
+				    						已报名（未开赛）
+				    					</template>
+				    					<template v-else-if="item.stustatus == 2">
+				    						比赛中
+				    					</template>
+				    					<template v-else>
+				    						比赛结束
+				    					</template>
+				    				</p>
+				    				<p v-if="item.ranking"><strong>当前排名：</strong>{{item.ranking}}</p>
+				    				<p class="mt10"><strong>报名时间：</strong>{{item.entrystarttime}}--{{item.entryendtime}}</p>
+				    				<p><strong>比赛时间：</strong>{{item.racestarttime}}--{{item.raceendtime}}</p>
 				    			</div>
 				    			<div class="list-item-r">
-				    				<router-link :to="'/competition/detail/detail/' + item.id" class="bt1">查看赛事详情</router-link>
-				    				<router-link :to="'f'" class="bt2">进入我的比赛</router-link>
-				    				<router-link :to="'/competition/detail/sort/' + item.id" class="bt3">查看赛事排名</router-link>
-				    				<router-link :to="'f'" class="bt4">立即参加</router-link>
+				    				<el-button class="bt2" @click.stop="jump(item, 'entry')" v-if="item.stustatus != 0">进入我的比赛</el-button>
+									<el-button class="bt3" @click.stop="jump(item, 'sort')" v-if="item.stustatus == 2 || item.stustatus == 10">查看赛事排名</el-button>
+				    				<el-button class="bt4" @click.stop="openDialog(item)" v-if="item.stustatus == 0">立即参加</el-button>
+				    				<el-button type="danger" v-if="item.stustatus == 2" v-for="(acct, index) in item.fuacct" :key="index" @click.stop="trade(item, acct)">{{acct.fuaccttype == 1 ? '竞赛交易' : '期权交易'}}</el-button>
 				    			</div>
 				    		</div>
+				    		<div class="pager-wrapper">
+				    			<el-pagination
+								  background
+								  layout="prev, pager, next"
+								  :total="tabs.tabs.list.data.page.responsetotal" @current-change="changePage" :page-size="searchVal.page.size">
+								</el-pagination>
+				    		</div>
 				    	</div>
+
+				    	<!-- 报名弹窗 -->
+						<el-dialog title="赛事报名" :visible.sync="signUp.dialogFormVisible" class="signUp" width="600px" center>
+							<el-form :model="signUp.signUpForm" :rules="signUp.signUpRules" ref="signUpForm">
+								<el-form-item label="验证码" prop="code" class="code" :label-width="signUp.formLabelWidth">
+									<el-input v-model="signUp.signUpForm.code" placeholder="请输入验证码"></el-input>
+									<img :src="signUp.codeUrl" @click.stop="refreshCode">
+								</el-form-item>
+								<el-form-item :label-width="signUp.formLabelWidth">
+									<el-button type="primary" @click="submitForm('signUpForm')">确定</el-button>
+								</el-form-item>
+							</el-form>
+						</el-dialog>
 				    </el-tab-pane>
 				</el-tabs>
 			</div>
@@ -194,6 +256,16 @@
 						value: '--   --   (--)'
 					}
 				],
+				searchVal: {
+					markettype: '',
+					visitamount: '',
+					status: '',
+					racename: '',
+					page: {
+						start: "1",
+						size: this.$utils.CONFIG.pageSize
+					},
+				},
 				tabs: {
 					activeTab: 'list',
 					tabs: {
@@ -242,12 +314,7 @@
 						},
 						list: {
 							name: '赛事列表',
-							pageSize: 10,
 							search: {
-								markettype: '',
-								visitamount: '',
-								status: '',
-								racename: '',
 								condition: [
 									{
 										name: '市场类型',
@@ -341,65 +408,125 @@
 									}
 								]
 							},
-							dataList: [
-								{
-									id: '0',
-									url: require('../assets/images/img2.png'),
-									name: '西南财经大学模拟炒股大赛',
-									host: '西南财经大学',
-									type: '公开赛',
-									signUpStatus: '进行中',
-									matchDateStatus: '报名中',
-									signUpDate: '2018-06-28--2018-09-10',
-									matchDate: '2018-06-28--2018-09-10'
-								},
-								{
-									id: '0',
-									url: require('../assets/images/img2.png'),
-									name: '西南财经大学模拟炒股大赛',
-									host: '西南财经大学',
-									type: '公开赛',
-									signUpStatus: '进行中',
-									matchDateStatus: '报名中',
-									signUpDate: '2018-06-28--2018-09-10',
-									matchDate: '2018-06-28--2018-09-10'
-								},
-								{
-									id: '0',
-									url: require('../assets/images/img2.png'),
-									name: '西南财经大学模拟炒股大赛',
-									host: '西南财经大学',
-									type: '公开赛',
-									signUpStatus: '进行中',
-									matchDateStatus: '报名中',
-									sort: 100,
-									signUpDate: '2018-06-28--2018-09-10',
-									matchDate: '2018-06-28--2018-09-10'
-								},
-								{
-									id: '0',
-									url: require('../assets/images/img2.png'),
-									name: '西南财经大学模拟炒股大赛',
-									host: '西南财经大学',
-									type: '公开赛',
-									signUpStatus: '进行中',
-									matchDateStatus: '报名中',
-									signUpDate: '2018-06-28--2018-09-10',
-									matchDate: '2018-06-28--2018-09-10'
-								},
-								{
-									id: '0',
-									url: require('../assets/images/img2.png'),
-									name: '西南财经大学模拟炒股大赛',
-									host: '西南财经大学',
-									type: '公开赛',
-									signUpStatus: '进行中',
-									matchDateStatus: '报名中',
-									signUpDate: '2018-06-28--2018-09-10',
-									matchDate: '2018-06-28--2018-09-10'
+							data: {
+								list: [
+									{
+										usagecode: '0',
+										url: require('../assets/images/img2.png'),
+										racename: '西南财经大学模拟炒股大赛',
+										hostunit: '西南财经大学',
+										type: '公开赛',
+										entrystatus: 40,
+										racestatus: 40,
+										entrystarttime: '2018-06-28',
+										entryendtime: '2018-09-10',
+										racestarttime: '2018-06-28',
+										raceendtime: '2018-09-10',
+										stustatus: 0,
+										ranking: '',
+										fuacct:[
+											{
+												fuaccttype: "1",
+												fuacct: "1000103600"
+											},
+											{
+												fuaccttype: "2",
+												fuacct: "1000103600"
+											}
+										]
+									},
+									{
+										usagecode: '0',
+										url: require('../assets/images/img2.png'),
+										racename: '西南财经大学模拟炒股大赛',
+										hostunit: '西南财经大学',
+										type: '公开赛',
+										entrystatus: 40,
+										racestatus: 40,
+										entrystarttime: '2018-06-28',
+										entryendtime: '2018-09-10',
+										racestarttime: '2018-06-28',
+										raceendtime: '2018-09-10',
+										stustatus: 2,
+										ranking: '',
+										fuacct:[
+											{
+												fuaccttype: "1",
+												fuacct: "1000103600"
+											},
+											{
+												fuaccttype: "2",
+												fuacct: "1000103600"
+											}
+										]
+									},
+									{
+										usagecode: '0',
+										url: require('../assets/images/img2.png'),
+										racename: '西南财经大学模拟炒股大赛',
+										hostunit: '西南财经大学',
+										type: '公开赛',
+										entrystatus: 40,
+										racestatus: 40,
+										entrystarttime: '2018-06-28',
+										entryendtime: '2018-09-10',
+										racestarttime: '2018-06-28',
+										raceendtime: '2018-09-10',
+										stustatus: 2,
+										ranking: '',
+										fuacct:[
+											{
+												fuaccttype: "1",
+												fuacct: "1000103600"
+											}
+										]
+									},
+									{
+										usagecode: '0',
+										url: require('../assets/images/img2.png'),
+										racename: '西南财经大学模拟炒股大赛',
+										hostunit: '西南财经大学',
+										type: '公开赛',
+										entrystatus: 40,
+										racestatus: 40,
+										entrystarttime: '2018-06-28',
+										entryendtime: '2018-09-10',
+										racestarttime: '2018-06-28',
+										raceendtime: '2018-09-10',
+										stustatus: 10,
+										ranking: '',
+										fuacct:[
+											{
+												fuaccttype: "2",
+												fuacct: "1000103600"
+											}
+										]
+									},
+								],
+								page: {
+									start: 0,
+									size: 0,
+									responsenum: 0,
+									responsetotal: 100
 								}
-							]
+							}
 						}
+					}
+				},
+				isCodeLoading: false,
+				saveSignData: {},
+				signUp: {
+					dialogFormVisible: false,
+					formLabelWidth: '120px',
+					codeUrl: '',
+					signUpForm: {
+						code: '',
+					},
+					signUpRules: {
+						code: [
+							{ required: true, message: '请输入验证码', trigger: 'blur' },
+							{ min: 4, max: 4, message: '请输入4位验证码', trigger: 'blur' }
+						]
 					}
 				}
 			}
@@ -417,9 +544,104 @@
 						e.isActive = false;
 					}
 				})
-				this.tabs.tabs.list.search[data.type] = data.value;
-				console.log(this.tabs.tabs.list.search[data.type])
-			}
+				var that = this;
+				that.searchVal[data.type] = data.value;
+				//that.searchVal.racename = '';
+				that.searchVal.page.start = 1;
+				that.$utils.getJson(that.$utils.CONFIG.api.competitionList, function(res) {
+	             	if(res.succflag == 0) {
+	                	that.tabs.tabs.list.dataList = res.data;
+	              	}else {
+	              		that.$utils.showTip('error', '', '', '', res.message);
+	              	}
+	            }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
+			},
+			search() {
+				if(!this.searchVal.racename) return;
+				var that = this;
+				that.searchVal.page.start = 1;
+				that.$utils.getJson(that.$utils.CONFIG.api.competitionList, function(res) {
+	             	if(res.succflag == 0) {
+	                	that.tabs.tabs.list.dataList = res.data;
+	              	}else {
+	              		that.$utils.showTip('error', '', '', '', res.message);
+	              	}
+	            }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
+			},
+			jump(item, type) {
+				switch (type) {
+					case 'detail':  //比赛详情
+						this.$router.push({ path: '/competition/detail/detail/', query: item});
+						break;
+					case 'entry':  //进入我的赛事
+						this.$router.push('/admin/home');
+						break;
+					case 'sort':   //赛事排名
+						this.$router.push('/competition/detail/sort/' + item.usagecode);
+						break;
+				}
+			},
+			refreshCode() {
+				var that = this;
+				that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
+					if(res.succflag == 0) {
+						that.signUp.codeUrl = res.data.image;
+					}else {
+						that.$utils.showTip('error', 'error', '-1022');
+					}
+					that.isCodeLoading = false;
+				}, function() {
+					that.isCodeLoading = false;
+				}, {objectid: '', type: "3"}, false)
+			},
+			openDialog(item) {
+				var that = this;
+				that.signUp.dialogFormVisible = true;
+				that.signUp.usagecode = item.usagecode;
+				that.saveSignData = item;
+				that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
+					if(res.succflag == 0) {
+						that.signUp.codeUrl = res.data.image;
+					}else {
+						that.$utils.showTip('error', 'error', '-1022');
+					}
+					that.isCodeLoading = false;
+				}, function() {
+					that.isCodeLoading = false;
+				}, {objectid: '', type: "3"}, false)
+			},
+			submitForm(formName) {
+	            var that = this;
+	            that.$refs[formName].validate((valid) => {
+	              if (valid) {
+	                var signUpData = {
+						raceid: that.saveSignData.usagecode,
+						vcode: that.signUp.signUpForm.code
+	                }
+	                that.$utils.getJson(that.$utils.CONFIG.api.signUp, function(res) {
+	                  if(res.succflag == 0) {
+	                  	that.saveSignData.stustatus = 1;
+	                  	that.signUp.dialogFormVisible = false;
+	                  }else {
+	                    that.$utils.showTip('error', '', '', '', res.message);
+	                  }
+	                }, function() {}, signUpData, false, {token: that.$utils.CONFIG.token})
+	              } else {
+	                return false;
+	              }
+	            });
+	        },
+	        changePage(currentPage) {
+	        	var that = this;
+				that.searchVal.page.start = (currentPage - 1) * that.searchVal.page.size;
+				that.$utils.getJson(that.$utils.CONFIG.api.competitionList, function(res) {
+	             	if(res.succflag == 0) {
+	                	that.tabs.tabs.list.dataList = res.data;
+	              	}else {
+	              		that.$utils.showTip('error', '', '', '', res.message);
+	              	}
+	            }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
+	        }
 		},
 		created() {
 			var that = this;
@@ -501,26 +723,16 @@
               	}else {
               		that.$utils.showTip('error', '', '', '', res.message);
               	}
-            }, function() {}, {token: that.$utils.CONFIG.token})
+            }, function() {}, {}, true, {token: that.$utils.CONFIG.token})
 
             //赛事列表
-            var postData = {
-				"markettype": "",
-				"visitamount": "",
-				"page": {
-					"start": "1",
-					"size": that.tabs.tabs.list.pageSize
-				},
-				"status": "",
-				"racename": ""
-			}
             that.$utils.getJson(that.$utils.CONFIG.api.competitionList, function(res) {
              	if(res.succflag == 0) {
                 	that.tabs.tabs.list.dataList = res.data;
               	}else {
               		that.$utils.showTip('error', '', '', '', res.message);
               	}
-            }, function() {}, {token: that.$utils.CONFIG.token})
+            }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
 		},
 		destroyed: function () {
 			clearInterval(this.timer)
@@ -708,6 +920,7 @@
 										background: #5091fa;
 										span {
 											width: auto;
+											line-height: 22px;
 										}
 									}
 								}
@@ -737,13 +950,13 @@
 				margin-top: 20px;
 				.list-item {
 					display: flex;
-					height: 256px;
+					height: 296px;
 					margin-top: 10px;
 					padding: 20px;
 					border: 1px solid #dde1e6;
 					background: #fff;
 					.list-item-l {
-						width: 320px;
+						width: 360px;
 						background-size: cover;
 					}
 					.list-item-c {
@@ -762,12 +975,16 @@
 					}
 					.list-item-r {
 						width: 140px;
-						a {
+						padding-top: 40px;
+						text-align: center;
+						a, button {
 							display: inline-block;
 							width: 110px;
 							height: 40px;
 							line-height: 40px;
 							text-align: center;
+							padding: 0;
+							margin-left: 0;
 							margin-bottom: 10px;
 							color: #fff;
 							border-radius: 4px;
@@ -789,5 +1006,37 @@
 				}
 			}
 		}
+		.pager-wrapper {
+			padding-top: 10px;
+			padding-bottom: 10px;
+			margin-top: 10px;
+			background: #fff;
+			border: 1px solid #dde1e6;
+			.el-pagination {
+				text-align: center;
+				margin: 40px auto;
+			}
+		}
+		.signUp {
+	      .el-form {
+	        width: 490px;
+	        margin: 20px auto;
+	        margin-bottom: 60px;
+	        img {
+	          width: 92px;
+	          height: 32px;
+	          position: absolute;
+	          top: 4px;
+	          right: 5px;
+	        }
+	        .el-button--primary {
+	          width: 100%;
+	          margin-top: 20px;
+	        }
+	        .el-form-item {
+	          margin-bottom: 25px;
+	        }
+	      }
+	    }
 	}
 </style>

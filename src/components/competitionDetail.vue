@@ -12,32 +12,56 @@
 				    	<div class="detail-body">
 					    	<div class="detail-item">
 					    		<h2>比赛介绍</h2>
-					    		<div v-html="tabs.tabs.detail.data.desc"></div>
+					    		<div>{{tabs.tabs.detail.data.racedesc}}</div>
 					    	</div>
 					    	<div class="detail-item">
 					    		<h2>赛程安排</h2>
-					    		<div v-html="tabs.tabs.detail.data.arrange"></div>
+					    		<div>
+					    			<p>报名阶段：{{tabs.tabs.detail.data.entrystarttime}}~{{tabs.tabs.detail.data.entryendtime}}</p>
+					    			<p>比赛阶段：{{tabs.tabs.detail.data.racestarttime}}~{{tabs.tabs.detail.data.raceendtime}}</p>
+					    		</div>
 					    	</div>
 					    	<div class="detail-item">
 					    		<h2>比赛规则</h2>
-					    		<div v-html="tabs.tabs.detail.data.rule"></div>
+					    		<div>
+					    			<p>起始资金：{{tabs.tabs.detail.data.initfund}}元</p>
+					    			<p>交易品种：{{tabs.tabs.detail.data.racestarttime}}~{{tabs.tabs.detail.data.tradekind}}</p>
+					    		</div>
 					    	</div>
 					    	<div class="detail-item">
 					    		<h2>主办方</h2>
-					    		<div v-html="tabs.tabs.detail.data.host"></div>
+					    		<div>{{tabs.tabs.detail.data.hostunit}}</div>
 					    	</div>
 					    	<div class="detail-item">
 					    		<h2>当前状态</h2>
-					    		<div v-html="tabs.tabs.detail.data.status"></div>
+					    		<div>
+					    			<template v-if="tabs.tabs.detail.data.status == -1">未开始报名</template>
+					    			<template v-else-if="tabs.tabs.detail.data.status == 0">报名中</template>
+					    			<template v-else-if="tabs.tabs.detail.data.status == 1">比赛中</template>
+					    			<template v-else-if="tabs.tabs.detail.data.status == 2">比赛结束</template>
+					    		</div>
 					    	</div>
 					    	<div class="detail-item">
 					    		<h2>注意事项</h2>
-					    		<div v-html="tabs.tabs.detail.data.care"></div>
+					    		<div>{{tabs.tabs.detail.data.attention}}</div>
 					    	</div>
-					    	<div class="detail-item">
-					    		<el-button type="primary">立即报名</el-button>
+					    	<div class="detail-item" v-if="saveRace.stustatus == 0">
+					    		<el-button type="primary" @click="openDialog">立即报名</el-button>
 					    	</div>
 					    </div>
+
+					    <!-- 报名弹窗 -->
+						<el-dialog title="赛事报名" :visible.sync="signUp.dialogFormVisible" class="signUp" width="600px" center>
+							<el-form :model="signUp.signUpForm" :rules="signUp.signUpRules" ref="signUpForm">
+								<el-form-item label="验证码" prop="code" class="code" :label-width="signUp.formLabelWidth">
+									<el-input v-model="signUp.signUpForm.code" placeholder="请输入验证码"></el-input>
+									<img :src="signUp.codeUrl" @click.stop="refreshCode">
+								</el-form-item>
+								<el-form-item :label-width="signUp.formLabelWidth">
+									<el-button type="primary" @click="submitForm('signUpForm')">确定</el-button>
+								</el-form-item>
+							</el-form>
+						</el-dialog>
 				    </el-tab-pane>
 				    <el-tab-pane :label="tabs.tabs.sort.name" name="sort" class="sort">
 				    	<div class="sort-head">
@@ -168,19 +192,41 @@
 						link: ''
 					}
 				],
+				saveRace: {},
+				isCodeLoading: false,
+				saveSignData: {},
+				signUp: {
+					dialogFormVisible: false,
+					formLabelWidth: '120px',
+					codeUrl: '',
+					signUpForm: {
+						code: '',
+					},
+					signUpRules: {
+						code: [
+							{ required: true, message: '请输入验证码', trigger: 'blur' },
+							{ min: 4, max: 4, message: '请输入4位验证码', trigger: 'blur' }
+						]
+					}
+				},
 				tabs: {
 					activeTab: 'detail',
 					tabs: {
 						detail: {
 							name: '赛事详情',
 							data: {
-								id: 0,
-								desc: '实盘大赛：<br/>钱坤杯·凤凰实盘炒股大赛是由凤凰网财经频道主办、钱坤投资赞助、东方证券提供交易服务的A股投资比赛。参赛选手需是凤凰网注册用户，且在东方证券开立证券账户方可完成报名。大赛旨在挖掘民间“草',
-								arrange: '实盘大赛：<br/>钱坤杯·凤凰实盘炒股大赛是由凤凰网财经频道主办、钱坤投资赞助、东方证券提供交易服务的A股投资比赛。参赛选手需是凤凰网注册用户，且在东方证券开立证券账户方可完成报名。大赛旨在挖掘民间“草参赛选手需是凤凰网注册用户，且在东方证券开立证券账户方可完成报名。大赛旨在挖掘民间“草',
-								rule: '起始资金： 200,000.00元 <br/>起始资金： 200,000.00元',
-								host: '四川省教育厅',
-								status: '比赛中',
-								care: '只能四川省高校学生才能参加，前十名会有奖励'
+								raceid: 0,
+								racedesc: '“四川省模拟炒股”第三届全国大学生金融挑战赛火热开赛悬赏百万，等你来战！',
+								entrystarttime: '2018年06月30日',
+								entryendtime: '2018年07月30日',
+								racestarttime: '2018年06月30日',
+								raceendtime: '2018年06月30日',
+								initfund: '200,000.00',
+								tradekind: '沪深A股市场的股票',
+								hostunit: '四川省教育厅',
+								status: -1,
+								attention: '只能四川省高校学生才能参加，前十名会有奖励',
+								entrynum: 1000
 							}
 						},
 						sort: {
@@ -357,23 +403,71 @@
 			}
 		},
 		methods: {
-
+			refreshCode() {
+				var that = this;
+				that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
+					if(res.succflag == 0) {
+						that.signUp.codeUrl = res.data.image;
+					}else {
+						that.$utils.showTip('error', 'error', '-1022');
+					}
+					that.isCodeLoading = false;
+				}, function() {
+					that.isCodeLoading = false;
+				}, {objectid: '', type: "3"}, false)
+			},
+			openDialog(item) {
+				var that = this;
+				that.signUp.dialogFormVisible = true;
+				that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
+					if(res.succflag == 0) {
+						that.signUp.codeUrl = res.data.image;
+					}else {
+						that.$utils.showTip('error', 'error', '-1022');
+					}
+					that.isCodeLoading = false;
+				}, function() {
+					that.isCodeLoading = false;
+				}, {objectid: '', type: "3"}, false)
+			},
+			submitForm(formName) {
+	            var that = this;
+	            that.$refs[formName].validate((valid) => {
+	              if (valid) {
+	                var signUpData = {
+						raceid: that.saveRace.usagecode,
+						vcode: that.signUp.signUpForm.code
+	                }
+	                that.$utils.getJson(that.$utils.CONFIG.api.signUp, function(res) {
+	                  if(res.succflag == 0) {
+	                  	that.saveRace.stustatus = 1;
+	                  	that.signUp.dialogFormVisible = false;
+	                  }else {
+	                    that.$utils.showTip('error', '', '', '', res.message);
+	                  }
+	                }, function() {}, signUpData, false, {token: that.$utils.CONFIG.token})
+	              } else {
+	                return false;
+	              }
+	            });
+	        },
 		},
 		created() {
-			if(this.$route.params.type) {
-				this.tabs.activeTab = this.$route.params.type;
+			var that = this;
+			if(that.$route.params.type) {
+				that.tabs.activeTab = that.$route.params.type;
 			}
 
-			if(this.$route.params.id == undefined) return;
+			if(that.$route.query.usagecode == undefined) return;
 
-			var that = this;
+			that.saveRace = that.$route.query;
 			that.$utils.getJson(that.$utils.CONFIG.api.competitionDetail, function(res) {
               	if(res.succflag == 0) {
                 	
               	}else {
                 	that.$utils.showTip('error', '', '', '', res.message);
               	}
-            }, function() {}, {raceid: that.$route.params.id}, true, {token: that.$utils.CONFIG.token})
+            }, function() {}, {raceid: that.saveRace.usagecode}, true, {token: that.$utils.CONFIG.token})
 		}
 	}
 </script>
@@ -475,5 +569,26 @@
 				}
 			}
 		}
+		.signUp {
+	      .el-form {
+	        width: 490px;
+	        margin: 20px auto;
+	        margin-bottom: 60px;
+	        img {
+	          width: 92px;
+	          height: 32px;
+	          position: absolute;
+	          top: 4px;
+	          right: 5px;
+	        }
+	        .el-button--primary {
+	          width: 100%;
+	          margin-top: 20px;
+	        }
+	        .el-form-item {
+	          margin-bottom: 25px;
+	        }
+	      }
+	    }
 	}
 </style>

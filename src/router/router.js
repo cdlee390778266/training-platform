@@ -66,7 +66,7 @@ const router = new Router({
           meta: { title: '投资竞赛'}
         },
         {
-          path: '/competition/detail/:type/:id',
+          path: '/competition/detail/:type',
           name: 'competitionDetail',
           component: CompetitionDeail,
           meta: { title: '投资竞赛'}

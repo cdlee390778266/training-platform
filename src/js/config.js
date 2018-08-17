@@ -5,6 +5,7 @@ const CONFIG = {
 	universitycode: '', //院校代码
 	token: '99', //令牌
 	codeTime: 5,	//验证码倒计时时间
+	pageSize: 20,
 	api: {
 		code: baseUrl + 'jk.php', //验证码接口
 		//code: baseUrl + 'comm/obtainVerifycode.do', //验证码
@@ -19,6 +20,7 @@ const CONFIG = {
 		hq: 'http://192.168.1.213:9080/quotescenter/service', //行情
 		myRacelist: baseUrl + 'competition/myracelist.do', //模拟赛列表
 		competitionList: baseUrl + 'competition/list.do', //赛事列表
+		signUp: baseUrl + 'competition/signup.do', //赛事报名
 		competitionDetail: baseUrl + 'competition/racedetail.do', //赛事详情
 
 		msgTypeList: baseUrl + 'msgcenter/typelist.do', //消息类型列表
