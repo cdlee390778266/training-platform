@@ -1,17 +1,1042 @@
 <template>
-	<div>
+	<div class="competition">
+		<swiper :options="swiperOption" ref="mySwiper">
+		    <swiper-slide v-for="(item, index) in ads" :key="index">
+		    	<img :src="item.url" class="img-responsive">
+		    </swiper-slide>
+		</swiper>
+		<div class="ql-wrapper">
+			<el-row class="activity">
+				<el-col :span="6" v-for="(item, index) in activity" :key="index" :style="'background-image: url(' + item.url + ');'">
+					<span>{{item.name}}</span>
+				</el-col>
+			</el-row>
+			<el-row class="lattice" :gutter="20">
+				<el-col :span="6" v-for="(item, index) in lattice" :key="index">
+					<div>
+						<h2>{{item.name}}</h2>
+						<strong>{{item.value}}</strong>
+					</div>
+				</el-col>
+			</el-row>
+			<div class="competition-body">
+				<el-tabs v-model="tabs.activeTab">
+				    <el-tab-pane :label="tabs.tabs.simulation.name" name="simulation">
+				    	<el-row :gutter="20">
+							<el-col :span="12" v-for="(item, index) in tabs.tabs.simulation.dataList" :key="index">
+								<div class="simulation-item">
+									<div class="simulation-bar">{{item.racename  | strLen(32)}} <router-link :to="'/competition/detail/detail/' + item.usagecode">查看详情</router-link></div>
+									<div class="simulation-img" :style="'background-image: url(' + item.url + ');'"></div>
+									<el-row :gutter="20" class="simulation-text">
+										<template v-if="item.racestatus != 41">
+											<el-col :span="8">
+												<strong class="simulation-text-type1">{{item.dayupdown}}</strong>
+												<span>日涨跌幅</span>
+											</el-col>
+											<el-col :span="8" >
+												<strong class="simulation-text-type2">{{item.dayincome}}</strong>
+												<span>昨日收益</span>
+											</el-col>
+											<el-col :span="8">
+												<strong class="simulation-text-type3">{{item.totalincomerate}}</strong>
+												<span>总收益</span>
+											</el-col>
+										</template>
+										<template v-else>
+											<el-col :span="24">
+												<p>{{item.raceDesc | strLen(115)}}</p>
+											</el-col>
+										</template>
+									</el-row>
+									<div class="simulation-trade">
+										当前排名：<span>{{item.ranking}}</span>
+										<router-link :to="'/competition/detail/sort/' + item.usagecode">查看排行榜</router-link>
 
+										<el-button type="danger" v-for="(acct, index) in item.fuacct" :key="index" @click="trade(item, acct)">{{acct.fuaccttype == 1 ? '竞赛交易' : '期权交易'}}</el-button>
+									</div>
+								</div>
+							</el-col>
+						</el-row>
+				    </el-tab-pane>
+				    <el-tab-pane :label="tabs.tabs.list.name" name="list">
+				    	<div class="search">
+				    		<div class="search-l">
+				    			<div class="search-item" v-for="(item, index) in tabs.tabs.list.search.condition">
+				    				<div class="search-item-type">
+				    					{{item.name}}
+				    				</div>
+				    				<div class="search-item-list">
+				    					<span v-for="(data, index) in item.list" @click="changeCondition(data, item.list)" :class="{active: data.isActive}">{{data.name}}</span>
+				    				</div>
+				    			</div>
+								<div class="search-item">
+				    				<div class="search-item-type"></div>
+				    				<div class="search-item-list">
+								        <el-form>
+								          <el-form-item>
+								            <el-input placeholder="输入比赛名称" v-model="searchVal.racename"></el-input>
+								            <el-button type="primary" size="small" class="codeBtn" @click="search">搜索</el-button>
+								          </el-form-item>
+								        </el-form>
+				    				</div>
+				    			</div>
+				    		</div>
+				    		<div class="search-r">
+				    			<strong>{{tabs.tabs.list.data.page.responsetotal}}</strong>
+				    			<span>比赛总数</span>
+				    		</div>
+				    	</div>
+				    	<div class="list">
+				    		<div class="list-item" v-for="(item, index) in tabs.tabs.list.data.list" @click="jump(item, 'detail')">
+				    			<div class="list-item-l" :style="'background-image: url(' + item.url + ');'"></div>
+				    			<div class="list-item-c">
+				    				<h2>{{item.racename}}</h2>
+				    				<p><strong>主办方：</strong>{{item.hostunit}}</p>
+				    				<p><strong>比赛性质：</strong>{{item.type}}</p>
+				    				<p>
+				    					<strong>报名状态：</strong>
+				    					<template v-if="item.entrystatus == 41">
+				    						报名中
+				    					</template>
+				    					<template v-else-if="item.entrystatus == 40">
+				    						临时禁止报名
+				    					</template>
+				    					<template v-else-if="item.entrystatus == 4999">
+				    						报名结束
+				    					</template>
+				    					<template v-else>
+				    						其他状态
+				    					</template>
+				    				</p>
+				    				<p>
+				    					<strong>比赛状态：</strong>
+										<template v-if="item.racestatus == 41">
+				    						比赛中
+				    					</template>
+				    					<template v-else-if="item.racestatus == 40">
+				    						临时闭赛
+				    					</template>
+				    					<template v-else-if="item.racestatus == 4999">
+				    						比赛结束
+				    					</template>
+				    					<template v-else>
+				    						其他状态（等待开赛）
+				    					</template>
+				    				</p>
+				    				<p v-if="item.stustatus != 10">
+				    					<strong>我的状态：</strong>
+				    					<template v-if="item.stustatus == 0">
+				    						未报名
+				    					</template>
+				    					<template v-else-if="item.stustatus == 1">
+				    						已报名（未开赛）
+				    					</template>
+				    					<template v-else-if="item.stustatus == 2">
+				    						比赛中
+				    					</template>
+				    					<template v-else>
+				    						比赛结束
+				    					</template>
+				    				</p>
+				    				<p v-if="item.ranking"><strong>当前排名：</strong>{{item.ranking}}</p>
+				    				<p class="mt10"><strong>报名时间：</strong>{{item.entrystarttime}}--{{item.entryendtime}}</p>
+				    				<p><strong>比赛时间：</strong>{{item.racestarttime}}--{{item.raceendtime}}</p>
+				    			</div>
+				    			<div class="list-item-r">
+				    				<el-button class="bt2" @click.stop="jump(item, 'entry')" v-if="item.stustatus != 0">进入我的比赛</el-button>
+									<el-button class="bt3" @click.stop="jump(item, 'sort')" v-if="item.stustatus == 2 || item.stustatus == 10">查看赛事排名</el-button>
+				    				<el-button class="bt4" @click.stop="openDialog(item)" v-if="item.stustatus == 0">立即参加</el-button>
+				    				<el-button type="danger" v-if="item.stustatus == 2" v-for="(acct, index) in item.fuacct" :key="index" @click.stop="trade(item, acct)">{{acct.fuaccttype == 1 ? '竞赛交易' : '期权交易'}}</el-button>
+				    			</div>
+				    		</div>
+				    		<div class="pager-wrapper">
+				    			<el-pagination
+								  background
+								  layout="prev, pager, next"
+								  :total="tabs.tabs.list.data.page.responsetotal" @current-change="changePage" :page-size="searchVal.page.size">
+								</el-pagination>
+				    		</div>
+				    	</div>
+
+				    	<!-- 报名弹窗 -->
+						<el-dialog title="赛事报名" :visible.sync="signUp.dialogFormVisible" class="signUp" width="600px" center>
+							<el-form :model="signUp.signUpForm" :rules="signUp.signUpRules" ref="signUpForm">
+								<el-form-item label="验证码" prop="code" class="code" :label-width="signUp.formLabelWidth">
+									<el-input v-model="signUp.signUpForm.code" placeholder="请输入验证码"></el-input>
+									<img :src="signUp.codeUrl" @click.stop="refreshCode">
+								</el-form-item>
+								<el-form-item :label-width="signUp.formLabelWidth">
+									<el-button type="primary" @click="submitForm('signUpForm')">确定</el-button>
+								</el-form-item>
+							</el-form>
+						</el-dialog>
+				    </el-tab-pane>
+				</el-tabs>
+			</div>
+		</div>
 	</div>
 </template>
 <script>
 	export default {
 		data() {
 			return {
-				
+				timer: '',
+				swiperOption: {
+			        centeredSlides: true,
+			        loop: true,
+			        autoplay: {
+			            delay: 5000
+			        }
+		        },
+				ads: [
+					{
+						id: 0,
+						name: '',
+						url: require('../assets/images/ad1.png'),
+						link: ''
+					},
+					{
+						id: 1,
+						name: '',
+						url: require('../assets/images/ad1.png'),
+						link: ''
+					},
+					{
+						id: 2,
+						name: '',
+						url: require('../assets/images/ad1.png'),
+						link: ''
+					}
+				],
+				activity: [
+					{
+						id: '0',
+						name: '人脸识别迎重磅利好 2股望受益',
+						url: require('../assets/images/img1.png'),
+						link: ''
+					},
+					{
+						id: '1',
+						name: '人脸识别迎重磅利好 2股望受益',
+						url: require('../assets/images/img1.png'),
+						link: ''
+					},
+					{
+						id: '2',
+						name: '人脸识别迎重磅利好 2股望受益',
+						url: require('../assets/images/img1.png'),
+						link: ''
+					},
+					{
+						id: '3',
+						name: '人脸识别迎重磅利好 2股望受益',
+						url: require('../assets/images/img1.png'),
+						link: ''
+					}
+				],
+				lattice: [
+					{
+						id: '0',
+						name: '上证指数',
+						value: '--   --   (--)'
+					},
+					{
+						id: '1',
+						name: '深证指数',
+						value: '--   --   (--)'
+					},
+					{
+						id: '2',
+						name: '创业板指',
+						value: '--   --   (--)'
+					},
+					{
+						id: '3',
+						name: '沪深300',
+						value: '--   --   (--)'
+					}
+				],
+				searchVal: {
+					markettype: '',
+					visitamount: '',
+					status: '',
+					racename: '',
+					page: {
+						start: "1",
+						size: this.$utils.CONFIG.pageSize
+					},
+				},
+				tabs: {
+					activeTab: 'list',
+					tabs: {
+						simulation: {
+							name: '我的模拟赛事',
+							dataList: [
+								{
+									usagecode: '1',
+									racename: '2018四川模拟炒股大赛2018四川模拟炒股大赛2018四川模拟炒股大赛2018四川模拟炒股大赛2018四川模拟炒股大赛',
+									url: require('../assets/images/img3.png'),
+									racestatus: 0,
+									dayupdown: '-0.49%',
+									dayincome: '15.22',
+									totalincomerate: '11.3125',
+									ranking: 25,
+									raceDesc: '只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加',
+									fuacct:[
+										{
+											fuaccttype: "1",
+											fuacct: "1000103600"
+										},
+										{
+											fuaccttype: "2",
+											fuacct: "1000103600"
+										}
+									]
+								},
+								{
+									usagecode: '1',
+									racename: '2018四川模拟炒股大赛2018四川模拟炒股大赛2018四川模拟炒股大赛2018四川模拟炒股大赛2018四川模拟炒股大赛',
+									url: require('../assets/images/img3.png'),
+									racestatus: 41,
+									dayupdown: '-0.49%',
+									dayincome: '15.22',
+									totalincomerate: '11.3125',
+									ranking: 25,
+									raceDesc: '只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加',
+									fuacct:[
+										{
+											fuaccttype: "2",
+											fuacct: "1000103600"
+										}
+									]
+								}
+							]
+						},
+						list: {
+							name: '赛事列表',
+							search: {
+								condition: [
+									{
+										name: '市场类型',
+										value: 0,
+										list: [
+											{
+												name: '全部',
+												value: '',
+												type: 'markettype',
+												isActive: false
+											},
+											{
+												name: '股票',
+												value: '0',
+												type: 'markettype',
+												isActive: false
+											},
+											{
+												name: '期权',
+												value: '1',
+												type: 'markettype',
+												isActive: false
+											}
+										]
+									},
+									{
+										name: '参赛人数',
+										value: 1,
+										list: [
+											{
+												name: '全部',
+												value: '',
+												type: 'visitamount',
+												isActive: false
+											},
+											{
+												name: '100以内',
+												value: '-100',
+												type: 'visitamount',
+												isActive: false
+											},
+											{
+												name: '100-500',
+												value: '100-500',
+												type: 'visitamount',
+												isActive: false
+											},
+											{
+												name: '500-1000',
+												value: '500-1000',
+												type: 'visitamount',
+												isActive: false
+											},
+											{
+												name: '1000以上',
+												value: '1000-',
+												type: 'visitamount',
+												isActive: false
+											}
+										]
+									},
+									{
+										name: '赛事状态',
+										value: 2,
+										list: [
+											{
+												name: '全部',
+												value: '',
+												type: 'status',
+												isActive: false
+											},
+											{
+												name: '报名中',
+												value: '0',
+												type: 'status',
+												isActive: false
+											},
+											{
+												name: '比赛中',
+												value: '1',
+												type: 'status',
+												isActive: false
+											},
+											{
+												name: '已结束',
+												value: '2',
+												type: 'status',
+												isActive: false
+											}
+										]
+									}
+								]
+							},
+							data: {
+								list: [
+									{
+										usagecode: '0',
+										url: require('../assets/images/img2.png'),
+										racename: '西南财经大学模拟炒股大赛',
+										hostunit: '西南财经大学',
+										type: '公开赛',
+										entrystatus: 40,
+										racestatus: 40,
+										entrystarttime: '2018-06-28',
+										entryendtime: '2018-09-10',
+										racestarttime: '2018-06-28',
+										raceendtime: '2018-09-10',
+										stustatus: 0,
+										ranking: '',
+										fuacct:[
+											{
+												fuaccttype: "1",
+												fuacct: "1000103600"
+											},
+											{
+												fuaccttype: "2",
+												fuacct: "1000103600"
+											}
+										]
+									},
+									{
+										usagecode: '0',
+										url: require('../assets/images/img2.png'),
+										racename: '西南财经大学模拟炒股大赛',
+										hostunit: '西南财经大学',
+										type: '公开赛',
+										entrystatus: 40,
+										racestatus: 40,
+										entrystarttime: '2018-06-28',
+										entryendtime: '2018-09-10',
+										racestarttime: '2018-06-28',
+										raceendtime: '2018-09-10',
+										stustatus: 2,
+										ranking: '',
+										fuacct:[
+											{
+												fuaccttype: "1",
+												fuacct: "1000103600"
+											},
+											{
+												fuaccttype: "2",
+												fuacct: "1000103600"
+											}
+										]
+									},
+									{
+										usagecode: '0',
+										url: require('../assets/images/img2.png'),
+										racename: '西南财经大学模拟炒股大赛',
+										hostunit: '西南财经大学',
+										type: '公开赛',
+										entrystatus: 40,
+										racestatus: 40,
+										entrystarttime: '2018-06-28',
+										entryendtime: '2018-09-10',
+										racestarttime: '2018-06-28',
+										raceendtime: '2018-09-10',
+										stustatus: 2,
+										ranking: '',
+										fuacct:[
+											{
+												fuaccttype: "1",
+												fuacct: "1000103600"
+											}
+										]
+									},
+									{
+										usagecode: '0',
+										url: require('../assets/images/img2.png'),
+										racename: '西南财经大学模拟炒股大赛',
+										hostunit: '西南财经大学',
+										type: '公开赛',
+										entrystatus: 40,
+										racestatus: 40,
+										entrystarttime: '2018-06-28',
+										entryendtime: '2018-09-10',
+										racestarttime: '2018-06-28',
+										raceendtime: '2018-09-10',
+										stustatus: 10,
+										ranking: '',
+										fuacct:[
+											{
+												fuaccttype: "2",
+												fuacct: "1000103600"
+											}
+										]
+									},
+								],
+								page: {
+									start: 0,
+									size: 0,
+									responsenum: 0,
+									responsetotal: 100
+								}
+							}
+						}
+					}
+				},
+				isCodeLoading: false,
+				saveSignData: {},
+				signUp: {
+					dialogFormVisible: false,
+					formLabelWidth: '120px',
+					codeUrl: '',
+					signUpForm: {
+						code: '',
+					},
+					signUpRules: {
+						code: [
+							{ required: true, message: '请输入验证码', trigger: 'blur' },
+							{ min: 4, max: 4, message: '请输入4位验证码', trigger: 'blur' }
+						]
+					}
+				}
 			}
+		},
+		methods: {
+			trade(item, acct) {
+				console.log(item);
+			},
+			changeCondition(data, item) {
+				if(data.isActive) return;
+				item.forEach(function(e, i) {
+					if(data.value == e.value) {
+						e.isActive = true;
+					}else {
+						e.isActive = false;
+					}
+				})
+				var that = this;
+				that.searchVal[data.type] = data.value;
+				//that.searchVal.racename = '';
+				that.searchVal.page.start = 1;
+				that.$utils.getJson(that.$utils.CONFIG.api.competitionList, function(res) {
+	             	if(res.succflag == 0) {
+	                	that.tabs.tabs.list.dataList = res.data;
+	              	}else {
+	              		that.$utils.showTip('error', '', '', '', res.message);
+	              	}
+	            }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
+			},
+			search() {
+				if(!this.searchVal.racename) return;
+				var that = this;
+				that.searchVal.page.start = 1;
+				that.$utils.getJson(that.$utils.CONFIG.api.competitionList, function(res) {
+	             	if(res.succflag == 0) {
+	                	that.tabs.tabs.list.dataList = res.data;
+	              	}else {
+	              		that.$utils.showTip('error', '', '', '', res.message);
+	              	}
+	            }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
+			},
+			jump(item, type) {
+				switch (type) {
+					case 'detail':  //比赛详情
+						this.$router.push({ path: '/competition/detail/detail/', query: item});
+						break;
+					case 'entry':  //进入我的赛事
+						this.$router.push('/admin/home');
+						break;
+					case 'sort':   //赛事排名
+						this.$router.push('/competition/detail/sort/' + item.usagecode);
+						break;
+				}
+			},
+			refreshCode() {
+				var that = this;
+				that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
+					if(res.succflag == 0) {
+						that.signUp.codeUrl = res.data.image;
+					}else {
+						that.$utils.showTip('error', 'error', '-1022');
+					}
+					that.isCodeLoading = false;
+				}, function() {
+					that.isCodeLoading = false;
+				}, {objectid: '', type: "3"}, false)
+			},
+			openDialog(item) {
+				var that = this;
+				that.signUp.dialogFormVisible = true;
+				that.signUp.usagecode = item.usagecode;
+				that.saveSignData = item;
+				that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
+					if(res.succflag == 0) {
+						that.signUp.codeUrl = res.data.image;
+					}else {
+						that.$utils.showTip('error', 'error', '-1022');
+					}
+					that.isCodeLoading = false;
+				}, function() {
+					that.isCodeLoading = false;
+				}, {objectid: '', type: "3"}, false)
+			},
+			submitForm(formName) {
+	            var that = this;
+	            that.$refs[formName].validate((valid) => {
+	              if (valid) {
+	                var signUpData = {
+						raceid: that.saveSignData.usagecode,
+						vcode: that.signUp.signUpForm.code
+	                }
+	                that.$utils.getJson(that.$utils.CONFIG.api.signUp, function(res) {
+	                  if(res.succflag == 0) {
+	                  	that.saveSignData.stustatus = 1;
+	                  	that.signUp.dialogFormVisible = false;
+	                  }else {
+	                    that.$utils.showTip('error', '', '', '', res.message);
+	                  }
+	                }, function() {}, signUpData, false, {token: that.$utils.CONFIG.token})
+	              } else {
+	                return false;
+	              }
+	            });
+	        },
+	        changePage(currentPage) {
+	        	var that = this;
+				that.searchVal.page.start = (currentPage - 1) * that.searchVal.page.size;
+				that.$utils.getJson(that.$utils.CONFIG.api.competitionList, function(res) {
+	             	if(res.succflag == 0) {
+	                	that.tabs.tabs.list.dataList = res.data;
+	              	}else {
+	              		that.$utils.showTip('error', '', '', '', res.message);
+	              	}
+	            }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
+	        }
+		},
+		created() {
+			var that = this;
+			//上证指数、沪深300 行情 
+			var shHqPostData = {
+			 	serviceid: "snapshot",
+				body: {
+				  	marketid: "0",
+				  	stockcode: ["000001","000300"]
+			 	}
+			}
+			that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
+             	if(res.status == 0) {
+                	res.data.forEach( function(e, i) {
+                		if(shHqPostData.body.stockcode[0] === e.code) {
+                			that.lattice[0].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+                		}
+                		if(shHqPostData.body.stockcode[1] === e.code) {
+                			that.lattice[3].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+                		}
+                	});
+              	}
+            }, function() {}, shHqPostData, false)
+
+            //深证指数、创业板指 行情
+			var scHqPostData = {
+			 	serviceid: "snapshot",
+				 	body: {
+				  	marketid: "1",
+				  	stockcode: ["399001","399006"]
+			 	}
+			}
+			that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
+             	if(res.status == 0) {
+                	res.data.forEach( function(e, i) {
+                		if(scHqPostData.body.stockcode[0] === e.code) {
+                			that.lattice[1].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+                		}
+                		if(scHqPostData.body.stockcode[1] === e.code) {
+                			that.lattice[2].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+                		}
+                	});
+              	}
+            }, function() {}, scHqPostData, false)
+
+            that.timer = setInterval(function() {
+            	that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
+	             	if(res.status == 0) {
+	                	res.data.forEach( function(e, i) {
+	                		if(shHqPostData.body.stockcode[0] === e.code) {
+	                			that.lattice[0].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+	                		}
+	                		if(shHqPostData.body.stockcode[1] === e.code) {
+	                			that.lattice[3].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+	                		}
+	                	});
+	              	}
+	            }, function() {}, shHqPostData, false)
+
+	            that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
+	             	if(res.status == 0) {
+	                	res.data.forEach( function(e, i) {
+	                		if(scHqPostData.body.stockcode[0] === e.code) {
+	                			that.lattice[1].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+	                		}
+	                		if(scHqPostData.body.stockcode[1] === e.code) {
+	                			that.lattice[2].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+	                		}
+	                	});
+	              	}
+	            }, function() {}, scHqPostData, false)
+
+            }, 3000)
+
+            //模拟赛
+            that.$utils.getJson(that.$utils.CONFIG.api.myRacelist, function(res) {
+             	if(res.succflag == 0) {
+                	that.tabs.tabs.simulation.dataList = res.data;
+              	}else {
+              		that.$utils.showTip('error', '', '', '', res.message);
+              	}
+            }, function() {}, {}, true, {token: that.$utils.CONFIG.token})
+
+            //赛事列表
+            that.$utils.getJson(that.$utils.CONFIG.api.competitionList, function(res) {
+             	if(res.succflag == 0) {
+                	that.tabs.tabs.list.dataList = res.data;
+              	}else {
+              		that.$utils.showTip('error', '', '', '', res.message);
+              	}
+            }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
+		},
+		destroyed: function () {
+			clearInterval(this.timer)
 		}
 	}
 </script>
-<style scoped lang="scss">
-  
+<style lang="scss">
+	.competition {
+		padding-top: 0;
+		.swiper-container {
+			width: 100%;
+			min-width: 1200px;
+		}
+		.activity {
+			margin-top: 10px;
+			.el-col {
+				position: relative;
+				height: 196px;
+				background-size: cover;
+				span {
+					position: absolute;
+					left: 0;
+					bottom: 0;
+					right: 0;
+					height: 50px;
+					line-height: 50px;
+					padding: 0 10px;
+					color: #fff;
+					font-size: 16px;
+					background: rgba(27, 27, 27, .6);
+				}
+			}
+		}
+		.lattice {
+			margin-top: 20px;
+			.el-col {
+				position: relative;
+				height: 140px;
+				div {
+					height: 140px;
+					padding: 30px;
+					background: #fff;
+					border: 1px solid #dde1e6;
+					h2 {
+						font-size: 18px;
+						font-weight: normal;
+						margin-bottom: 30px;
+					}
+					strong {
+						font-size: 14px;
+						color: #e20026;
+					}
+				}
+			}
+		}
+		.competition-body {
+			margin-bottom: 100px;
+			.el-tabs {
+				margin: 20px 0;
+				.el-tabs__nav {
+					margin-left: 20px;
+				}
+				.el-tabs__item {
+					font-size: 16px;
+					color: #4e4e4e;
+				}
+				.el-tabs__nav-wrap::after {
+					background-color: transparent;
+				}
+				.el-tabs__active-bar {
+					background-color: #e30129;
+				}
+			}
+			.simulation-item {
+				height: 450px;
+				padding: 20px;
+				margin-top: 20px;
+				border: 1px solid #dde1e6;
+				background-color: #fff;
+				.simulation-bar {
+					font-size: 16px;
+					color: #4e4e4e;
+					margin-top: 10px;
+					a {
+						font-size: 12px;
+						color: #5091fa;
+						float: right;
+					}
+				}
+				.simulation-img {
+					margin: 20px 0;
+					height: 210px;
+					background-size: cover;
+				}
+				.simulation-text {
+					height: 53px;
+					strong {
+						display: block;
+						padding: 0 15px;
+						font-size: 18px;
+						margin-bottom: 10px;
+					}
+					.simulation-text-type1 {
+						color: #e20026;
+					}
+					.simulation-text-type2 {
+						color: #6bca24;
+					}
+					.simulation-text-type3 {
+						color: #e20026;
+					}
+					span {
+						padding: 0 15px;
+						font-size: 14px;
+						color: #4e4e4e;
+					}
+				}
+				.simulation-trade {
+					height: 40px;
+					line-height: 40px;
+					margin-top: 30px;
+					color: #4e4e4e;
+					span {
+						color: #e30129;
+					}
+					a {
+						color: #5091fa;
+						margin-left: 20px;
+					}
+					.el-button--danger {
+						float: right;
+						margin-left: 20px;
+						background: #e30129;
+						span {
+							color: #fff;
+						}
+					}
+				}
+			}
+			.search {
+				display: flex;
+				height: 350px;
+				padding: 0 40px;
+				margin-top: 20px;
+				border: 1px solid #dde1e6;
+				background: #fff;
+				.search-l {
+					flex: 1;
+					padding: 40px 20px 0 40px;
+					.search-item {
+						display: flex;
+						margin-bottom: 40px;
+						.search-item-type {
+							width: 88px;
+							line-height: 30px;
+							font-weight: bold;
+							color: #4e4e4e;
+						}
+						.search-item-list {
+							flex: 1;
+							span {
+								display: inline-block;
+								width: 80px;
+								height: 30px;
+								line-height: 30px;
+								margin-right: 10px;
+								text-align: center;
+								&.active {
+									color: #fff;
+									border-radius: 20px;
+									background: #5091fa;
+								}
+							}
+							form {
+								.el-form-item {
+									width: 430px;
+									.el-button {
+										position: absolute;
+										top: 0;
+										right: 0;
+										bottom: 0;
+										width: 100px;
+										border-top-left-radius: 0;
+										border-bottom-left-radius: 0;
+										background: #5091fa;
+										span {
+											width: auto;
+											line-height: 22px;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				.search-r {
+					width: 240px;
+					text-align: center;
+					border-left: 1px solid #dde1e6;
+					strong {
+						display: block;
+						margin-top: 110px;
+						text-align: center;
+						font-size: 60px;
+						color: #e30129;
+					}
+					span {
+						font-size: 14px;
+						font-weight: bold;
+						color: #4e4e4e;
+					}
+				}
+			}
+			.list {
+				margin-top: 20px;
+				.list-item {
+					display: flex;
+					height: 296px;
+					margin-top: 10px;
+					padding: 20px;
+					border: 1px solid #dde1e6;
+					background: #fff;
+					.list-item-l {
+						width: 360px;
+						background-size: cover;
+					}
+					.list-item-c {
+						padding-left: 20px;
+						line-height: 26px;
+						color: #747474;
+						flex: 1;
+						strong {
+							font-weight: normal;
+						}
+						h2 {
+							font-size: 18px;
+							color: #747474;
+							margin-bottom: 10px;
+						}
+					}
+					.list-item-r {
+						width: 140px;
+						padding-top: 40px;
+						text-align: center;
+						a, button {
+							display: inline-block;
+							width: 110px;
+							height: 40px;
+							line-height: 40px;
+							text-align: center;
+							padding: 0;
+							margin-left: 0;
+							margin-bottom: 10px;
+							color: #fff;
+							border-radius: 4px;
+							font-size: 12px;
+						}
+						.bt1 {
+							background: #6ea5ff;
+						}
+						.bt2 {
+							background: #18ded2;
+						}
+						.bt3 {
+							background: #5091fa;
+						}
+						.bt4 {
+							background: #e30129;
+						}
+					}
+				}
+			}
+		}
+		.pager-wrapper {
+			padding-top: 10px;
+			padding-bottom: 10px;
+			margin-top: 10px;
+			background: #fff;
+			border: 1px solid #dde1e6;
+			.el-pagination {
+				text-align: center;
+				margin: 40px auto;
+			}
+		}
+		.signUp {
+	      .el-form {
+	        width: 490px;
+	        margin: 20px auto;
+	        margin-bottom: 60px;
+	        img {
+	          width: 92px;
+	          height: 32px;
+	          position: absolute;
+	          top: 4px;
+	          right: 5px;
+	        }
+	        .el-button--primary {
+	          width: 100%;
+	          margin-top: 20px;
+	        }
+	        .el-form-item {
+	          margin-bottom: 25px;
+	        }
+	      }
+	    }
+	}
 </style>

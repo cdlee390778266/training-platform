@@ -15,16 +15,31 @@ export default {
   	}
   },
   created() {
+    var that = this;
   	this.$utils.getTaken(function(res) {
-      alert(res);
+        alert(res);
     }, function(error) {
-      alert(error);
+        alert(error);
     })
+
+    this.$utils.getLoginData(function(res) {
+        alert(res);
+        that.$utils.CONFIG.token = res;
+    }, function(error) {
+        alert(error);
+    })
+
+    this.$utils.getUniversityCode(function(res) {
+        that.$utils.CONFIG.universitycode = res;
+    }, function(error) {
+        alert(error);
+    })
+
   }
 }
 </script>
 
-<style>
+<style lang="scss">
 * {
   padding: 0;
   margin: 0;
@@ -40,6 +55,17 @@ a {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+.img-responsive {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.mt10 {
+  margin-top: 10px;
+}
+.border {
+  border: 1px solid #dde1e6;
+}
 body {
   color: #4e4e4e;
   font-size: 14px;
@@ -53,9 +79,26 @@ body {
   bottom: 0;
 }
 .ql-wrapper {
-  width: 1400px;
+  width: 1200px;
   margin-left: auto;
   margin-right: auto;
+  &.ql-wrapper-common {
+    margin-top: 60px;
+    margin-bottom: 60px;
+    padding-bottom: 200px;
+    background: #fff;
+    border: 1px solid #dde1e6;
+    h1 {
+      color: #969595;
+      font-size: 16px;
+      padding: 30px 15px;
+      margin-left: 20px;
+    }
+  }
+}
+.el-pagination {
+  text-align: center;
+  margin: 40px auto;
 }
 .fade-enter-active, .fade-leave-active {
   transition: opacity .5s;

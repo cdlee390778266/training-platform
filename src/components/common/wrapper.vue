@@ -1,7 +1,7 @@
 <template>
 	<div class="wrapper">
-		<ql-head></ql-head>
-		<div class="ql-container" :class="{ menuCollapse: isCollapse}">
+		<ql-head :nav="nav"></ql-head>
+		<!-- <div class="ql-container" :class="{ menuCollapse: isCollapse}">
 	        <div class="ql-menu">
 	        	<ul class="ql-menu-ul">
 			        <li v-for="item in menu">
@@ -37,7 +37,8 @@
 		  	<div class="ql-right-view">
 		  		<router-view/>
 		  	</div>
-		</div>
+		</div> -->
+		<router-view/>
 	</div>
 </template>
 <script>
@@ -48,6 +49,67 @@
 		},
   		data() {
   			return {
+  				nav: [
+					{
+						id: '0',
+						text: '投资竞赛',
+						iconClass: 'menu-icon1',
+						handle: 'jumpToUrl',
+						handleData: '/competition',
+						isExternalLink: false
+					},
+		            {
+		              id: '1',
+		              text: '期权行情',
+		              iconClass: 'menu-icon2',
+		              handle: 'startExe',
+					  handleData: 'option',
+					  isExternalLink: false
+		            },
+		            {
+		              id: '2',
+		              text: '股票行情',
+		              iconClass: 'menu-icon3',
+		              handle: 'startExe',
+					  handleData: 'shares',
+					  isExternalLink: false
+		            },
+		            {
+		              id: '3',
+		              text: '策略选股',
+		              iconClass: 'menu-icon4',
+		              handle: 'jumpToUrl',
+					  handleData: '/stockselection',
+					  isExternalLink: false
+		            },
+		            {
+		              id: '4',
+		              text: '云课堂',
+		              iconClass: 'menu-icon5',
+		              handle: 'dropdown',
+					  handleData: [
+					  	{
+					  		text: '财经直播',
+					  		handleData: '/live',
+					  		isExternalLink: false
+					  	},
+					  	{
+					  		text: '知识库',
+					  		handleData: '',
+					  		isExternalLink: false
+					  	}
+					  ],
+					  isExternalLink: false
+		            },
+		            {
+		              id: '6',
+		              text: '教学课程',
+		              iconClass: 'menu-icon6',
+		              handle: 'jumpToUrl',
+					  handleData: '/curriculum',
+					  isExternalLink: false
+		            }
+  				],
   				menu: [
   					{
   						id: '0',

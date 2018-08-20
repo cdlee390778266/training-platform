@@ -1,5 +1,6 @@
 <template>
 	<div class="ahome">
+		<ql-head :nav="nav"></ql-head>
 		<div class="ql-wrapper">
 			<div class="ahome-top">
 				<div class="ahome-left">
@@ -21,6 +22,7 @@
 						    :colors="chartOpts.colors"
 						    :data-zoom="chartOpts.dataZoom"
 						    :tooltip="chartOpts.tooltip"
+						    :settings="chartOpts.chartSettings"
 						    >
 						</ve-line>
 					</div>
@@ -75,11 +77,11 @@
 					    </el-tab-pane>
 					    <el-tab-pane label="我的持仓" name="holdPos">
 					    	<div class="tab-chart">
-					    		<ve-ring :data="tabs.holdPos.chart.chartData"  ref="veRing" :legend="tabs.holdPos.chart.options.legend"></ve-ring>
+					    		<ve-ring :data="tabs.holdPos.chart.chartData"  ref="veRing" :legend="tabs.holdPos.chart.options.legend" ></ve-ring>
 					    	</div>
 					    	<div class="holdPos-bar">
 					    		持仓个股
-					    		<router-link>去交易</router-link>
+					    		<router-link to="/home"><el-button type="danger">去交易</el-button></router-link>
 					    	</div>
 					    	<div class="tab-body">
 					    		<el-table
@@ -90,44 +92,52 @@
 								    <el-table-column
 								      prop="code"
 								      label="股票代码"
-								      sortable
-								      width="180">
+								      sortable>
 								    </el-table-column>
 								    <el-table-column
 								      prop="name"
 								      label="股票名称"
+								      sortable>
+								    </el-table-column>
+								    <el-table-column
+								      prop="holdPos"
 								      sortable
-								      width="180">
+								      label="持仓量">
+								    </el-table-column>
+								    <el-table-column
+								      prop="date"
+								      sortable
+								      label="建仓时间">
+								    </el-table-column>
+								    <el-table-column
+								      prop="cost"
+								      sortable
+								      label="盈亏成本">
+								    </el-table-column>
+								    <el-table-column
+								      prop="price"
+								      sortable
+								      label="现价">
 								    </el-table-column>
 								    <el-table-column
 								      prop="increase"
 								      sortable
-								      label="幅度%">
-								    </el-table-column>
-								    <el-table-column
-								      prop="newest"
-								      sortable
-								      label="最新">
-								    </el-table-column>
-								    <el-table-column
-								      prop="riseAndFall"
-								      sortable
-								      label="涨跌">
-								    </el-table-column>
-								    <el-table-column
-								      prop="total"
-								      sortable
-								      label="总量">
-								    </el-table-column>
-								    <el-table-column
-								      prop="turnoverRate"
-								      sortable
-								      label="换手率%">
+								      label="今日涨幅">
 								    </el-table-column>
 								    <el-table-column
 								      prop="marketValue"
 								      sortable
-								      label="流通市值">
+								      label="股票市值">
+								    </el-table-column>
+								    <el-table-column
+								      prop="profitAndLoss"
+								      sortable
+								      label="盈亏率">
+								    </el-table-column>
+								    <el-table-column
+								      prop="float"
+								      sortable
+								      label="浮动盈亏">
 								    </el-table-column>
 							  	</el-table>
 							  	<el-pagination
@@ -167,6 +177,11 @@
 							    style="width: 100%"
 							    :default-sort = "{prop: 'date', order: 'descending'}"
 							    >
+							    	<el-table-column
+								      prop="date"
+								      sortable
+								      label="成交时间">
+								    </el-table-column>
 								    <el-table-column
 								      prop="code"
 								      label="股票代码"
@@ -180,34 +195,29 @@
 								      width="180">
 								    </el-table-column>
 								    <el-table-column
-								      prop="increase"
+								      prop="handle"
 								      sortable
-								      label="幅度%">
+								      label="操作">
 								    </el-table-column>
 								    <el-table-column
-								      prop="newest"
+								      prop="nums"
 								      sortable
-								      label="最新">
+								      label="成交数量">
 								    </el-table-column>
 								    <el-table-column
-								      prop="riseAndFall"
+								      prop="price"
 								      sortable
-								      label="涨跌">
+								      label="成交价">
 								    </el-table-column>
 								    <el-table-column
 								      prop="total"
 								      sortable
-								      label="总量">
+								      label="成交金额">
 								    </el-table-column>
 								    <el-table-column
-								      prop="turnoverRate"
+								      prop="status"
 								      sortable
-								      label="换手率%">
-								    </el-table-column>
-								    <el-table-column
-								      prop="marketValue"
-								      sortable
-								      label="流通市值">
+								      label="交易状态">
 								    </el-table-column>
 							  	</el-table>
 							  	<el-pagination
@@ -217,7 +227,73 @@
 								</el-pagination>
 					    	</div>
 					    </el-tab-pane>
-					    <el-tab-pane label="赛事排名" name="sort">赛事排名</el-tab-pane>
+					    <el-tab-pane label="赛事排名" name="sort" class="sort">
+					    	<div class="sort-head">
+							    <el-select v-model="tabs.sort.selectVal" placeholder="请选择">
+								    <el-option
+								      v-for="item in tabs.sort.selectOpts"
+								      :key="item.value"
+								      :label="item.label"
+								      :value="item.value">
+								    </el-option>
+								</el-select>
+					    	</div>
+					    	<div class="tab-body">
+					    		<el-table
+							    :data="tabs.sort.tableData"
+							    style="width: 100%"
+							    :default-sort = "{prop: 'date', order: 'descending'}"
+							    >
+								    <el-table-column
+								      prop="sort"
+								      label="排名"
+								    >
+								    </el-table-column>
+								    <el-table-column
+								      prop="name"
+								      label="用户名"
+								  >
+								    </el-table-column>
+								    <el-table-column
+								      prop="dayRate"
+								      label="日涨跌幅">
+								    </el-table-column>
+								    <el-table-column
+								      prop="weekRate"
+								      label="周收益率">
+								    </el-table-column>
+								    <el-table-column
+								      prop="monthRate"
+								      label="月收益率">
+								    </el-table-column>
+								    <el-table-column
+								      prop="totalRate"
+								      label="总收益率">
+								    </el-table-column>
+								    <el-table-column
+								      prop="total"
+								      label="总收益">
+								    </el-table-column>
+								    <el-table-column
+								      prop="marketValue"
+								      label="单位净值">
+								    </el-table-column>
+								    <el-table-column
+								      prop="marketValue"
+								      label="操作次数">
+								    </el-table-column>
+								    <el-table-column
+								      prop="marketValue"
+								      label="持仓市值">
+								    </el-table-column>
+							  	</el-table>
+							  	<el-pagination
+								  background
+								  layout="prev, pager, next"
+								  :total="1000">
+								</el-pagination>
+					    	</div>
+					    </el-tab-pane>
 					</el-tabs>
 				</div>
 				<div class="ahome-right">
@@ -225,7 +301,8 @@
 					<ul class="comment">
 						<li v-for="(item, index) in tabs.history.comment">
 							<div class="comment-head">
-								<span :style="'background-image: url(' + item.faceUrl + ')'"></span>
+								<span :style="'background-image: url(' + item.faceUrl + ')'" v-if="item.faceUrl"></span>
+								<span :style="'background-image: url(' + defaultFaceUrl + ')'" v-else></span>
 								<strong>{{item.name}}</strong>
 								{{item.date}}
 							</div>
@@ -233,7 +310,7 @@
 								<span>{{item.content | strLen(36)}}</span>
 							</div>
 							<div class="comment-foot">
-								<router-link :to="'/amdin/reply/' + item.id">回复</router-link>
+								<router-link :to="'/admin/reply/' + item.id">回复</router-link>
 							</div>
 						</li>
 					</ul>
@@ -247,10 +324,77 @@
 	import 'echarts/lib/component/dataZoom'
 	import 'echarts/lib/component/title'
 	import 'echarts/lib/component/tooltip'
+	import CONFIG from '../../js/config'
+	import qlHead from '../common/head.vue'
 	export default {
+	components: {
+		qlHead
+	},
     data () {
       return {
+      	nav: [
+			{
+				id: '0',
+				text: '投资竞赛',
+				iconClass: 'menu-icon1',
+				handle: 'jumpToUrl',
+				handleData: '/competition',
+				isExternalLink: false
+			},
+            {
+              id: '1',
+              text: '期权行情',
+              iconClass: 'menu-icon2',
+              handle: 'startExe',
+			  handleData: 'option',
+			  isExternalLink: false
+            },
+            {
+              id: '2',
+              text: '股票行情',
+              iconClass: 'menu-icon3',
+              handle: 'startExe',
+			  handleData: 'shares',
+			  isExternalLink: false
+            },
+            {
+              id: '3',
+              text: '策略选股',
+              iconClass: 'menu-icon4',
+              handle: 'jumpToUrl',
+			  handleData: '/stockselection',
+			  isExternalLink: false
+            },
+            {
+              id: '4',
+              text: '云课堂',
+              iconClass: 'menu-icon5',
+              handle: 'dropdown',
+			  handleData: [
+			  	{
+			  		text: '财经直播',
+			  		handleData: '/live',
+			  		isExternalLink: false
+			  	},
+			  	{
+			  		text: '知识库',
+			  		handleData: '',
+			  		isExternalLink: false
+			  	}
+			  ],
+			  isExternalLink: false
+            },
+            {
+              id: '5',
+              text: '教学课程',
+              iconClass: 'menu-icon6',
+              handle: 'jumpToUrl',
+			  handleData: '/curriculum',
+			  isExternalLink: false
+            }
+		],
       	account: '',
+      	defaultFaceUrl: CONFIG.defaultFaceUrl,
       	accountList: [
 	      	{
 	          value: '0',
@@ -279,7 +423,7 @@
         ],
         chartOpts: {
     		title: {
-			  	text: '收益率走势图  (创建于2018.08.08)',
+			  	text: '--',
 			  	left: 40,
 			  	textStyle: {
 			  		color: '#7d858d',
@@ -311,29 +455,37 @@
                 	return params.name + '<br/>' + params.marker + params.seriesName + ': ' + params.data[1]*100 + '%' ;
                 }
 		    },
+		    chartSettings: {
+			    labelMap: {
+		          'profit': '我的收益',
+		          'hs300': '沪深300',
+		          'hs500': '沪深500'
+		        }
+		    },
 		    data: {
-	          columns: ['日期', '我的收益', '沪深300', '沪深500'],
+	          columns: ['date', 'profit', 'hs300', 'hs500'],
+	          title: '收益率走势图  (创建于2018.08.08)',
 	          rows: [
-	            { '日期': '2015-12-21', '我的收益': 0.1, '沪深300': 0.05, '沪深500': -0.05},
-	            { '日期': '2015-12-22', '我的收益': 0.2, '沪深300': 0.25, '沪深500': 0.2},
-	            { '日期': '2015-12-23', '我的收益': 0.3888, '沪深300': -0.1, '沪深500': -0.3},
-	            { '日期': '2015-12-24', '我的收益': -0.15, '沪深300': -0.32, '沪深500': -0.2},
-	            { '日期': '2015-12-25', '我的收益': -0.01, '沪深300': 0.3, '沪深500': -0.05},
-	            { '日期': '2015-12-26', '我的收益': -0.4, '沪深300': -0.55, '沪深500': -0.5}
+	            { 'date': '2015-12-21', 'profit': 0.1, 'hs300': 0.05, 'hs500': -0.05},
+	            { 'date': '2015-12-22', 'profit': 0.2, 'hs300': 0.25, 'hs500': 0.2},
+	            { 'date': '2015-12-23', 'profit': 0.3888, 'hs300': -0.1, 'hs500': -0.3},
+	            { 'date': '2015-12-24', 'profit': -0.15, 'hs300': -0.32, 'hs500': -0.2},
+	            { 'date': '2015-12-25', 'profit': -0.01, 'hs300': 0.3, 'hs500': -0.05},
+	            { 'date': '2015-12-26', 'profit': -0.4, 'hs300': -0.55, 'hs500': -0.5}
 	          ]
 	        }
     	},
-    	activeTab: 'assets',
+    	activeTab: 'holdPos',
     	tabs: {
     		assets: {
     			data: {
     				day: [
 	    				{
 	    				  text: '当日账户',
-				          profit: '-1.10%',
-				          loss: '-2.22%',
-				          assets: '10000',
-				          increase: '10%'
+				          profit: '当日盈利率',
+				          loss: '当日盈亏',
+				          assets: '昨日资产',
+				          increase: '当日上证涨幅'
 				        },
 				        {
 				          profit: '-1.10%',
@@ -344,11 +496,11 @@
 			        ],
 			        week: [
 	    				{
-	    				  text: '本周账户',
-				          profit: '-1.10%',
-				          loss: '-2.22%',
-				          assets: '10000',
-				          increase: '10%'
+	    				  text: '当日账户',
+				          profit: '当日盈利率',
+				          loss: '当日盈亏',
+				          assets: '昨日资产',
+				          increase: '当日上证涨幅'
 				        },
 				        {
 				          profit: '-1.10%',
@@ -359,11 +511,11 @@
 			        ],
 			        month: [
 	    				{
-	    				  text: '本月账户',
-				          profit: '-1.10%',
-				          loss: '-2.22%',
-				          assets: '10000',
-				          increase: '10%'
+	    				  text: '当日账户',
+				          profit: '当日盈利率',
+				          loss: '当日盈亏',
+				          assets: '昨日资产',
+				          increase: '当日上证涨幅'
 				        },
 				        {
 				          profit: '-1.10%',
@@ -374,11 +526,11 @@
 			        ],
 			        assets: [
 	    				{
-	    				  text: '资产',
-				          profit: '-1.10%',
-				          loss: '-2.22%',
-				          assets: '10000',
-				          increase: '10%'
+	    				  text: '当日账户',
+				          profit: '当日盈利率',
+				          loss: '当日盈亏',
+				          assets: '昨日资产',
+				          increase: '当日上证涨幅'
 				        },
 				        {
 				          profit: '-1.10%',
@@ -414,95 +566,105 @@
     			},
 		        tableData: [
 			        {
-			          code: '0006558',
-			          name: '王小虎',
-			          increase: -0.64,
-			          newest: 44.38,
-			          riseAndFall: 1.38,
-			          total: 44.38,
-			          turnoverRate: 75064,
-			          marketValue: 0.35
+			          code: '000651',
+			          name: '格力空调',
+			          holdPos: 500,
+			          date: '2018-04-23',
+			          cost: 49.66,
+			          price: 44.38,
+			          marketValue: 23010.00,
+			          increase: '1.61%',
+			          profitAndLoss: '-7.33%',
+			          float: '-1819.81'
 			        },
 			        {
-			          code: '000621',
-			          name: '王小虎',
-			          increase: -0.64,
-			          newest: 44.38,
-			          riseAndFall: 1.38,
-			          total: 44.38,
-			          turnoverRate: 75064,
-			          marketValue: 0.35
+			          code: '000651',
+			          name: '格力空调',
+			          holdPos: 500,
+			          date: '2018-04-23',
+			          cost: 49.66,
+			          price: 44.38,
+			          marketValue: 23010.00,
+			          increase: '1.61%',
+			          profitAndLoss: '-7.33%',
+			          float: '-1819.81'
 			        },
 			        {
-			          code: '000654',
-			          name: '王小虎',
-			          increase: -0.64,
-			          newest: 44.38,
-			          riseAndFall: 1.38,
-			          total: 44.38,
-			          turnoverRate: 75064,
-			          marketValue: 0.35
+			          code: '000651',
+			          name: '格力空调',
+			          holdPos: 500,
+			          date: '2018-04-23',
+			          cost: 49.66,
+			          price: 44.38,
+			          marketValue: 23010.00,
+			          increase: '1.61%',
+			          profitAndLoss: '-7.33%',
+			          float: '-1819.81'
 			        },
 			        {
-			          code: '000654',
-			          name: '王小虎',
-			          increase: -0.64,
-			          newest: 44.38,
-			          riseAndFall: 1.38,
-			          total: 44.38,
-			          turnoverRate: 75064,
-			          marketValue: 0.35
+			          code: '000651',
+			          name: '格力空调',
+			          holdPos: 500,
+			          date: '2018-04-23',
+			          cost: 49.66,
+			          price: 44.38,
+			          marketValue: 23010.00,
+			          increase: '1.61%',
+			          profitAndLoss: '-7.33%',
+			          float: '-1819.81'
 			        },
 			        {
-			          code: '000654',
-			          name: '王小虎',
-			          increase: -0.64,
-			          newest: 44.38,
-			          riseAndFall: 1.38,
-			          total: 44.38,
-			          turnoverRate: 75064,
-			          marketValue: 0.35
-			        },
+			          code: '000651',
+			          name: '格力空调',
+			          holdPos: 500,
+			          date: '2018-04-23',
+			          cost: 49.66,
+			          price: 44.38,
+			          marketValue: 23010.00,
+			          increase: '1.61%',
+			          profitAndLoss: '-7.33%',
+			          float: '-1819.81'
+			        }
 		        ],
 		        comment: [
 		        	{
 		        		id: '1',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '2',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '3',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '4',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '5',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
@@ -544,95 +706,228 @@
 		        daterange: '',
 		        tableData: [
 			        {
+			          date: '2018-07-03',
 			          code: '000658',
-			          name: '王小虎',
-			          increase: -0.64,
-			          newest: 44.38,
-			          riseAndFall: 1.38,
-			          total: 44.38,
-			          turnoverRate: 75064,
-			          marketValue: 0.35
+			          name: '蓝海华腾',
+			          handle: '卖出',
+			          nums: 10900,
+			          price: 17.08,
+			          total: 186172.33,
+			          status: '已成交'
 			        },
 			        {
-			          code: '000621',
-			          name: '王小虎',
-			          increase: -0.64,
-			          newest: 44.38,
-			          riseAndFall: 1.38,
-			          total: 44.38,
-			          turnoverRate: 75064,
-			          marketValue: 0.35
+			          date: '2018-07-03',
+			          code: '000658',
+			          name: '蓝海华腾',
+			          handle: '卖出',
+			          nums: 10900,
+			          price: 17.08,
+			          total: 186172.33,
+			          status: '已成交'
 			        },
 			        {
-			          code: '000654',
-			          name: '王小虎',
-			          increase: -0.64,
-			          newest: 44.38,
-			          riseAndFall: 1.38,
-			          total: 44.38,
-			          turnoverRate: 75064,
-			          marketValue: 0.35
+			          date: '2018-07-03',
+			          code: '000658',
+			          name: '蓝海华腾',
+			          handle: '卖出',
+			          nums: 10900,
+			          price: 17.08,
+			          total: 186172.33,
+			          status: '已成交'
 			        },
 			        {
-			          code: '000654',
-			          name: '王小虎',
-			          increase: -0.64,
-			          newest: 44.38,
-			          riseAndFall: 1.38,
-			          total: 44.38,
-			          turnoverRate: 75064,
-			          marketValue: 0.35
+			          date: '2018-07-03',
+			          code: '000658',
+			          name: '蓝海华腾',
+			          handle: '卖出',
+			          nums: 10900,
+			          price: 17.08,
+			          total: 186172.33,
+			          status: '已成交'
 			        },
 			        {
-			          code: '000654',
-			          name: '王小虎',
-			          increase: -0.64,
-			          newest: 44.38,
-			          riseAndFall: 1.38,
-			          total: 44.38,
-			          turnoverRate: 75064,
-			          marketValue: 0.35
-			        },
+			          date: '2018-07-03',
+			          code: '000658',
+			          name: '蓝海华腾',
+			          handle: '卖出',
+			          nums: 10900,
+			          price: 17.08,
+			          total: 186172.33,
+			          status: '已成交'
+			        }
 		        ],
 		        comment: [
 		        	{
 		        		id: '1',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '2',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '3',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '4',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
 		        	},
 		        	{
 		        		id: '5',
-		        		faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+		        		faceUrl: '',
+		        		name: '张老师',
+		        		date: '2018-07-02',
+		        		content: '王同学的选股能力还是很不错的，加油!'
+		        	}
+		        ]
+    		},
+    		sort: {
+    			selectVal: [],
+		        selectOpts: [
+			      	{
+			          value: '0',
+			          label: '日涨跌幅'
+			        },
+			        {
+			          value: '1',
+			          label: '周收益率'
+			        },
+			        {
+			          value: '2',
+			          label: '月收益率'
+			        },
+			        {
+			          value: '3',
+			          label: '总收益率'
+			        },
+			        {
+			          value: '4',
+			          label: '总收益'
+			        },
+			        {
+			          value: '5',
+			          label: '单位净值'
+			        },
+			        {
+			          value: '6',
+			          label: '操作次数'
+			        },
+			        {
+			          value: '7',
+			          label: '持仓市值'
+			        }
+		        ],
+		        tableData: [
+			        {
+			          sort: '1',
+			          name: '豌豆荚',
+			          dayRate: '+0.64%',
+			          weekRate: '+0.64%',
+			          monthRate: '0.00%',
+			          totalRate: '-44.38%',
+			          total: 25648.33,
+			          marketValue: 32568799.33
+			        },
+			        {
+			          sort: '2',
+			          name: '豌豆荚',
+			          dayRate: '+0.64%',
+			          weekRate: '+0.64%',
+			          monthRate: '0.00%',
+			          totalRate: '-44.38%',
+			          total: 25648.33,
+			          marketValue: 32568799.33
+			        },
+			        {
+			          sort: '3',
+			          name: '豌豆荚',
+			          dayRate: '+0.64%',
+			          weekRate: '+0.64%',
+			          monthRate: '0.00%',
+			          totalRate: '-44.38%',
+			          total: 25648.33,
+			          marketValue: 32568799.33
+			        },
+			        {
+			          sort: '4',
+			          name: '豌豆荚',
+			          dayRate: '+0.64%',
+			          weekRate: '+0.64%',
+			          monthRate: '0.00%',
+			          totalRate: '-44.38%',
+			          total: 25648.33,
+			          marketValue: 32568799.33
+			        },
+			        {
+			          sort: '5',
+			          name: '豌豆荚',
+			          dayRate: '+0.64%',
+			          weekRate: '+0.64%',
+			          monthRate: '0.00%',
+			          totalRate: '-44.38%',
+			          total: 25648.33,
+			          marketValue: 32568799.33
+			        }
+		        ],
+		        comment: [
+		        	{
+		        		id: '1',
+		        		faceUrl: '',
+		        		name: '张老师',
+		        		date: '2018-07-02',
+		        		content: '王同学的选股能力还是很不错的，加油!'
+		        	},
+		        	{
+		        		id: '2',
+		        		faceUrl: '',
+		        		name: '张老师',
+		        		date: '2018-07-02',
+		        		content: '王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油!'
+		        	},
+		        	{
+		        		id: '3',
+		        		faceUrl: '',
+		        		name: '张老师',
+		        		date: '2018-07-02',
+		        		content: '王同学的选股能力还是很不错的，加油!'
+		        	},
+		        	{
+		        		id: '',
+		        		faceUrl: '',
+		        		name: '张老师',
+		        		date: '2018-07-02',
+		        		content: '王同学的选股能力还是很不错的，加油!'
+		        	},
+		        	{
+		        		id: '4',
+		        		faceUrl: '',
+		        		name: '张老师',
+		        		date: '2018-07-02',
+		        		content: '王同学的选股能力还是很不错的，加油!'
+		        	},
+		        	{
+		        		id: '5',
+		        		faceUrl: '',
 		        		name: '张老师',
 		        		date: '2018-07-02',
 		        		content: '王同学的选股能力还是很不错的，加油!'
@@ -666,24 +961,26 @@
 			console.log('submit!');
 		}
     },
-    filters: {
-	  strLen: function (str, maxLength) {
-	    if (!str) return ''
-	    str = str.toString()
-	    return str.length >= maxLength ? str.substr(0, maxLength) + '...' : str;
-	  }
-	},
 	watch: {
       activeTab (v) {
         this.$nextTick(_ => {
           this.$refs['veRing'].echarts.resize()
         })
       }
+    },
+    created() {
+    	this.chartOpts.title.text = '收益率走势图  (创建于2018.08.08)'
     }
   }
 </script>
 <style lang="scss">
 	.ahome {
+		.header {
+			min-width: 1400px;
+		}
+		.ql-wrapper {
+			width: 1400px;
+		}
 		.ahome-top {
 			height: 374px;
 			margin-top: 20px;
@@ -818,6 +1115,24 @@
 						font-size: 18px;
 						font-weight: bold;
 					}
+				}
+				.holdPos-bar {
+					padding: 20px;
+					line-height: 40px;
+					overflow: hidden;
+					a {
+						float: right;
+					}
+					.el-button--danger {
+						background-color: #e30129;
+    					border-color: #e30129;
+					}
+				}
+				.sort-head {
+					text-align: right;
+					margin-top: 0px;
+					margin-bottom: 20px;
+					margin-right: 50px;
 				}
 			}
 			.comment {

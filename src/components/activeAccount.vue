@@ -1,19 +1,16 @@
 <template>
-	<div class="register">
-		<div class="register-box">
-			<h1>注册账号</h1>
-			<el-form :model="registerForm" status-icon :rules="registerRules" ref="registerForm" label-width="120px" class="demo-ruleForm register-form">
+	<div class="activeAccount">
+		<div class="activeAccount-box">
+			<h1>激活账号</h1>
+			<el-form :model="activeAccountForm" status-icon :rules="activeAccountRules" ref="activeAccountForm" label-width="120px" class="demo-ruleForm activeAccount-form">
 			  <el-form-item label="学号" prop="ID">
-			    <el-input v-model="registerForm.ID" placeholder="请输入学号"></el-input>
-			  </el-form-item>
-			  <el-form-item label="姓名" prop="name">
-			    <el-input v-model="registerForm.name" placeholder="请输入真实姓名"></el-input>
+			    <el-input v-model="activeAccountForm.ID" placeholder="请输入学号"></el-input>
 			  </el-form-item>
 			  <el-form-item label="手机号" prop="phone">
-			    <el-input v-model="registerForm.phone" placeholder="请输入手机号"></el-input>
+			    <el-input v-model="activeAccountForm.phone" placeholder="请输入手机号"></el-input>
 			  </el-form-item>
 			  <el-form-item label="验证码" prop="code" class="code">
-			    <el-input v-model="registerForm.code" placeholder="请输入验证码"></el-input>
+			    <el-input v-model="activeAccountForm.code" placeholder="请输入验证码"></el-input>
 			    <el-button @click="getCode" :disabled="isShowCountDown">
 			    	<template v-if="!isShowCountDown">
 			    		<span v-if="isCodeLoading"><i class="el-icon-loading"></i>加载中</span>
@@ -24,14 +21,8 @@
 			    	</template>
 				</el-button>
 			  </el-form-item>
-			  <el-form-item label="设置密码" prop="pass">
-			    <el-input type="password" v-model="registerForm.pass" auto-complete="off" placeholder="请设置密码"></el-input>
-			  </el-form-item>
-			  <el-form-item label="再次输入密码" prop="checkPass">
-			    <el-input type="password" v-model="registerForm.checkPass" auto-complete="off" placeholder="请再次输入密码"></el-input>
-			  </el-form-item>
-			  <el-form-item class="register-submit">
-			    <el-button @click="submitForm('registerForm')">注册</el-button>
+			  <el-form-item class="activeAccount-submit">
+			    <el-button @click="submitForm('activeAccountForm')">激活</el-button>
 			  </el-form-item>
 			</el-form>
 		</div>
@@ -65,8 +56,8 @@
 				if (value === '') {
 					callback(new Error('请输入密码'));
 				} else {
-				if (this.registerForm.checkPass !== '') {
-					this.$refs.registerForm.validateField('checkPass');
+				if (this.activeAccountForm.checkPass !== '') {
+					this.$refs.activeAccountForm.validateField('checkPass');
 				}
 					callback();
 				}
@@ -74,7 +65,7 @@
 			var validatePass2 = (rule, value, callback) => {
 				if (value === '') {
 					callback(new Error('请再次输入密码'));
-				} else if (value !== this.registerForm.pass) {
+				} else if (value !== this.activeAccountForm.pass) {
 					callback(new Error('两次输入密码不一致!'));
 				} else {
 					callback();
@@ -85,20 +76,14 @@
 				isCodeLoading: false,
 				count: '',
 				timer: null,
-				registerForm: {
+				activeAccountForm: {
 					ID: '',
-					name: '',
 					phone: '',
-					code: '',
-					pass: '',
-					checkPass: ''
+					code: ''
 				},
-				registerRules: {
+				activeAccountRules: {
 					ID: [
 						{ required: true, message: '请输入学号', trigger: 'blur' }
-					],
-					name: [
-						{ required: true, message: '请输入真实姓名', trigger: 'blur' }
 					],
 					phone: [
 						{ required: true, message: '请输入手机号', trigger: 'blur' },
@@ -121,11 +106,11 @@
 		},
 		methods: {
 			getCode() {
-				if (!this.registerForm.phone) {
+				if (!this.activeAccountForm.phone) {
 					this.$utils.showTip('error', 'error', '-1010');
 					return;
 				}
-				if(!(/^1[3|4|5|8][0-9]\d{8}$/.test(this.registerForm.phone))){
+				if(!(/^1[3|4|5|8][0-9]\d{8}$/.test(this.activeAccountForm.phone))){
 					this.$utils.showTip('error', 'error', '-1011');
 					return;
 				}
@@ -152,36 +137,31 @@
 							}, 1000)
 						}
 					}else {
-						that.$utils.showTip('error', 'error', '-1012');
+						this.$utils.showTip('error', 'error', '-1012');
 					}
 					that.isCodeLoading = false;
 				}, function() {
 					that.isCodeLoading = false;
-				}, {objectid: that.registerForm.phone, type: "1"}, false)
+				}, {objectid: that.activeAccountForm.phone, type: "1"}, false)
 			},
 			submitForm(formName) {
 				var that = this;
-				var universitycode
 				this.$refs[formName].validate((valid) => {
 					if (valid) {
-						var registerData = {
+						var activeAccountData = {
 						 	universitycode: that.$utils.CONFIG.universitycode,
-						 	studentid: that.registerForm.ID,
-						 	realname: that.registerForm.name,
-						 	mobile: that.registerForm.phone,
-						 	verifycode: that.registerForm.code,
-						 	password: that.$utils.sha1(that.registerForm.pass)
+						 	userid: that.activeAccountForm.phone,
+						 	verifycode: that.activeAccountForm.code,
+						 	studentid: that.activeAccountForm.ID
 						}
-						that.$utils.getJson(that.$utils.CONFIG.api.register, function(res) {
+						that.$utils.getJson(that.$utils.CONFIG.api.activeAccount, function(res) {
 							if(res.succflag == 0) {
-								that.$utils.showTip('success', '', '', res.message);
-								that.$refs['registerForm'].resetFields();
+								this.$utils.showTip('error', '', '', '', res.message);
+								this.$refs['activeAccountForm'].resetFields();
 							}else {
-								that.$utils.showTip('error', '', '', res.message);
+								this.$utils.showTip('error', '', '', '', res.message);
 							}
-						}, function() {
-
-						}, registerData)
+						}, function() {}, activeAccountData)
 					} else {
 						return false;
 					}
@@ -194,8 +174,8 @@
 	}
 </script>
 <style lang="scss">
-	.register {
-		.register-box {
+	.activeAccount {
+		.activeAccount-box {
 			width: 800px;
 			padding: 40px 60px 100px 60px;
 			margin: 100px auto;
@@ -204,7 +184,7 @@
 				font-size: 18px;
 				color: #7d858d;
 			}
-			.register-form {
+			.activeAccount-form {
 				padding: 100px 85px;
 				font-size: 16px;
 				.el-form-item__label {
@@ -230,7 +210,7 @@
 						border: 1px solid #e3e3e3;
 					}
 				}
-				.register-submit {
+				.activeAccount-submit {
 					margin-top: 30px;
 					.el-button {
 						width: 100%;

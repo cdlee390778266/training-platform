@@ -13,12 +13,30 @@
               <template v-if="item.handle =='jumpToUrl'">
                 <router-link :to="item.handleData" v-if="!item.isExternalLink">
                   <i class="ql-nav-icon" :class="item.iconClass"></i>
-                        <span>{{item.text}}</span>
+                      <span>{{item.text}}</span>
                 </router-link>
                 <a :href="item.handleData" v-else>
                   <i class="ql-nav-icon" :class="item.iconClass"></i>
                     <span>{{item.text}}</span>
                 </a>
+              </template>
+              <template v-if="item.handle == 'dropdown'">
+                <el-dropdown>
+                  <span class="el-dropdown-link">
+                    <i class="ql-nav-icon" :class="item.iconClass"></i>
+                    <strong>{{item.text}}<i class="el-icon-arrow-down el-icon-caret-bottom"></i></strong>
+                  </span>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item v-for="(data, index) in item.handleData" :key="index">
+                      <router-link :to="data.handleData" v-if="!data.isExternalLink">
+                          <span>{{data.text}}</span>
+                      </router-link>
+                      <a :href="data.handleData" v-else>
+                          <span>{{data.text}}</span>
+                      </a>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
               </template>
             </li>
           </ul>
@@ -39,7 +57,12 @@
                         <router-link :to="data.data">{{data.text}}</router-link>
                       </template>
                       <template v-if="!data.isLink">
-                        <span>{{data.text}}</span>
+                        <template v-if="data.isBindEmail">
+                          <span @click="email.dialogFormVisible = true">{{data.text}}</span>
+                        </template>
+                        <template v-else>
+                          <span>{{data.text}}</span>
+                        </template>
                       </template>
                     </el-dropdown-item>
                   </el-dropdown-menu>
@@ -48,11 +71,55 @@
     			</li>
     		</ul>
       </div>
+      <!-- 绑定邮箱弹窗 -->
+      <el-dialog title="绑定邮箱" :visible.sync="email.dialogFormVisible" class="bindEmail" width="600px">
+        <el-form :model="email.emailForm" :rules="email.emailRules" ref="bindEmailForm">
+          <el-form-item label="邮箱" :label-width="email.formLabelWidth" prop="email">
+            <el-input v-model="email.emailForm.email" placeholder="请输入邮箱地址" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="验证码" prop="code" class="code" :label-width="email.formLabelWidth">
+            <el-input v-model="email.emailForm.code" placeholder="请输入验证码"></el-input>
+            <el-button @click="getCode" :disabled="isShowCountDown" type="danger" size="small" class="codeBtn">
+              <template v-if="!isShowCountDown">
+                <span v-if="isCodeLoading"><i class="el-icon-loading"></i>加载中</span>
+                <span v-else>获取验证码</span>
+              </template>
+              <template v-else>
+                {{count}}s
+              </template>
+          </el-button>
+          </el-form-item>
+          <el-form-item :label-width="email.formLabelWidth">
+            <el-button type="primary" @click="submitForm('bindEmailForm')">确定</el-button>
+          </el-form-item>
+        </el-form>
+      </el-dialog>
   	</div>
 </template>
 <script>
+    var saveCode = '';
   	export default {
   		data() {
+        var checkCode = (rule, value, callback) => {
+          if (!value) {
+            return callback(new Error('请输入正确验证码'));
+          }
+          if(value != saveCode){
+            callback(new Error('验证码不正确'));
+          } else {
+            callback();
+          }
+        };
+        var checkEmail = (rule, value, callback) => {
+          if (!value) {
+            return callback(new Error('请输入邮箱地址'));
+          }
+          if(!(/^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/.test(value))){
+            callback(new Error('邮箱地址错误'));
+          } else {
+            callback();
+          }
+        };
   			return {
   				header: [
   					{
@@ -68,23 +135,46 @@
   						data: [
                 {
                   text: '个人信息',
-                  data:'/admin/user',
+                  data:'/admin/userinfo',
                   isLink: true
                 },
                 {
                   text: '绑定邮箱',
-                  data:'/admin/email',
-                  isLink: true
+                  data:'/admin/setting/email',
+                  isBindEmail: true,
+                  isLink: false
                 },
                 {
-                  text: '个人设置',
+                  text: '账号设置',
                   data:'/admin/setting',
                   isLink: true
                 }
               ],
               isLink: false
   					}
-  				]
+  				],
+          isShowCountDown: false,
+          isCodeLoading: false,
+          count: '',
+          timer: null,
+          email: {
+            dialogFormVisible: false,
+            formLabelWidth: '120px',
+            emailForm: {
+              email: '',
+              code: '',
+            },
+            emailRules: {
+              email: [
+                { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+                { validator: checkEmail, trigger: 'blur' }
+              ],
+              code: [
+                { required: true, message: '请输入验证码', trigger: 'blur' },
+                { validator: checkCode, trigger: 'blur' }
+              ]
+            }
+          }
   			}
   		},
       props: ['nav'],
@@ -102,18 +192,90 @@
               }
               this.$utils.handleExe(json, function(){}, function(){})
             }
-          }
+          },
+          submitForm(formName) {
+            this.$refs[formName].validate((valid) => {
+              if (valid) {
+                alert('submit!');
+              } else {
+                console.log('error submit!!');
+                return false;
+              }
+            });
+          },
+          getCode() {
+            if (!this.email.emailForm.email) {
+              this.$utils.showTip('error', 'error', '-1020');
+              return;
+            }
+            if(!(/^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/.test(this.email.emailForm.email))){
+              this.$utils.showTip('error', 'error', '-1011');
+              return;
+            }
+            if(this.isCodeLoading) {
+              return;
+            }
+            this.isCodeLoading = true;
+            var that = this;
+            var timeCount = this.$utils.CONFIG.codeTime;
+            that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
+              if(res.succflag == 0) {
+                saveCode = res.data;
+                if (!that.timer) {
+                  that.count = timeCount;
+                  that.isShowCountDown = true;
+                  that.timer = setInterval(() => {
+                    if (that.count > 0 && that.count <= timeCount) {
+                    that.count--;
+                    } else {
+                      that.isShowCountDown = false;
+                      clearInterval(that.timer);
+                      that.timer = null;
+                    }
+                  }, 1000)
+                }
+              }else {
+                that.$utils.showTip('error', 'error', '-1022');
+              }
+              that.isCodeLoading = false;
+            }, function() {
+              that.isCodeLoading = false;
+            }, {objectid: that.email.emailForm.email, type: "2"}, false)
+          },
+          submitForm(formName) {
+            var that = this;
+            this.$refs[formName].validate((valid) => {
+              if (valid) {
+                var editEmailData = {
+                  universitycode: that.$utils.CONFIG.universitycode,
+                  verifycode: that.email.emailForm.code,
+                  email: that.email.emailForm.email
+                }
+                that.$utils.getJson(that.$utils.CONFIG.api.editEmail, function(res) {
+                  if(res.succflag == 0) {
+                    that.$utils.showTip('error', '', '', '', res.message);
+                    that.$refs['bindEmailForm'].resetFields();
+                  }else {
+                    that.$utils.showTip('error', '', '', '', res.message);
+                  }
+                }, function() {}, editEmailData)
+              } else {
+                return false;
+              }
+            });
+          },
       }
   	}
 </script>
-<style scoped lang="scss">
+<style lang="scss">
     .header {
       height: 36px;
       line-height: 36px;
-      min-width: 1400px;
+      min-width: 1200px;
       border-bottom: 1px solid #e1e4e8;
       text-align: right;
-      background: #f7fbff;
+      background: #fff;
+      overflow: hidden;
       ul {
         li {
           display: inline-block;
@@ -143,6 +305,8 @@
           overflow: hidden;
           &> div, & > a {
             display: block;
+            padding-left: 5px;
+            padding-right: 12px;
             transition: all .4s;
             cursor: pointer;
             &:hover {
@@ -180,6 +344,9 @@
               &.menu-icon5 {
                 background-position: -5px -273px;
               }
+              &.menu-icon6 {
+                background-position: -5px -337px;
+              }
             }
             &.active {
               background: #f1f4f7;
@@ -198,8 +365,47 @@
               .menu-icon5 {
                 background-position: -48px -273px;
               }
+              .menu-icon6 {
+                background-position: -48px -337px;
+              }
+              span {
+                color: #e92a34 !important;
+              }
             }
           }
+        }
+        .el-dropdown-link {
+          display: block;
+          height: 36px;
+          strong {
+            position: relative;
+            top: -7px;
+            color: #969595;
+          }
+        }
+      }
+    }
+    .bindEmail {
+      .el-dialog__header {
+        text-align: left;
+      }
+      .el-form {
+        width: 490px;
+        margin: 20px auto;
+        margin-bottom: 60px;
+        .codeBtn {
+          width: 92px;
+          position: absolute;
+          top: 4px;
+          right: 5px;
+          background: #e30129;
+        }
+        .el-button--primary {
+          width: 100%;
+          margin-top: 20px;
+        }
+        .el-form-item {
+          margin-bottom: 25px;
         }
       }
     }

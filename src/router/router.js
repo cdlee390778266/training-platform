@@ -5,16 +5,22 @@ const Home  = () => import('../components/home')
 
 const Wrapper  = () => import('../components/common/wrapper.vue')
 const Competition  = () => import('../components/competition.vue')
-const OptionsMarket  = () => import('../components/optionsmarket.vue')
-const StockMarket  = () => import('../components/stockmarket.vue')
+const CompetitionDeail  = () => import('../components/competitionDetail.vue')
 const StockSelection  = () => import('../components/stockselection.vue')
 const Live  = () => import('../components/live.vue')
+const Curriculum  = () => import('../components/curriculum.vue')
+const CurriculumDetail  = () => import('../components/curriculumDetail.vue')
 
 const AdminWrapper  = () => import('../components/admin/adminWrapper.vue')
+const MsgCenter  = () => import('../components/msgCenter.vue')
 const AdminHome  = () => import('../components/admin/adminHome.vue')
+const Reply  = () => import('../components/admin/reply.vue')
+const UserInfo  = () => import('../components/admin/userInfo.vue')
 const Setting  = () => import('../components/admin/setting.vue')
 
 const Register  = () => import('../components/register.vue')
+const GetPwd  = () => import('../components/getPwd.vue')
+const ActiveAccount  = () => import('../components/activeAccount.vue')
 
 Vue.use(Router)
 
@@ -37,6 +43,18 @@ const router = new Router({
       meta: { title: '注册'}
     },
     {
+      path: '/getpwd',
+      name: 'getpwd',
+      component: GetPwd,
+      meta: { title: '找回密码'}
+    },
+    {
+      path: '/activeaccount',
+      name: 'activeaccount',
+      component: ActiveAccount,
+      meta: { title: '激活账号'}
+    },
+    {
       path: '/wrapper',
       name: 'wrapper',
       component: Wrapper,
@@ -48,16 +66,10 @@ const router = new Router({
           meta: { title: '投资竞赛'}
         },
         {
-          path: '/optionsmarket',
-          name: 'optionsmarket',
-          component: OptionsMarket,
-          meta: { title: '期权行情'}
-        },
-        {
-          path: '/stockmarket',
-          name: 'stockmarket',
-          component: StockMarket,
-          meta: { title: '股票行情'}
+          path: '/competition/detail/:type',
+          name: 'competitionDetail',
+          component: CompetitionDeail,
+          meta: { title: '投资竞赛'}
         },
         {
           path: '/stockselection',
@@ -69,7 +81,25 @@ const router = new Router({
           path: '/live',
           name: 'live',
           component: Live,
-          meta: { title: '云直播'}
+          meta: { title: '财经直播'}
+        },
+        {
+          path: '/curriculum',
+          name: 'curriculum',
+          component: Curriculum,
+          meta: { title: '教学课程'}
+        },
+        {
+          path: '/curriculum/detail/:type/:id',
+          name: 'curriculumDetail',
+          component: CurriculumDetail,
+          meta: { title: '教学课程'}
+        },
+        {
+          path: '/msgCenter',
+          name: 'msgCenter',
+          component: MsgCenter,
+          meta: { title: '消息中心'}
         },
       ]
     },
@@ -79,22 +109,30 @@ const router = new Router({
       component: AdminWrapper,
       children: [
         {
-          path: 'home',
-          name: 'adminHome',
-          component: AdminHome,
-          meta: { title: '个人中心'}
+          path: 'reply/:id',
+          name: 'reply',
+          component: Reply,
+          meta: { title: '教师点评'}
+        },
+        {
+          path: 'userinfo',
+          name: 'userinfo',
+          component: UserInfo,
+          meta: { title: '个人信息'}
         },
         {
           path: 'setting',
           name: 'setting',
           component: Setting,
           meta: { title: '个人设置'}
-        },
-        {
-          path: '**',
-          redirect: '/admin/home'
-        },
+        }
       ]
+    },
+    {
+      path: '/admin/home',
+      name: 'adminHome',
+      component: AdminHome,
+      meta: { title: '个人中心'}
     },
     {
       path: '**',

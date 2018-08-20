@@ -2,12 +2,17 @@ import axios from 'axios'
 import CONFIG from './config'
 import { Loading, Message, MessageBox } from 'element-ui';
 import store from '../store/vuex'
+import sha1 from 'sha1'
 
 var Utils = {}
 
 Utils.$http = axios;
 
 Utils.$store = store;
+
+Utils.sha1 = sha1;
+
+Utils.CONFIG = CONFIG;
 
 Utils.ajaxCount = 0;
 
@@ -30,10 +35,10 @@ Utils.getTipText = function(type , code) {
  * @param      {<string>}  textType    提示文字类型
  * @param      {<string>}  code        提示代码
  */
-Utils.showTip = function(type, textType, code) {
+Utils.showTip = function(type, textType, code, text) {
 	Message({
       showClose: true,
-      message: Utils.getTipText(textType, code),
+      message: text ? text : Utils.getTipText(textType, code),
       type: type ? type: 'success'
     })
 }
@@ -93,7 +98,48 @@ Utils.getTaken = function(success, error) {
 	console.log("taken");
 	if(window.cefQuery) {
 		window.cefQuery({
-		    request: 'taken',
+		    request: 'getCurrentToken',
+		    onSuccess: function(response) {
+		      if(typeof success == 'function')  success(response);
+		    },
+		    onFailure: function(error_code, error_message) {
+		      if(typeof error == 'function')  error(response);
+		    }
+		})
+	}
+}
+
+/**
+ * Gets the university code.获取院校代码
+ *
+ * @param      {Function}  success  The success
+ * @param      {Function}  error    The error
+ */
+Utils.getUniversityCode = function(success, error) {
+	if(window.cefQuery) {
+		window.cefQuery({
+		    request: 'universitycode',
+		    onSuccess: function(response) {
+		      if(typeof success == 'function')  success(response);
+		    },
+		    onFailure: function(error_code, error_message) {
+		      if(typeof error == 'function')  error(response);
+		    }
+		})
+	}
+}
+
+/**
+ * Gets the login data.获取登录信息
+ *
+ * @param      {Function}  success  The success
+ * @param      {Function}  error    The error
+ */
+Utils.getLoginData = function(success, error) {
+	console.log("login");
+	if(window.cefQuery) {
+		window.cefQuery({
+		    request: 'getLoginData',
 		    onSuccess: function(response) {
 		      if(typeof success == 'function')  success(response);
 		    },
@@ -112,21 +158,31 @@ Utils.getTaken = function(success, error) {
  * @param      {Function}  error    失败回调
  * @param      {string}    params   参数
  */
-Utils.getJson = function(url, success, error, params = {}) {
+Utils.getJson = function(url, success, error, params = {}, isShowPop=true, urlParams) {
 	if(!url) return;
-	var loadingInstance = Loading.service({
-		fullscreen: true,
-		spinner: 'fa fa-refresh fa-spin fa-3x fa-fw ql-loading',
-		customClass: 'loading page-loading'
-	});
+	var loadingInstance;
+	if(isShowPop) {
+		loadingInstance = Loading.service({
+			fullscreen: true,
+			customClass: 'loading page-loading'
+		});
+	}
 	Utils.ajaxCount++;
-	Utils.$http.get(url, {params: params})
+	Utils.$http({
+			method: 'post',
+			url: url,
+			data: params,
+			params: urlParams
+		})
 		.then(function(res){
-			--CONFIG.ajaxCount ? '' : loadingInstance.close();
-            if(typeof success == 'function') success(res)
-        })
-        .catch(function(err){
-        	loadingInstance.close();
+			if(!(--Utils.ajaxCount) && isShowPop) {
+				loadingInstance.close()
+			}
+            if(typeof success == 'function') success(res.data)
+        }, function(err){
+        	if(isShowPop) {
+        		loadingInstance.close();
+        	}
         	Utils.showTip('error', 'error', '-1');
             if(typeof error == 'function') error(err)
         })
