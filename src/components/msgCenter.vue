@@ -308,7 +308,7 @@
 								that.currentMsg.data.list = res.data.list;
 								that.currentMsg.data.page = res.data.page;
 							}else {
-								this.$utils.showTip('error', '', '', '', res.message);
+								that.$utils.showTip('error', '', '', '', res.message);
 							}
 							that.currentMsg.isLoading = false;
 						}, function() {
@@ -317,7 +317,7 @@
 					}
 
 				}else {
-					this.$utils.showTip('error', '', '', '', res.message);
+					that.$utils.showTip('error', '', '', '', res.message);
 				}
 			}, function() {}, {}, true, {token: that.$utils.CONFIG.token})
 		}

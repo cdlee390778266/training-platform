@@ -100,16 +100,6 @@
     var saveCode = '';
   	export default {
   		data() {
-        var checkCode = (rule, value, callback) => {
-          if (!value) {
-            return callback(new Error('请输入正确验证码'));
-          }
-          if(value != saveCode){
-            callback(new Error('验证码不正确'));
-          } else {
-            callback();
-          }
-        };
         var checkEmail = (rule, value, callback) => {
           if (!value) {
             return callback(new Error('请输入邮箱地址'));
@@ -171,7 +161,7 @@
               ],
               code: [
                 { required: true, message: '请输入验证码', trigger: 'blur' },
-                { validator: checkCode, trigger: 'blur' }
+                { min: 4, max: 4, message: '请输入4位验证码', trigger: 'blur' }
               ]
             }
           }

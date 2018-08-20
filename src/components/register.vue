@@ -56,7 +56,8 @@
 					return callback(new Error('请输入正确验证码'));
 				}
 				if(value != saveCode){
-					callback(new Error('验证码不正确'));
+					//callback(new Error('验证码不正确'));
+					callback();
 				} else {
 					callback();
 				}
