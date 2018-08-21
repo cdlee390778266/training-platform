@@ -4,12 +4,12 @@
 		<div class="ql-wrapper">
 			<div class="ahome-top">
 				<div class="ahome-left">
-					<el-select v-model="account" placeholder="请选择" size="small">
+					<el-select v-model="account" placeholder="请选择" size="small" @change="refresh">
 					    <el-option
-					      v-for="item in accountList"
-					      :key="item.value"
-					      :label="item.label"
-					      :value="item.value">
+					      v-for="(item, index) in accountList"
+					      :key="index"
+					      :label="item.name"
+					      :value="item">
 					    </el-option>
 					</el-select>
 					<div class="chart-wrapper">
@@ -30,13 +30,12 @@
 				<div class="ahome-right">
 					<h1>账户信息</h1>
 					<div class="info-body">
-						<p><strong>资金账号</strong>39999</p>
-						<p><strong>账号类型</strong>期权</p>
+						<p><strong>资金账号</strong>{{account.name}}</p>
+						<p><strong>账号类型</strong>{{account.usage == 0 ? '常规账户' : '竞赛账户'}}</p>
 						<p><strong>加入时间</strong>2018-4-23</p>
 						<div class="handle">
-						  <span class="link">赛事详情</span>
-						  <span>股票市场</span>
-						  <span>期权市场</span>
+						  	<span class="link" @click="jumpToDetail(account.raceid)">赛事详情</span>
+						  	<span v-for="item in account.accts" @click="trade(item)">{{item.type == 1 ? '股票市场' : '期权市场'}}</span>
 						</div>
 					</div>
 				</div>
@@ -393,7 +392,7 @@
 			  isExternalLink: false
             }
 		],
-      	account: '',
+      	account: {},
       	defaultFaceUrl: CONFIG.defaultFaceUrl,
       	accountList: [
 	      	{
@@ -906,6 +905,12 @@
       }
     },
     methods: {
+    	trade(item) {
+    		console.log(item)
+    	},
+    	jumpToDetail(raceid) {
+    		this.$router.push({ path: '/competition/detail/detail/', query: {usagecode: raceid}});
+    	},
     	objectSpanMethod({ row, column, rowIndex, columnIndex }) {
 	        if (columnIndex === 0) {
 	          if (rowIndex % 2 === 0) {
@@ -926,6 +931,9 @@
 		},
 		onSubmit() {
 			console.log('submit!');
+		},
+		refresh() {
+			console.log('refresh')
 		}
     },
 	watch: {
@@ -954,13 +962,15 @@
     created() {
     	var that = this;
     	that.chartOpts.title.text = '收益率走势图  (创建于2018.08.08)';
+    	that.accountList = that.$utils.CONFIG.account;
+    	that.account = that.accountList[0];
     	//我的评论
     	var commentPostData = {
     		page: {
 				start: "1",
 				size: "5"
 			},
-			//nexusid: ""
+			nexusid: that.account.raceid
     	}
     	that.$utils.getJson(that.$utils.CONFIG.api.comment, function(res) {
           	if(res.succflag == 0) {

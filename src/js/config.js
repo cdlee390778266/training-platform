@@ -3,7 +3,61 @@ var baseUrl = 'http://192.168.1.213:9080/fests/';
 const CONFIG = {
 	cookieKey: 'user',
 	universitycode: '10001', //院校代码
-	token: 'ff40a568e186e87ffc26e84621ae20bf96ddb023abb7701d304cf62635985195', //令牌
+	token: '', //令牌
+	account: [],
+	loginData: {
+		data: {
+			student: {
+				studentid: "",
+				name: "",
+				college: null,
+				depart: "",
+				major: "",
+				grade: "",
+				class: ""
+			},
+			account: [
+				{
+					usage: '1',
+					raceid: "1",
+					name: "测试排行榜赛事账户",
+					accts: [
+						{
+							type: 1,
+							acct: "10001689211",
+							acctname: "沪深A股交易资金账户"
+						}
+					]
+				},
+				{
+					usage: 0,
+					raceid: 2,
+					name: "模拟主账户",
+					accts: [
+						{
+							type: 1,
+							acct: "1000168921",
+							acctname: "沪深A股交易资金账户"
+						},
+						{
+							type: 2,
+							acct: "1000124622",
+							acctname: "沪深期权交易资产账户"
+						}
+					]
+				}
+			],
+			base: {
+				clientname: "",
+				certno: "",
+				tel: "",
+				address: "成都市"
+			}
+		},
+		message: "",
+		succflag: 0,
+		token: "ff40a568e186e87ffc26e84621ae20bf96ddb023abb7701d304cf62635985195"
+	},
 	codeTime: 60,	//验证码倒计时时间
 	pageSize: 20,
 	api: {
@@ -36,6 +90,7 @@ const CONFIG = {
 		stockDel: baseUrl + 'ststock/stockDel.do', //策略信息删除商品
 
 		comment: baseUrl + 'comcenter/mycomment.do', //我的评论
+		commentreply: baseUrl + 'comcenter/commentreply.do', //回复评论
 		
 	},
 	defaultFaceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',

@@ -5,32 +5,32 @@
 			<div class="reply-body">
 				<div class="reply-bar">
 					<div>
-						<i :style="'background-image: url(' + reply.content.faceUrl + ')'" v-if="reply.content.faceUrl"></i>
+						<i :style="'background-image: url(' + reply.data.list[0].faceUrl + ')'" v-if="reply.data.list[0].faceUrl"></i>
 						<i :style="'background-image: url(' + defaultFaceUrl + ')'" v-else></i>
-						{{reply.content.name}}
+						{{reply.data.list[0].observername}}
 					</div>
 					<div class="reply-tContent">
-						{{reply.content.content}}
-						<span>2018-08-02</span>
+						{{reply.data.list[0].comment}}
+						<span>{{reply.data.list[0].publishtime}}</span>
 					</div>
 				</div>
 				<div class="reply-content">
-					<div class="reply-item" v-for="(item, index) in reply.replyList" :class="{'reply-item-student': item.type, 'reply-item-teacher': !item.type}">
+					<div class="reply-item" v-for="(item, index) in reply.data.list" v-if="index > 0" :class="{'reply-item-student': reply.data.list[0].observerid != item.observerid, 'reply-item-teacher': reply.data.list[0].observerid == item.observerid}">
 						<div class="reply-item-left">
-							<i v-if="!item.type && item.faceUrl" :style="'background-image: url(' + item.faceUrl + ')'"></i>
-							<i v-if="!item.type && !item.faceUrl" :style="'background-image: url(' + defaultFaceUrl + ')'"></i>
-							<strong><span>{{item.name}}</span>回复{{item.to}}</strong>
+							<i v-if="reply.data.list[0].observerid == item.observerid && item.faceUrl" :style="'background-image: url(' + item.faceUrl + ')'"></i>
+							<i v-if="reply.data.list[0].observerid == item.observerid && !item.faceUrl" :style="'background-image: url(' + defaultFaceUrl + ')'"></i>
+							<strong><span>{{item.observername}}</span>回复 {{reply.data.list[0].observername}}</strong>
 						</div>
 						<div class="reply-item-right">
-							{{item.content}}<span>{{item.date}}</span>
+							{{item.comment}}<span>{{item.publishtime}}</span>
 						</div>
 					</div>
-					<el-form :model="ruleForm" :rules="rules" ref="ruleForm" class="demo-ruleForm">
+					<el-form :model="commentForm" :rules="commentRules" ref="commentForm">
 					  <el-form-item prop="desc">
-					    <el-input type="textarea" v-model="ruleForm.desc" placeholder="在此输入回复内容"></el-input>
+					    <el-input type="textarea" v-model="commentForm.desc" placeholder="在此输入回复内容"></el-input>
 					  </el-form-item>
 					  <el-form-item>
-					    <el-button type="primary" @click="submitForm('ruleForm')" size="small">回复</el-button>
+					    <el-button type="primary" @click="submitForm('commentForm')" size="small">回复</el-button>
 					  </el-form-item>
 					</el-form>
 				</div>
@@ -39,68 +39,104 @@
 	</div>
 </template>
 <script>
-	import CONFIG from '../../js/config'
 	export default {
 		data() {
 			return {
-				defaultFaceUrl: CONFIG.defaultFaceUrl,
+				defaultFaceUrl: this.$utils.CONFIG.defaultFaceUrl,
 				reply: {
-					content: {
-						type: 0,
-						name: '张老师',
-						faceUrl: '',
-						to: '我',
-						content: '小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！',
-						date: '2018-08-02'
-					},
-					replyList: [
-						{
-							type: 1,
-							name: '我',
-							faceUrl: '',
-							to: '张老师',
-							content: '谢谢老师！',
-							date: '2018-08-02'
-						},
-						{
-							type: 0,
-							name: '张老师',
-							faceUrl: '',
-							to: '我',
-							content: '小王继续加油！',
-							date: '2018-08-02'
-						},
-						{
-							type: 1,
-							name: '我',
-							faceUrl: '',
-							to: '张老师',
-							content: '好的',
-							date: '2018-08-02'
+					data: {
+						list: [
+							{
+								id: 0,
+								observerid: 66,
+								observername: '张老师',
+								nexusid: 1,
+								comment: '小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！',
+								publishtime: '2018-08-02',
+								extranum: 100
+							},
+							{
+								id: 0,
+								observerid: 6,
+								observername: '对对对',
+								nexusid: 1,
+								comment: '小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！',
+								publishtime: '2018-08-02',
+								extranum: 100
+							},
+							{
+								id: 1010,
+								observerid: 66,
+								observername: '张老师',
+								nexusid: 1,
+								comment: '小王的！',
+								publishtime: '2018-08-02',
+								extranum: 100
+							},
+						],
+						page: {
+							start: 0,
+							size: 20,
+							responsetotal: 1,
+							responsenum: 20
 						}
-					]
+					}
 				},
-				ruleForm: {
+				commentPostData: {},
+				commentForm: {
 		          desc: ''
 		        },
-		        rules: {
+		        commentRules: {
+		        	desc: [
+		        		{ required: true, message: '评论内容为空', trigger: 'blur' },
+		        	]
 		        }
 			}
 		},
 		methods: {
 			submitForm(formName) {
+				var that = this;
 		        this.$refs[formName].validate((valid) => {
-		          if (valid) {
-		            alert('submit!');
-		          } else {
-		            console.log('error submit!!');
-		            return false;
-		          }
+		          	if (valid) {
+		          		that.$utils.getJson(that.$utils.CONFIG.api.commentreply, function(res) {
+				          	if(res.succflag == 0) {
+				          		that.$utils.getJson(that.$utils.CONFIG.api.comment, function(res) {
+						          	if(res.succflag == 0) {
+						            	that.reply.data = res.data;
+						            	that.reply.page = res.page;
+						          	}else {
+						            	that.$utils.showTip('error', '', '', res.message);
+						          	}
+						        }, function() {}, that.commentPostData, true, {token: that.$utils.CONFIG.token})
+				            	this.$refs[formName].resetFields();
+				          	}else {
+				            	that.$utils.showTip('error', '', '', res.message);
+				          	}
+				        }, function() {}, {commentid: that.reply.data.list[that.reply.data.list.length - 1].id, comment: that.commentForm.desc}, true, {token: that.$utils.CONFIG.token})
+		          	} else {
+		            	console.log('error submit!!');
+		            	return false;
+		          	}
 		        });
-		    },
-			resetForm(formName) {
-				this.$refs[formName].resetFields();
-			}
+		    }
+		},
+		created() {
+			var that = this;
+			that.commentPostData = {
+	    		page: {
+					start: "1",
+					size: "20"
+				},
+				nexusid: that.$route.params.id
+	    	}
+	    	that.$utils.getJson(that.$utils.CONFIG.api.comment, function(res) {
+	          	if(res.succflag == 0) {
+	            	that.reply.data = res.data;
+	            	that.reply.page = res.page;
+	          	}else {
+	            	that.$utils.showTip('error', '', '', res.message);
+	          	}
+	        }, function() {}, that.commentPostData, true, {token: that.$utils.CONFIG.token})
 		}
 	}
 </script>

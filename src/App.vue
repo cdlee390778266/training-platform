@@ -16,15 +16,14 @@ export default {
   },
   created() {
     var that = this;
-  	this.$utils.getTaken(function(res) {
-        alert(res);
-    }, function(error) {
-        alert(error);
-    })
-
+  	//test
+    that.$utils.CONFIG.token = that.$utils.CONFIG.loginData.token;
+    that.$utils.CONFIG.account = that.$utils.CONFIG.loginData.data.account;
     this.$utils.getLoginData(function(res) {
         alert(res);
-        that.$utils.CONFIG.token = res;
+        that.$utils.CONFIG.loginData = res;
+        that.$utils.CONFIG.token = that.$utils.CONFIG.loginData.token;
+        that.$utils.CONFIG.account = that.$utils.CONFIG.loginData.data.account;
     }, function(error) {
         alert(error);
     })
