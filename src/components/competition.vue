@@ -577,7 +577,7 @@
 						this.$router.push('/admin/home');
 						break;
 					case 'sort':   //赛事排名
-						this.$router.push('/competition/detail/sort/' + item.usagecode);
+						this.$router.push({ path: '/competition/detail/sort', query: item});
 						break;
 				}
 			},

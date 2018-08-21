@@ -45,16 +45,6 @@
 					callback();
 				}
 			};
-			var checkCode = (rule, value, callback) => {
-				if (!value) {
-					return callback(new Error('请输入正确验证码'));
-				}
-				if(value != saveCode){
-					callback(new Error('验证码不正确'));
-				} else {
-					callback();
-				}
-			};
 			var validatePass = (rule, value, callback) => {
 				if (value === '') {
 					callback(new Error('请输入密码'));
@@ -92,7 +82,7 @@
 					],
 					code: [
 						{ required: true, message: '请输入验证码', trigger: 'blur' },
-						{ validator: checkCode, trigger: 'blur' }
+						{ min: 4, max: 4, message: '请输入4位验证码', trigger: 'blur' }
 					],
 					pass: [
 						{ required: true, message: '请设置密码', trigger: 'blur' },
@@ -157,10 +147,10 @@
 						}
 						that.$utils.getJson(that.$utils.CONFIG.api.getPwd, function(res) {
 							if(res.succflag == 0) {
-								that.$utils.showTip('error', '', '', '', res.message);
+								that.$utils.showTip('error', '', '', res.message);
 								that.$refs['getPwdForm'].resetFields();
 							}else {
-								that.$utils.showTip('error', '', '', '', res.message);
+								that.$utils.showTip('error', '', '', res.message);
 							}
 						}, function() {}, getPwdData)
 					} else {

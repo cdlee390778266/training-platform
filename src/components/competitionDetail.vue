@@ -1,11 +1,15 @@
 <template>
 	<div class="competitionDetail">
-		<swiper :options="swiperOption" ref="mySwiper">
-		    <swiper-slide v-for="(item, index) in ads" :key="index">
-		    	<img :src="item.url" class="img-responsive">
-		    </swiper-slide>
-		</swiper>
 		<div class="ql-wrapper">
+			<h1 class="border">
+				<el-button size="small" @click="goBack">
+				<i class="el-icon-arrow-left"></i></el-button>{{tabs.tabs.detail.data.racename}}
+			</h1>
+			<swiper :options="swiperOption" ref="mySwiper">
+			    <swiper-slide v-for="(item, index) in ads" :key="index">
+			    	<img :src="item.url" class="img-responsive">
+			    </swiper-slide>
+			</swiper>
 			<div class="competitionDetail-body">
 				<el-tabs v-model="tabs.activeTab">
 				    <el-tab-pane :label="tabs.tabs.detail.name" name="detail" class="detail">
@@ -65,14 +69,28 @@
 				    </el-tab-pane>
 				    <el-tab-pane :label="tabs.tabs.sort.name" name="sort" class="sort">
 				    	<div class="sort-head">
-						    <el-select v-model="tabs.tabs.sort.selectVal" placeholder="请选择">
-							    <el-option
-							      v-for="item in tabs.tabs.sort.selectOpts"
-							      :key="item.value"
-							      :label="item.label"
-							      :value="item.value">
-							    </el-option>
-							</el-select>
+				    		<el-form ref="form"  label-width="80px" :inline="true">
+				    			<el-form-item label="市场类型">
+								    <el-select v-model="tabs.tabs.sort.searchVal.mkttype" placeholder="请选择" @change="changeCondition">
+									    <el-option
+									      v-for="item in tabs.tabs.sort.form.type"
+									      :key="item.value"
+									      :label="item.label"
+									      :value="item.value">
+									    </el-option>
+									</el-select>
+								</el-form-item>
+				    			<el-form-item label="指标排名">
+								    <el-select v-model="tabs.tabs.sort.searchVal.orderby.field" placeholder="请选择" @change="changeCondition">
+									    <el-option
+									      v-for="item in tabs.tabs.sort.form.sort"
+									      :key="item.value"
+									      :label="item.label"
+									      :value="item.value">
+									    </el-option>
+									</el-select>
+								</el-form-item>
+							</el-form>
 				    	</div>
 				    	<div class="tab-body">
 				    		<el-table
@@ -81,84 +99,107 @@
 						    :default-sort = "{prop: 'date', order: 'descending'}"
 						    >
 							    <el-table-column
-							      prop="sort"
+							      prop="ranking"
 							      label="排名"
 							    >
 							    </el-table-column>
 							    <el-table-column
-							      prop="name"
+							      prop="studentname"
 							      label="用户名"
 							  >
 							    </el-table-column>
 							    <el-table-column
-							      prop="dayRate"
+							      prop="dailyincomerate"
 							      label="日涨跌幅">
 							    </el-table-column>
 							    <el-table-column
-							      prop="weekRate"
+							      prop="weeklyincomerate"
 							      label="周收益率">
 							    </el-table-column>
 							    <el-table-column
-							      prop="monthRate"
+							      prop="monthincomerate"
 							      label="月收益率">
 							    </el-table-column>
 							    <el-table-column
-							      prop="totalRate"
+							      prop="totalincomerate"
 							      label="总收益率">
 							    </el-table-column>
 							    <el-table-column
-							      prop="total"
-							      label="总收益">
+							      prop="totalincome"
+							      label="总收益(元)">
 							    </el-table-column>
 							    <el-table-column
-							      prop="marketValue"
+							      prop="nativeassetvalue"
 							      label="单位净值">
 							    </el-table-column>
 							    <el-table-column
-							      prop="marketValue"
+							      prop="operatetimes"
 							      label="操作次数">
 							    </el-table-column>
 							    <el-table-column
-							      prop="marketValue"
+							      prop="positionmarketamount"
 							      label="持仓市值">
 							    </el-table-column>
 						  	</el-table>
-						  	<el-pagination
+						  	<!-- <el-pagination
 							  background
 							  layout="prev, pager, next"
 							  :total="1000">
-							</el-pagination>
+							</el-pagination> -->
 				    	</div>
 				    </el-tab-pane>
 				    <el-tab-pane :label="tabs.tabs.notice.name" name="notice" class="notice">
 				    	<div class="notice-body">
 				    		<el-table
-						    :data="tabs.tabs.notice.dataList"
-						    style="width: 100%"
+						    :data="tabs.tabs.notice.tableData.list"
+						    style="width: 100%" @row-click="handleMsg"
 						    >
 							    <el-table-column
-							      prop="name"
-							      label="公告名称">
-							    </el-table-column>
-							    <el-table-column
-							      prop="type"
-							      label="分类">
-							    </el-table-column>
-							    <el-table-column
-							      prop="date"
-							      label="发布时间">
-							    </el-table-column>
+								label="公告名称">
+									<template slot-scope="scope">
+										<span class="tag" v-if="scope.row.topflag">顶</span>
+										{{scope.row.title}}
+									</template>
+								</el-table-column>
+								<el-table-column
+								prop="typename"
+								label="分类"
+								width="180">
+								</el-table-column>
+								<el-table-column
+								prop="publishtime"
+								label="发布时间"
+								width="180">
+								</el-table-column>
 						  	</el-table>
 						  	<el-pagination
 							  background
 							  layout="prev, pager, next"
-							  :total="1000">
+							  :total="1000"
+							  @current-change="pageChange">
 							</el-pagination>
 				    	</div>
 				    </el-tab-pane>
 				</el-tabs>
 			</div>
 		</div>
+		<el-dialog
+		title="消息详情"
+		:visible.sync="tabs.tabs.notice.dialogVisible"
+		width="30%"
+		:before-close="handleClose" class="competition-msg-dialog">
+		<div class="el-loading-mask" v-show="tabs.tabs.notice.currentMsgDetail.isLoading">
+			<div class="el-loading-spinner">
+				<svg viewBox="25 25 50 50" class="circular">
+					<circle cx="50" cy="50" r="20" fill="none" class="path"></circle>
+				</svg>
+			</div>
+		</div>
+			<h3>{{tabs.tabs.notice.currentMsgDetail.title | strLen(20)}}<span>{{tabs.tabs.notice.currentMsgDetail.publishtime}}</span></h3>
+			<div class="msg-detail">
+				{{tabs.tabs.notice.currentMsgDetail.content}}
+			</div>
+		</el-dialog>
 	</div>
 </template>
 <script>
@@ -209,13 +250,113 @@
 						]
 					}
 				},
+				test1: [	//test
+				        {
+				          ranking: '1',
+				          studentname: '豌豆荚',
+				          dailyincomerate: '+0.64%',
+				          weeklyincomerate: '+0.64%',
+				          monthincomerate: '0.00%',
+				          totalincomerate: '-44.38%',
+				          totalincome: 25648.33,
+				          operatetimes: 32568799.33,
+				          nativeassetvalue: 32568799.33,
+				          positionmarketamount: 32568799.33,
+				        },
+				        {
+				          ranking: '1',
+				          studentname: '豌豆荚',
+				          dailyincomerate: '+0.64%',
+				          weeklyincomerate: '+0.64%',
+				          monthincomerate: '0.00%',
+				          totalincomerate: '-44.38%',
+				          totalincome: 25648.33,
+				          operatetimes: 32568799.33,
+				          nativeassetvalue: 32568799.33,
+				          positionmarketamount: 32568799.33,
+				        },
+				        {
+				          ranking: '1',
+				          studentname: '豌豆荚',
+				          dailyincomerate: '+0.64%',
+				          weeklyincomerate: '+0.64%',
+				          monthincomerate: '0.00%',
+				          totalincomerate: '-44.38%',
+				          totalincome: 25648.33,
+				          operatetimes: 32568799.33,
+				          nativeassetvalue: 32568799.33,
+				          positionmarketamount: 32568799.33,
+				        },
+				        {
+				          ranking: '1',
+				          studentname: '豌豆荚',
+				          dailyincomerate: '+0.64%',
+				          weeklyincomerate: '+0.64%',
+				          monthincomerate: '0.00%',
+				          totalincomerate: '-44.38%',
+				          totalincome: 25648.33,
+				          operatetimes: 32568799.33,
+				          nativeassetvalue: 32568799.33,
+				          positionmarketamount: 32568799.33,
+				        }
+			    ],
+			    test2: {
+					list: [
+						{
+							id: 1,
+							title: "站内测试消息",
+							typeid: 1,
+							typename: "系统消息",
+							publishtime: "2018-08-10 12:32:21",
+							nexusid: "111111",
+							readflag: 1,
+							topflag: 0
+						},
+						{
+							id: 1,
+							title: "站内测试消息",
+							typeid: 1,
+							typename: "系统消息",
+							publishtime: "2018-08-10 12:32:21",
+							nexusid: "111111",
+							readflag: 1,
+							topflag: 1
+						},
+						{
+							id: 1,
+							title: "站内测试消息",
+							typeid: 1,
+							typename: "系统消息",
+							publishtime: "2018-08-10 12:32:21",
+							nexusid: "111111",
+							readflag: 1,
+							topflag: 0
+						},
+						{
+							id: 1,
+							title: "站内测试消息",
+							typeid: 1,
+							typename: "系统消息",
+							publishtime: "2018-08-10 12:32:21",
+							nexusid: "111111",
+							readflag: 1,
+							topflag: 0
+						}
+					],
+					page: {
+						start: 0,
+						size: 20,
+						responsetotal: 105,
+						responsenum: 20
+					}
+				},
 				tabs: {
 					activeTab: 'detail',
 					tabs: {
 						detail: {
 							name: '赛事详情',
 							data: {
-								raceid: 0,
+								racename: '四川省精英大学模拟炒股',
 								racedesc: '“四川省模拟炒股”第三届全国大学生金融挑战赛火热开赛悬赏百万，等你来战！',
 								entrystarttime: '2018年06月30日',
 								entryendtime: '2018年07月30日',
@@ -231,178 +372,103 @@
 						},
 						sort: {
 							name: '赛事排名',
-			    			selectVal: [],
-					        selectOpts: [
-						      	{
-						          value: '0',
-						          label: '日涨跌幅'
-						        },
-						        {
-						          value: '1',
-						          label: '周收益率'
-						        },
-						        {
-						          value: '2',
-						          label: '月收益率'
-						        },
-						        {
-						          value: '3',
-						          label: '总收益率'
-						        },
-						        {
-						          value: '4',
-						          label: '总收益'
-						        },
-						        {
-						          value: '5',
-						          label: '单位净值'
-						        },
-						        {
-						          value: '6',
-						          label: '操作次数'
-						        },
-						        {
-						          value: '7',
-						          label: '持仓市值'
-						        }
-					        ],
-					        tableData: [
-						        {
-						          sort: '1',
-						          name: '豌豆荚',
-						          dayRate: '+0.64%',
-						          weekRate: '+0.64%',
-						          monthRate: '0.00%',
-						          totalRate: '-44.38%',
-						          total: 25648.33,
-						          marketValue: 32568799.33
-						        },
-						        {
-						          sort: '2',
-						          name: '豌豆荚',
-						          dayRate: '+0.64%',
-						          weekRate: '+0.64%',
-						          monthRate: '0.00%',
-						          totalRate: '-44.38%',
-						          total: 25648.33,
-						          marketValue: 32568799.33
-						        },
-						        {
-						          sort: '3',
-						          name: '豌豆荚',
-						          dayRate: '+0.64%',
-						          weekRate: '+0.64%',
-						          monthRate: '0.00%',
-						          totalRate: '-44.38%',
-						          total: 25648.33,
-						          marketValue: 32568799.33
-						        },
-						        {
-						          sort: '4',
-						          name: '豌豆荚',
-						          dayRate: '+0.64%',
-						          weekRate: '+0.64%',
-						          monthRate: '0.00%',
-						          totalRate: '-44.38%',
-						          total: 25648.33,
-						          marketValue: 32568799.33
-						        },
-						        {
-						          sort: '5',
-						          name: '豌豆荚',
-						          dayRate: '+0.64%',
-						          weekRate: '+0.64%',
-						          monthRate: '0.00%',
-						          totalRate: '-44.38%',
-						          total: 25648.33,
-						          marketValue: 32568799.33
-						        }
-					        ],
-					        comment: [
-					        	{
-					        		id: '1',
-					        		faceUrl: '',
-					        		name: '张老师',
-					        		date: '2018-07-02',
-					        		content: '王同学的选股能力还是很不错的，加油!'
-					        	},
-					        	{
-					        		id: '2',
-					        		faceUrl: '',
-					        		name: '张老师',
-					        		date: '2018-07-02',
-					        		content: '王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油!'
-					        	},
-					        	{
-					        		id: '3',
-					        		faceUrl: '',
-					        		name: '张老师',
-					        		date: '2018-07-02',
-					        		content: '王同学的选股能力还是很不错的，加油!'
-					        	},
-					        	{
-					        		id: '',
-					        		faceUrl: '',
-					        		name: '张老师',
-					        		date: '2018-07-02',
-					        		content: '王同学的选股能力还是很不错的，加油!'
-					        	},
-					        	{
-					        		id: '4',
-					        		faceUrl: '',
-					        		name: '张老师',
-					        		date: '2018-07-02',
-					        		content: '王同学的选股能力还是很不错的，加油!'
-					        	},
-					        	{
-					        		id: '5',
-					        		faceUrl: '',
-					        		name: '张老师',
-					        		date: '2018-07-02',
-					        		content: '王同学的选股能力还是很不错的，加油!'
-					        	}
-					        ]
+							searchVal: {
+								raceid: '',
+								mkttype: 1,
+								orderby: {
+									field: 'DIR',
+									sort: 'DESC'
+								}
+							},
+							tableData: [],
+			    			form: {
+			    				type: [
+		    						{
+		    							value: 1,
+		    							label: '股票市场',
+		    						},
+		    						{
+		    							value: 2,
+		    							label: '期权市场',
+		    						}
+		    					],
+			    				sort: [
+		    						{
+							          value: 'DIR',
+							          label: '日涨跌幅'
+							        },
+							        {
+							          value: 'WIR',
+							          label: '周收益率'
+							        },
+							        {
+							          value: 'MIR',
+							          label: '月收益率'
+							        },
+							        {
+							          value: 'TIR',
+							          label: '总收益率'
+							        },
+							        {
+							          value: 'TI',
+							          label: '总收益'
+							        },
+							        {
+							          value: 'NAV',
+							          label: '单位净值'
+							        },
+							        {
+							          value: 'OT',
+							          label: '操作次数'
+							        },
+							        {
+							          value: 'PMA',
+							          label: '持仓市值'
+							        }
+		    					]
+			    			}
 			    		},
 			    		notice: {
 							name: '赛事公告',
-					        dataList: [
-						        {
-						          id: 1,
-						          name: '四川省模拟炒股大赛火热报名中',
-						          type: '赛事信息',
-						          date: '2018-06-07'
-						        },
-						        {
-						          id: 1,
-						          name: '四川省模拟炒股大赛火热报名中',
-						          type: '赛事信息',
-						          date: '2018-06-07'
-						        },
-						        {
-						          id: 1,
-						          name: '四川省模拟炒股大赛火热报名中',
-						          type: '赛事信息',
-						          date: '2018-06-07'
-						        },
-						        {
-						          id: 1,
-						          name: '四川省模拟炒股大赛火热报名中',
-						          type: '赛事信息',
-						          date: '2018-06-07'
-						        },
-						        {
-						          id: 1,
-						          name: '四川省模拟炒股大赛火热报名中',
-						          type: '赛事信息',
-						          date: '2018-06-07'
-						        }
-					        ]
+							searchVal: {
+								page: {
+									start: "1",
+									size: this.$utils.CONFIG.pageSize
+							 	},
+								type: ''
+							},
+					        tableData: {
+					        	list: [
+						        ],
+						        page: {
+									start: 0,
+									size: 20,
+									responsetotal: 105,
+									responsenum: 20
+								}
+					        },
+					        dialogVisible: false,
+					        currentMsgDetail: {
+					        	msgid: 1,
+								typeid: 1,
+								typename: "系统消息",
+								title: "委托系统维护中",
+								publishtime: "2018-08-10 12:32:21",
+								publisher: "张三",
+								nexusid: "111111",
+								readflag: 1,
+								topflag: 0,
+								content: "给你带来不便请谅解。10月10日到10月13日股票行情系统维护中，给你带来不便请谅解。"
+					        }
 			    		}
 					}
 				}
 			}
 		},
 		methods: {
+			goBack() {
+				window.history.go(-1);
+			},
 			refreshCode() {
 				var that = this;
 				that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
@@ -451,6 +517,45 @@
 	              }
 	            });
 	        },
+	        changeCondition() {
+	        	var that = this;
+	        	that.$utils.getJson(that.$utils.CONFIG.api.competitionSort, function(res) {
+	              	if(res.succflag == 0) {
+	              		that.tabs.tabs.sort.tableData = res.data;
+	              	}else {
+	                	that.$utils.showTip('error', '', '', '', res.message);
+	              	}
+	            }, function() {}, that.tabs.tabs.sort.searchVal, true, {token: that.$utils.CONFIG.token})
+	        },
+	        pageChange(currentPage) {
+				var that = this;
+				that.tabs.tabs.notice.searchVal.page.start = (currentPage - 1) * that.tabs.tabs.notice.searchVal.page.size;
+				that.$utils.getJson(that.$utils.CONFIG.api.msglist, function(res) {
+	              	if(res.succflag == 0) {
+	                	that.tabs.tabs.notice.tableData = res.data;
+	              	}else {
+	                	that.$utils.showTip('error', '', '', '', res.message);
+	              	}
+	            }, function() {}, that.tabs.tabs.notice.searchVal, true, {token: that.$utils.CONFIG.token})
+	      	},
+	      	handleMsg(row, event, column) {
+	      		var that = this;
+	      		that.tabs.tabs.notice.dialogVisible = true;
+	      		if(!row.id) {
+	      			that.tabs.tabs.notice.currentMsgDetail.isLoading = true;
+	      			that.$utils.getJson(that.$utils.CONFIG.api.msg, function(res) {
+						if(res.succflag == 0) {
+							that.tabs.tabs.notice.currentMsgDetail= res.data;
+						}else {
+							this.$utils.showTip('error', '', '', '', res.message);
+						}
+					}, function() {}, {msgid: row.id}, false, {token: that.$utils.CONFIG.token})
+	      		}
+	      	},
+	      	handleClose(done) {
+	      		this.tabs.tabs.notice.currentMsgDetail = {};
+	      		done();
+	      	}
 		},
 		created() {
 			var that = this;
@@ -461,6 +566,7 @@
 			if(that.$route.query.usagecode == undefined) return;
 
 			that.saveRace = that.$route.query;
+			//赛事详情
 			that.$utils.getJson(that.$utils.CONFIG.api.competitionDetail, function(res) {
               	if(res.succflag == 0) {
                 	
@@ -468,12 +574,56 @@
                 	that.$utils.showTip('error', '', '', '', res.message);
               	}
             }, function() {}, {raceid: that.saveRace.usagecode}, true, {token: that.$utils.CONFIG.token})
+
+            //赛事排名
+            //test
+            that.tabs.tabs.sort.tableData = that.test1;
+            //
+            that.tabs.tabs.sort.searchVal.raceid = that.saveRace.usagecode;
+			that.$utils.getJson(that.$utils.CONFIG.api.competitionSort, function(res) {
+              	if(res.succflag == 0) {
+                	that.tabs.tabs.sort.tableData = res.data;
+              	}else {
+                	that.$utils.showTip('error', '', '', '', res.message);
+              	}
+            }, function() {}, that.tabs.tabs.sort.searchVal, true, {token: that.$utils.CONFIG.token})
+
+            //赛事公告
+            //test
+            that.tabs.tabs.notice.tableData = that.test2;
+            //
+			that.$utils.getJson(that.$utils.CONFIG.api.msglist, function(res) {
+              	if(res.succflag == 0) {
+                	that.tabs.tabs.notice.tableData = res.data;
+              	}else {
+                	that.$utils.showTip('error', '', '', '', res.message);
+              	}
+            }, function() {}, that.tabs.tabs.notice.searchVal, true, {token: that.$utils.CONFIG.token})
 		}
 	}
 </script>
 <style lang="scss">
 	.competitionDetail {
 		padding-top: 0;
+		h1 {
+			height: 130px;
+			line-height: 125px;
+			padding: 0 40px;
+			margin-top: 20px;
+			font-size: 18px;
+			color: #7d858d;
+			background: #fff;
+			.el-button {
+				font-size: 20px;
+				text-align: center;
+				padding: 5px;
+				font-weight: bold;
+				color: #ccd0d5;
+				background: #e8edf2;
+				border: none;
+				margin-right: 50px;
+			}
+		}
 		.swiper-container {
 			width: 100%;
 			min-width: 1200px;
@@ -567,6 +717,18 @@
 				.el-table th {
 					font-size: 16px;
 				}
+				.tag {
+					display: inline-block;
+					width: 26px;
+					height: 26px;
+					text-align: center;
+					line-height: 26px;
+					font-size: 12px;
+					color: #fff;
+					margin-right: 5px;
+					background: #f45e63;
+					border-radius: 8px;
+				}
 			}
 		}
 		.signUp {
@@ -590,5 +752,27 @@
 	        }
 	      }
 	    }
+	    .competition-msg-dialog {
+			.el-dialog__body {
+				height: 400px;
+				overflow-y: auto;
+			}
+			h3 {
+				color: #4e4e4e;
+				font-weight: normal;
+				text-align: center;
+				padding-bottom: 10px;
+				margin-bottom: 20px;
+				border-bottom: 1px dashed #ddd;
+				span {
+					display: block;
+					font-size: 12px;
+					color: #999;
+				}
+			}
+			.msg-detail {
+				text-indent: 2em;
+			}
+		}
 	}
 </style>

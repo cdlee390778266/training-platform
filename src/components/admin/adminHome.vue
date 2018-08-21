@@ -32,12 +32,12 @@
 					<div class="info-body">
 						<p><strong>资金账号</strong>39999</p>
 						<p><strong>账号类型</strong>期权</p>
-						<p><strong>当前排名</strong>145</p>
 						<p><strong>加入时间</strong>2018-4-23</p>
-						<p>
-						  <el-button type="primary">赛事详情</el-button>
-						  <el-button type="danger">去交易</el-button>
-						</p>
+						<div class="handle">
+						  <span class="link">赛事详情</span>
+						  <span>股票市场</span>
+						  <span>期权市场</span>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -299,15 +299,15 @@
 				<div class="ahome-right">
 					<h1>教师点评</h1>
 					<ul class="comment">
-						<li v-for="(item, index) in tabs.history.comment">
+						<li v-for="(item, index) in comment">
 							<div class="comment-head">
 								<span :style="'background-image: url(' + item.faceUrl + ')'" v-if="item.faceUrl"></span>
 								<span :style="'background-image: url(' + defaultFaceUrl + ')'" v-else></span>
-								<strong>{{item.name}}</strong>
-								{{item.date}}
+								<strong>{{item.observerName}}</strong>
+								{{item.publishTime | date}}
 							</div>
 							<div class="comment-body">
-								<span>{{item.content | strLen(36)}}</span>
+								<span>{{item.comment | strLen(36)}}</span>
 							</div>
 							<div class="comment-foot">
 								<router-link :to="'/admin/reply/' + item.id">回复</router-link>
@@ -891,51 +891,18 @@
 		        ],
 		        comment: [
 		        	{
-		        		id: '1',
-		        		faceUrl: '',
-		        		name: '张老师',
-		        		date: '2018-07-02',
-		        		content: '王同学的选股能力还是很不错的，加油!'
-		        	},
-		        	{
-		        		id: '2',
-		        		faceUrl: '',
-		        		name: '张老师',
-		        		date: '2018-07-02',
-		        		content: '王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油王同学的选股能力还是很不错的，加油!'
-		        	},
-		        	{
-		        		id: '3',
-		        		faceUrl: '',
-		        		name: '张老师',
-		        		date: '2018-07-02',
-		        		content: '王同学的选股能力还是很不错的，加油!'
-		        	},
-		        	{
-		        		id: '',
-		        		faceUrl: '',
-		        		name: '张老师',
-		        		date: '2018-07-02',
-		        		content: '王同学的选股能力还是很不错的，加油!'
-		        	},
-		        	{
-		        		id: '4',
-		        		faceUrl: '',
-		        		name: '张老师',
-		        		date: '2018-07-02',
-		        		content: '王同学的选股能力还是很不错的，加油!'
-		        	},
-		        	{
-		        		id: '5',
-		        		faceUrl: '',
-		        		name: '张老师',
-		        		date: '2018-07-02',
-		        		content: '王同学的选股能力还是很不错的，加油!'
-		        	}
+						id: 1,
+						observerid: "1",
+						observername: "1",
+						publishtime: "2018-08-10 12:32:21",
+						nexusid: "111111",
+						comment: "今晚打老虎",
+						extranum: 10
+					}
 		        ]
     		}
     	},
-        
+        comment: []
       }
     },
     methods: {
@@ -968,8 +935,40 @@
         })
       }
     },
+    filters:{
+      date(time){
+          let oldDate = new Date(time)
+          let newDate = new Date()
+          var dayNum = "";
+          var getTime = (newDate.getTime() - oldDate.getTime())/1000;
+
+          let year   = oldDate.getFullYear();
+          let month  = oldDate.getMonth()+1;
+          let day    = oldDate.getDate();
+          let hour   = oldDate.getHours(); 
+          let minute = oldDate.getMinutes(); 
+          let second = oldDate.getSeconds(); 
+          return dayNum+" "+year+"-"+month+"-"+day+" "+hour+":"+minute+":"+second;
+      }
+  	},
     created() {
-    	this.chartOpts.title.text = '收益率走势图  (创建于2018.08.08)'
+    	var that = this;
+    	that.chartOpts.title.text = '收益率走势图  (创建于2018.08.08)';
+    	//我的评论
+    	var commentPostData = {
+    		page: {
+				start: "1",
+				size: "5"
+			},
+			//nexusid: ""
+    	}
+    	that.$utils.getJson(that.$utils.CONFIG.api.comment, function(res) {
+          	if(res.succflag == 0) {
+            	that.comment = res.list;
+          	}else {
+            	that.$utils.showTip('error', '', '', res.message);
+          	}
+        }, function() {}, commentPostData, true, {token: that.$utils.CONFIG.token})
     }
   }
 </script>
@@ -993,6 +992,7 @@
 				}
 			}
 			.ahome-right {
+				position: relative;
 				.info-body {
 					padding: 25px;
 					p {
@@ -1012,6 +1012,29 @@
 							}
 							&.el-button--danger {
 								background: #e30129;
+							}
+						}
+					}
+					.handle {
+						position: absolute;
+						left: 0;
+						right: 0;
+						bottom: 0;
+						display: flex;
+						height: 80px;
+						line-height: 80px;
+						text-align: center;
+						span {
+							flex: 1;
+							color: #ff486f;
+							border-top: 1px solid #dde1e6;
+							border-right: 1px solid #dde1e6;
+							cursor: pointer;
+							&:last-child {
+								border-right: none;
+							}
+							&.link {
+								color: #5091fa;
 							}
 						}
 					}

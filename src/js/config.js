@@ -1,14 +1,13 @@
-var baseUrl = 'http://192.168.16.41/';
+var baseUrl = 'http://192.168.1.213:9080/fests/';
 
 const CONFIG = {
 	cookieKey: 'user',
-	universitycode: '', //院校代码
-	token: '99', //令牌
-	codeTime: 5,	//验证码倒计时时间
+	universitycode: '10001', //院校代码
+	token: 'ff40a568e186e87ffc26e84621ae20bf96ddb023abb7701d304cf62635985195', //令牌
+	codeTime: 60,	//验证码倒计时时间
 	pageSize: 20,
 	api: {
-		code: baseUrl + 'jk.php', //验证码接口
-		//code: baseUrl + 'comm/obtainVerifycode.do', //验证码
+		code: baseUrl + 'comm/obtainVerifycode.do', //验证码
 		register: baseUrl + 'comm/register.do', //注册
 		getPwd: baseUrl + 'comm/passwordself.do', //找回密码
 		activeAccount: baseUrl + 'comm/activeaccount.do', //找回密码
@@ -22,10 +21,22 @@ const CONFIG = {
 		competitionList: baseUrl + 'competition/list.do', //赛事列表
 		signUp: baseUrl + 'competition/signup.do', //赛事报名
 		competitionDetail: baseUrl + 'competition/racedetail.do', //赛事详情
+		competitionSort: baseUrl + 'competition/raceranking.do', //赛事详情
 
 		msgTypeList: baseUrl + 'msgcenter/typelist.do', //消息类型列表
 		msglist: baseUrl + 'msgcenter/list.do', //消息列表
 		msg: baseUrl + 'msgcenter/message.do', //消息详情
+
+		poollist: baseUrl + 'selfstock/poollist.do', //自选股池列表查询
+		stockList: baseUrl + 'selfstock/stocklist.do', //自选股池数据列表查询
+		addPool: baseUrl + 'ststock/stockAdd.do', //加入策略选股池
+		clStockList: baseUrl + 'ststock/stocklist.do', //策略信息商品列表查询
+		stoprecList: baseUrl + 'ststock/stopreclist.do', //查看操作记录
+		stockUpd: baseUrl + 'ststock/stockUpd.do', //修改“选股理由”
+		stockDel: baseUrl + 'ststock/stockDel.do', //策略信息删除商品
+
+		comment: baseUrl + 'comcenter/mycomment.do', //我的评论
+		
 	},
 	defaultFaceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
 	ajaxCount: 0,
@@ -33,6 +44,7 @@ const CONFIG = {
 		"1": "加载数据成功",
 		'101': "注册成功",
 		'102': "",
+		'103': "",
 	},
 	error: {
 		'-1': '加载数据失败，请检查网络！',
@@ -42,6 +54,7 @@ const CONFIG = {
 		'-1020': '邮箱不能为空！',
 		'-1021': '邮箱不正确！',
 		'-1022': '获取验证码失败！',
+		'-1030': '至少选中一条数据！',
 	}
 }
 
