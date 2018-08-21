@@ -28,7 +28,15 @@ const CONFIG = {
 		msg: baseUrl + 'msgcenter/message.do', //消息详情
 
 		poollist: baseUrl + 'selfstock/poollist.do', //自选股池列表查询
-		stocklist: baseUrl + 'selfstock/stocklist.do', //自选股池数据列表查询
+		stockList: baseUrl + 'selfstock/stocklist.do', //自选股池数据列表查询
+		addPool: baseUrl + 'ststock/stockAdd.do', //加入策略选股池
+		clStockList: baseUrl + 'ststock/stocklist.do', //策略信息商品列表查询
+		stoprecList: baseUrl + 'ststock/stopreclist.do', //查看操作记录
+		stockUpd: baseUrl + 'ststock/stockUpd.do', //修改“选股理由”
+		stockDel: baseUrl + 'ststock/stockDel.do', //策略信息删除商品
+
+		comment: baseUrl + 'comcenter/mycomment.do', //我的评论
+		
 	},
 	defaultFaceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
 	ajaxCount: 0,
