@@ -4,12 +4,12 @@
 		<div class="ql-wrapper">
 			<div class="ahome-top">
 				<div class="ahome-left">
-					<el-select v-model="account" placeholder="请选择" size="small" @change="refresh">
+					<el-select v-model="accountRaceId" placeholder="请选择" size="small" @change="changeMainAccount">
 					    <el-option
 					      v-for="(item, index) in accountList"
 					      :key="index"
 					      :label="item.name"
-					      :value="item">
+					      :value="item.raceid">
 					    </el-option>
 					</el-select>
 					<div class="chart-wrapper">
@@ -75,11 +75,26 @@
 						    </el-table>
 					    </el-tab-pane>
 					    <el-tab-pane label="我的持仓" name="holdPos">
+					    	<div class="tab-head holdPos-changeAccount">
+					    		<div class="tab-head-text">持仓分布</div>
+					    		<el-form :inline="true">
+									<el-form-item class="tabs-checkbox" label="市场类型">
+										<el-select v-model="tabs.holdPos.accountAcct" placeholder="请选择" @change="changeHoldAccount">
+											<el-option
+											v-for="(item, index) in account.accts"
+											:key="index"
+											:label="item.type == 1 ? '股票市场' : '期权市场'"
+											:value="item.acct">
+											</el-option>
+										</el-select>
+									</el-form-item>
+								</el-form>
+					    	</div>
 					    	<div class="tab-chart">
 					    		<ve-ring :data="tabs.holdPos.chart.chartData"  ref="veRing" :legend="tabs.holdPos.chart.options.legend" ></ve-ring>
 					    	</div>
 					    	<div class="holdPos-bar">
-					    		持仓个股
+					    		持仓明细
 					    		<router-link to="/home"><el-button type="danger">去交易</el-button></router-link>
 					    	</div>
 					    	<div class="tab-body">
@@ -325,6 +340,79 @@
 	import 'echarts/lib/component/tooltip'
 	import CONFIG from '../../js/config'
 	import qlHead from '../common/head.vue'
+	//我的评论
+	var getComment = function(that) {
+		var commentPostData = {
+    		page: {
+				start: "1",
+				size: "5"
+			},
+			nexusid: that.account.raceid
+    	}
+    	that.$utils.getJson(that.$utils.CONFIG.api.comment, function(res) {
+          	if(res.succflag == 0) {
+            	that.comment = res.list;
+          	}else {
+            	that.$utils.showTip('error', '', '', res.message);
+          	}
+        }, function() {}, commentPostData, true, {token: that.$utils.CONFIG.token})
+	}
+
+	//走势图
+	var getLine = function(that) {
+		that.postLineData.raceid = that.account.raceid;
+		if(that.postLineData.columns.length) {
+			//走势图
+        	that.$utils.getJson(that.$utils.CONFIG.api.profit, function(res) {
+	          	if(res.succflag == 0) {
+	            	that.chartOpts.data = res.data;
+	          	}else {
+	            	that.$utils.showTip('error', '', '', res.message);
+	          	}
+	        }, function() {}, that.postLineData, true, {token: that.$utils.CONFIG.token})
+		}else {
+			//指数列表
+			that.$utils.getJson(that.$utils.CONFIG.api.lineList, function(res) {
+	          	if(res.succflag == 0) {
+	            	that.lineList = res.data;
+	            	that.chartOpts.chartSettings.labelMap = {};
+	            	that.lineList.forEach(function(item, index) {
+	            		that.postLineData.columns.push(item.code);
+	            		that.chartOpts.chartSettings.labelMap[item.code] = item.name;
+	            	})
+	            	//走势图
+	            	that.$utils.getJson(that.$utils.CONFIG.api.profit, function(res) {
+			          	if(res.succflag == 0) {
+			            	that.chartOpts.data = res.data;
+			            	that.chartOpts.title.text = that.chartOpts.data.title;
+			          	}else {
+			            	that.$utils.showTip('error', '', '', res.message);
+			          	}
+			        }, function() {}, that.postLineData, true, {token: that.$utils.CONFIG.token})
+	          	}else {
+	            	that.$utils.showTip('error', '', '', res.message);
+	          	}
+	        }, function() {}, {}, true, {token: that.$utils.CONFIG.token})
+		}
+	}
+
+	//我的持仓
+	var getHold = function(that) {
+		//饼状图
+		var postHoldData = {
+			raceid: that.account.raceid,
+			acct: that.tabs.holdPos.account.acct,
+			type: that.tabs.holdPos.account.type
+		}
+		//饼状图
+    	that.$utils.getJson(that.$utils.CONFIG.api.hold, function(res) {
+          	if(res.succflag == 0) {
+            	that.tabs.holdPos.chart.chartData = res.data;
+          	}else {
+            	that.$utils.showTip('error', '', '', res.message);
+          	}
+        }, function() {}, postHoldData, true, {token: that.$utils.CONFIG.token})
+	}
 	export default {
 	components: {
 		qlHead
@@ -392,34 +480,16 @@
 			  isExternalLink: false
             }
 		],
+		accountRaceId: '',
       	account: {},
       	defaultFaceUrl: CONFIG.defaultFaceUrl,
-      	accountList: [
-	      	{
-	          value: '0',
-	          label: '期权账户0'
-	        },
-	        {
-	          value: '1',
-	          label: '期权账户1'
-	        },
-	        {
-	          value: '2',
-	          label: '期权账户2'
-	        },
-	        {
-	          value: '3',
-	          label: '期权账户3'
-	        },
-	        {
-	          value: '4',
-	          label: '期权账户4'
-	        },
-	        {
-	          value: '5',
-	          label: '期权账户5'
-	        }
-        ],
+      	accountList: [],
+      	postLineData: {		//走势图请求参数
+			raceid: "0",
+		 	columns: [],
+		 	startdate: "2018-07-01",
+		 	enddate: "2018-08-01"
+		},
         chartOpts: {
     		title: {
 			  	text: '--',
@@ -451,28 +521,13 @@
 		    tooltip: {
 		    	formatter: function(params) {
 		    		console.log(params);
-                	return params.name + '<br/>' + params.marker + params.seriesName + ': ' + params.data[1]*100 + '%' ;
+                	return params.name + '<br/>' + params.marker + params.seriesName + ': ' + (params.data[1]*100).toFixed(2) + '%' ;
                 }
 		    },
 		    chartSettings: {
-			    labelMap: {
-		          'profit': '我的收益',
-		          'hs300': '沪深300',
-		          'hs500': '沪深500'
-		        }
+			    labelMap: {}
 		    },
-		    data: {
-	          columns: ['date', 'profit', 'hs300', 'hs500'],
-	          title: '收益率走势图  (创建于2018.08.08)',
-	          rows: [
-	            { 'date': '2015-12-21', 'profit': 0.1, 'hs300': 0.05, 'hs500': -0.05},
-	            { 'date': '2015-12-22', 'profit': 0.2, 'hs300': 0.25, 'hs500': 0.2},
-	            { 'date': '2015-12-23', 'profit': 0.3888, 'hs300': -0.1, 'hs500': -0.3},
-	            { 'date': '2015-12-24', 'profit': -0.15, 'hs300': -0.32, 'hs500': -0.2},
-	            { 'date': '2015-12-25', 'profit': -0.01, 'hs300': 0.3, 'hs500': -0.05},
-	            { 'date': '2015-12-26', 'profit': -0.4, 'hs300': -0.55, 'hs500': -0.5}
-	          ]
-	        }
+		    data: {}
     	},
     	activeTab: 'holdPos',
     	tabs: {
@@ -541,6 +596,8 @@
     			}
     		},
     		holdPos: {
+    			account: {},
+    			accountAcct: '',
     			chart: {
     				options: {
     					legend: {
@@ -552,16 +609,7 @@
 							}
 						}
     				},
-    				chartData: {
-						columns: ['name', 'count'],
-						rows: [
-							{ 'name': '现金', 'count': 1393 },
-							{ 'name': '白云山', 'count': 3530 },
-							{ 'name': '安琪酵母', 'count': 2923 },
-							{ 'name': '泰格医药', 'count': 1723 },
-							{ 'name': '其余股票', 'count': 3792 }
-						]
-					}
+    				chartData: {}
     			},
 		        tableData: [
 			        {
@@ -906,10 +954,48 @@
     },
     methods: {
     	trade(item) {
-    		console.log(item)
+    		var json = {
+                method: 'startexe',
+                data: {
+                  	type:'quotes',
+                  	exeName: item.type == 1 ? 'shares' : 'option',
+                  	account: item.acct
+                }
+            }
+	        this.$utils.handleExe(json, function(){}, function(){})
     	},
     	jumpToDetail(raceid) {
     		this.$router.push({ path: '/competition/detail/detail/', query: {usagecode: raceid}});
+    	},
+    	changeMainAccount(val) {	//切换账号
+    		var that = this;
+    		//设置账号
+    		for(var i = 0; i < that.accountList.length; i++) {
+	    		if(val == that.accountList[i].raceid) {
+	    			that.account = that.accountList[i];
+	    			break;
+	    		}
+	    	}
+	    	that.accountRaceId = that.account.raceid;
+	    	that.tabs.holdPos.account = that.account.accts[0];
+	    	that.tabs.holdPos.accountAcct = that.tabs.holdPos.account.acct;
+    		//走势图
+	 		getLine(that);
+	 		//我的持仓
+	 		getHold(that);
+	 		//我的评论
+ 			getComment(that);
+    	},
+    	changeHoldAccount(val) {	//我的持仓切换账号
+    		var that = this;
+    		for(var i = 0; i < that.account.accts.length; i++) {
+	    		if(val == that.account.accts[i].acct) {
+	    			this.tabs.holdPos.account = that.account.accts[i];
+	    			break;
+	    		}
+	    	}
+	 		//我的持仓
+	 		getHold(that);
     	},
     	objectSpanMethod({ row, column, rowIndex, columnIndex }) {
 	        if (columnIndex === 0) {
@@ -961,24 +1047,29 @@
   	},
     created() {
     	var that = this;
-    	that.chartOpts.title.text = '收益率走势图  (创建于2018.08.08)';
+    	var raceid = that.$route.query.raceid;
+    	//设置账号
     	that.accountList = that.$utils.CONFIG.account;
-    	that.account = that.accountList[0];
-    	//我的评论
-    	var commentPostData = {
-    		page: {
-				start: "1",
-				size: "5"
-			},
-			nexusid: that.account.raceid
+    	if(typeof raceid == 'undefined') {
+    		that.account = that.accountList[0];
+    	}else {
+	    	for(var i = 0; i < that.accountList.length; i++) {
+	    		if(raceid == that.accountList[i].raceid) {
+	    			that.account = that.accountList[i];
+	    			break;
+	    		}
+	    	}
     	}
-    	that.$utils.getJson(that.$utils.CONFIG.api.comment, function(res) {
-          	if(res.succflag == 0) {
-            	that.comment = res.list;
-          	}else {
-            	that.$utils.showTip('error', '', '', res.message);
-          	}
-        }, function() {}, commentPostData, true, {token: that.$utils.CONFIG.token})
+    	that.accountRaceId = that.account.raceid;
+    	that.tabs.holdPos.account = that.account.accts[0];
+    	that.tabs.holdPos.accountAcct = that.tabs.holdPos.account.acct;
+
+ 		//走势图
+ 		getLine(that);
+ 		//我的持仓
+ 		getHold(that);
+    	//我的评论
+ 		getComment(that);
     }
   }
 </script>
@@ -1119,6 +1210,17 @@
 					}
 					.el-range-separator {
 						color: #7d858d;
+					}
+					.tab-head-text {
+						float: left;
+						padding-left: 35px;
+					}
+					&.holdPos-changeAccount {
+						padding-left: 35px;
+						margin-top: 20px;
+						.el-form {
+							float: right;
+						}
 					}
 				}
 				.el-table {

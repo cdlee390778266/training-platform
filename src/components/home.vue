@@ -68,7 +68,8 @@
 						method: 'startexe',
 						data: {
 							type:'quotes',
-							exeName: item.handleData
+							exeName: item.handleData,
+							account: item.handleData == 'option' ? this.$utils.CONFIG.mainAccount2.acct : this.$utils.CONFIG.mainAccount1.acct
 						}
 					}
 					this.$utils.handleExe(json, function(){}, function(){})

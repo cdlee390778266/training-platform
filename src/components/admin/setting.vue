@@ -19,8 +19,8 @@
 				    </el-tab-pane> -->
 				    <el-tab-pane label="修改密码" name="pwd">
 				    	<el-form :model="tabs.pwd.pwdForm" status-icon :rules="tabs.pwd.pwdRules" ref="pwdForm" label-width="100px" class="demo-ruleForm">
-				    	  <el-form-item label="原密码" prop="oldPwd">
-						    <el-input v-model.number="tabs.pwd.pwdForm.oldPwd"></el-input>
+				    	  <el-form-item label="原密码" prop="oldPass">
+						    <el-input v-model="tabs.pwd.pwdForm.oldPass"></el-input>
 						  </el-form-item>
 						  <el-form-item label="新密码" prop="pass">
 						    <el-input type="password" v-model="tabs.pwd.pwdForm.pass" auto-complete="off"></el-input>
@@ -39,9 +39,17 @@
 						    <el-input v-model="tabs.email.emailForm.email" placeholder="请输入邮箱地址"></el-input>
 						  </el-form-item>
 						  <el-form-item label="验证码" prop="code" class="code">
-						    <el-input v-model="tabs.email.emailForm.code" placeholder="请输入验证码"></el-input>
-						    <el-button type="danger" size="small" class="codeBtn" @click="getCode('emailForm')">获取验证码</el-button>
-						  </el-form-item>
+				            <el-input v-model="tabs.email.emailForm.code" placeholder="请输入验证码"></el-input>
+				            <el-button @click="getCode('emailForm')" :disabled="tabs.email.isShowCountDown" type="danger" size="small" class="codeBtn">
+				              <template v-if="!tabs.email.isShowCountDown">
+				                <span v-if="tabs.email.isCodeLoading"><i class="el-icon-loading"></i>加载中</span>
+				                <span v-else>获取验证码</span>
+				              </template>
+				              <template v-else>
+				                {{tabs.email.count}}s
+				              </template>
+				          </el-button>
+				          </el-form-item>
 						  <el-form-item>
 						    <el-button type="primary" @click="submitForm('emailForm')">提交</el-button>
 						  </el-form-item>
@@ -53,9 +61,17 @@
 						    <el-input v-model="tabs.phone.phoneForm.phone" placeholder="请输入手机号码"></el-input>
 						  </el-form-item>
 						  <el-form-item label="验证码" prop="code" class="code">
-						    <el-input v-model="tabs.phone.phoneForm.code" placeholder="请输入验证码"></el-input>
-						    <el-button type="danger" size="small" class="codeBtn" @click="getCode('phoneForm')">获取验证码</el-button>
-						  </el-form-item>
+				            <el-input v-model="tabs.phone.phoneForm.code" placeholder="请输入验证码"></el-input>
+				            <el-button @click="getCode('phoneForm')" :disabled="tabs.phone.isShowCountDown" type="danger" size="small" class="codeBtn">
+				              <template v-if="!tabs.phone.isShowCountDown">
+				                <span v-if="tabs.phone.isCodeLoading"><i class="el-icon-loading"></i>加载中</span>
+				                <span v-else>获取验证码</span>
+				              </template>
+				              <template v-else>
+				                {{tabs.phone.count}}s
+				              </template>
+				          </el-button>
+				          </el-form-item>
 						  <el-form-item>
 						    <el-button type="primary" @click="submitForm('phoneForm')">提交</el-button>
 						  </el-form-item>
@@ -67,8 +83,6 @@
 	</div>
 </template>
 <script>
-	var saveEmailCode = '';
-	var savePhoneCode = '';
 	export default {
 		data () {
 		      var validatePass = (rule, value, callback) => {
@@ -144,7 +158,7 @@
 				          checkPass: ''
 				        },
 				        pwdRules: {
-				          oldPwd: [
+				          oldPass: [
 				          	{ required: true, message: '请输入原密码', trigger: 'blur' },
             			  	{ min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
 				          ],
@@ -161,6 +175,10 @@
 				        }
 					},
 					email: {
+						isShowCountDown: false,
+						isCodeLoading: false,
+						count: '',
+						timer: null,
 						emailForm: {
 				          email: '',
 				          code: '',
@@ -172,11 +190,15 @@
 						  ],
 						  code: [
 						    { required: true, message: '请输入验证码', trigger: 'blur' },
-						    { validator: checkEmailCode, trigger: 'blur' }
+						    { min: 4, max: 4, message: '请输入4位验证码', trigger: 'blur' }
 						  ]
 				        }
 					},
 					phone: {
+						isShowCountDown: false,
+						isCodeLoading: false,
+						count: '',
+						timer: null,
 						phoneForm: {
 				          phone: '',
 				          code: '',
@@ -188,7 +210,7 @@
 						  ],
 						  code: [
 						    { required: true, message: '请输入验证码', trigger: 'blur' },
-						    { validator: checkPhoneCode, trigger: 'blur' }
+						    { min: 4, max: 4, message: '请输入4位验证码', trigger: 'blur' }
 						  ]
 				        }
 					}
@@ -234,6 +256,32 @@
           				objectid: that.tabs.email.emailForm.email, 
           				type: "2"
           			}
+          			if(that.tabs.email.isCodeLoading) {
+						return;
+					}
+					that.tabs.email.isCodeLoading = true;
+					that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
+						if(res.succflag == 0) {
+							if (!that.tabs.email.timer) {
+								that.tabs.email.count = timeCount;
+								that.tabs.email.isShowCountDown = true;
+								that.tabs.email.timer = setInterval(() => {
+									if (that.tabs.email.count > 0 && that.tabs.email.count <= timeCount) {
+									that.tabs.email.count--;
+									} else {
+										that.tabs.email.isShowCountDown = false;
+										clearInterval(that.tabs.email.timer);
+										that.tabs.email.timer = null;
+									}
+								}, 1000)
+							}
+						}else {
+							that.$utils.showTip('error', 'error', '-1012');
+						}
+						that.tabs.email.isCodeLoading = false;
+					}, function() {
+						that.tabs.email.isCodeLoading = false;
+					}, postData, false)
           			break;
           		case 'phoneForm':
           			// 手机号
@@ -249,35 +297,34 @@
           				objectid: that.tabs.phone.phoneForm.phone, 
           				type: "1"
           			}
+          			if(that.tabs.phone.isCodeLoading) {
+						return;
+					}
+					that.tabs.phone.isCodeLoading = true;
+					that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
+						if(res.succflag == 0) {
+							if (!that.tabs.phone.timer) {
+								that.tabs.phone.count = timeCount;
+								that.tabs.phone.isShowCountDown = true;
+								that.tabs.phone.timer = setInterval(() => {
+									if (that.tabs.phone.count > 0 && that.tabs.phone.count <= timeCount) {
+									that.tabs.phone.count--;
+									} else {
+										that.tabs.phone.isShowCountDown = false;
+										clearInterval(that.tabs.phone.timer);
+										that.tabs.phone.timer = null;
+									}
+								}, 1000)
+							}
+						}else {
+							that.$utils.showTip('error', 'error', '-1012');
+						}
+						that.tabs.phone.isCodeLoading = false;
+					}, function() {
+						that.tabs.phone.isCodeLoading = false;
+					}, postData, false)
           			break;
           		}
-				if(that.isCodeLoading) {
-					return;
-				}
-				that.isCodeLoading = true;
-				that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
-					if(res.succflag == 0) {
-						formName == 'emailForm' ? saveEmailCode = res.data : savePhoneCode = res.data;
-						if (!that.timer) {
-							that.count = timeCount;
-							that.isShowCountDown = true;
-							that.timer = setInterval(() => {
-								if (that.count > 0 && that.count <= timeCount) {
-								that.count--;
-								} else {
-									that.isShowCountDown = false;
-									clearInterval(that.timer);
-									that.timer = null;
-								}
-							}, 1000)
-						}
-					}else {
-						that.$utils.showTip('error', 'error', '-1012');
-					}
-					that.isCodeLoading = false;
-				}, function() {
-					that.isCodeLoading = false;
-				}, postData, false)
 		  },
 	      submitForm(formName) {
 	      	var that = this;
@@ -317,10 +364,10 @@
 
 	          		that.$utils.getJson(modifyApi, function(res) {
 						if(res.succflag == 0) {
-							that.$utils.showTip('error', '', '', '', res.message);
+							that.$utils.showTip('success', '', '', res.message);
 							that.$refs[formName].resetFields();
 						}else {
-							that.$utils.showTip('error', '', '', '', res.message);
+							that.$utils.showTip('error', '', '', res.message);
 						}
 					}, function() {}, postData, true, {token: that.$utils.CONFIG.token})
 	          } else {
@@ -377,6 +424,13 @@
 					background: #e30129;
 				}
 			}
+		}
+		.el-form .codeBtn {
+		    width: 92px;
+		    position: absolute;
+		    top: 4px;
+		    right: 5px;
+		    background: #e30129;
 		}
 	}
 </style>

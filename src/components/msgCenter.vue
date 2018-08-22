@@ -84,82 +84,6 @@
 	export default {
 		data() {
 			return {
-				test1: [
-					{
-						id: '0',
-						name: '全部消息',
-					},
-					{
-						id: '1',
-						name: '系统消息'
-					},
-					{
-						id: '2',
-						name: '课程消息'
-					},
-					{
-						id: '3',
-						name: '直播消息'
-					},
-					{
-						id: '4',
-						name: '文章消息'
-					},
-					{
-						id: '5',
-						name: '赛事消息'
-					}
-				],
-				test2: {
-					list: [
-						{
-							id: 1,
-							title: "站内测试消息",
-							typeid: 1,
-							typename: "系统消息",
-							publishtime: "2018-08-10 12:32:21",
-							nexusid: "111111",
-							readflag: 1,
-							topflag: 0
-						},
-						{
-							id: 1,
-							title: "站内测试消息",
-							typeid: 1,
-							typename: "系统消息",
-							publishtime: "2018-08-10 12:32:21",
-							nexusid: "111111",
-							readflag: 1,
-							topflag: 1
-						},
-						{
-							id: 1,
-							title: "站内测试消息",
-							typeid: 1,
-							typename: "系统消息",
-							publishtime: "2018-08-10 12:32:21",
-							nexusid: "111111",
-							readflag: 1,
-							topflag: 0
-						},
-						{
-							id: 1,
-							title: "站内测试消息",
-							typeid: 1,
-							typename: "系统消息",
-							publishtime: "2018-08-10 12:32:21",
-							nexusid: "111111",
-							readflag: 1,
-							topflag: 0
-						}
-					],
-					page: {
-						start: 0,
-						size: 20,
-						responsetotal: 105,
-						responsenum: 20
-					}
-				},
 				pageSize: 20,
 				activeTab: '',
 				currentMsg: {},
@@ -206,7 +130,7 @@
 							that.currentMsg.data.list = res.data.list;
 							that.currentMsg.data.page = res.data.page;
 						}else {
-							this.$utils.showTip('error', '', '', '', res.message);
+							this.$utils.showTip('error', '', '', res.message);
 						}
 						that.currentMsg.isLoading = false;
 					}, function() {
@@ -229,7 +153,7 @@
 						that.currentMsg.data.list = res.data.list;
 						that.currentMsg.data.page = res.data.page;
 					}else {
-						this.$utils.showTip('error', '', '', '', res.message);
+						this.$utils.showTip('error', '', '', res.message);
 					}
 					that.currentMsg.isLoading = false;
 				}, function() {
@@ -246,7 +170,7 @@
 						if(res.succflag == 0) {
 							that.currentMsgDetail= row.detail = that.defaultMsgDetail;
 						}else {
-							this.$utils.showTip('error', '', '', '', res.message);
+							this.$utils.showTip('error', '', '', res.message);
 						}
 					}, function() {}, {msgid: row.id}, false, {token: that.$utils.CONFIG.token})
 	      		}
@@ -258,24 +182,6 @@
 		},
 		created() {
 			var that = this;
-			//test
-			that.test1.forEach(function(item, index) {
-				item.isLoading = false;
-				item.data = {};
-				item.data.list = [];
-				item.data.page = {}
-				item.data.page.responsetotal = 1;
-			})
-			that.msg = that.test1;
-			that.currentMsg = that.msg[0];
-			that.test2.list.forEach(function(item, index) {
-				item.detail = {};
-				item.detail.isLoading = false;
-			})
-			that.currentMsg.data.list = that.test2.list;
-			that.currentMsg.data.page = that.test2.page;
-			that.activeTab = that.currentMsg.id;
-
 			//获取消息类型列表
 			that.$utils.getJson(that.$utils.CONFIG.api.msgTypeList, function(res) {
 				if(res.succflag == 0) {
@@ -308,7 +214,7 @@
 								that.currentMsg.data.list = res.data.list;
 								that.currentMsg.data.page = res.data.page;
 							}else {
-								that.$utils.showTip('error', '', '', '', res.message);
+								that.$utils.showTip('error', '', '', res.message);
 							}
 							that.currentMsg.isLoading = false;
 						}, function() {
@@ -317,7 +223,7 @@
 					}
 
 				}else {
-					that.$utils.showTip('error', '', '', '', res.message);
+					that.$utils.showTip('error', '', '', res.message);
 				}
 			}, function() {}, {}, true, {token: that.$utils.CONFIG.token})
 		}

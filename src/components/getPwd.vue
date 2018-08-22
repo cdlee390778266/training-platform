@@ -147,7 +147,7 @@
 						}
 						that.$utils.getJson(that.$utils.CONFIG.api.getPwd, function(res) {
 							if(res.succflag == 0) {
-								that.$utils.showTip('error', '', '', res.message);
+								that.$utils.showTip('success', '', '', res.message);
 								that.$refs['getPwdForm'].resetFields();
 							}else {
 								that.$utils.showTip('error', '', '', res.message);

@@ -4,7 +4,9 @@ const CONFIG = {
 	cookieKey: 'user',
 	universitycode: '10001', //院校代码
 	token: '', //令牌
-	account: [],
+	account: [],	//账户列表
+	mainAccount1: {},	//竞赛主账户
+	mainAccount2: {},	//期权主账户
 	loginData: {
 		data: {
 			student: {
@@ -24,7 +26,7 @@ const CONFIG = {
 					accts: [
 						{
 							type: 1,
-							acct: "10001689211",
+							acct: "10001201876175",
 							acctname: "沪深A股交易资金账户"
 						}
 					]
@@ -56,7 +58,7 @@ const CONFIG = {
 		},
 		message: "",
 		succflag: 0,
-		token: "ff40a568e186e87ffc26e84621ae20bf96ddb023abb7701d304cf62635985195"
+		token: "ac312617c15ffd3afd1501d5c40741459591019aa7bf44d18588c75f88cbba8c"
 	},
 	codeTime: 60,	//验证码倒计时时间
 	pageSize: 20,
@@ -71,8 +73,8 @@ const CONFIG = {
 		editTel: baseUrl + 'my/edittel.do', //修改手机号
 
 		hq: 'http://192.168.1.213:9080/quotescenter/service', //行情
-		myRacelist: baseUrl + 'competition/myracelist.do', //模拟赛列表
-		competitionList: baseUrl + 'competition/list.do', //赛事列表
+		myRacelist: 'http://192.168.16.31:8080/fests/' + 'competition/myracelist.do', //模拟赛列表
+		competitionList: 'http://192.168.16.31:8080/fests/' + 'competition/list.do', //赛事列表
 		signUp: baseUrl + 'competition/signup.do', //赛事报名
 		competitionDetail: baseUrl + 'competition/racedetail.do', //赛事详情
 		competitionSort: baseUrl + 'competition/raceranking.do', //赛事详情
@@ -89,6 +91,9 @@ const CONFIG = {
 		stockUpd: baseUrl + 'ststock/stockUpd.do', //修改“选股理由”
 		stockDel: baseUrl + 'ststock/stockDel.do', //策略信息删除商品
 
+		lineList: 'http://192.168.16.40:8080/' + 'chart/indexlist.do', //指数列表
+		profit: 'http://192.168.16.40:8080/' + 'chart/profit.do', //走势图
+		hold: 'http://192.168.16.40:8080/' + 'chart/hold.do', //持仓饼图
 		comment: baseUrl + 'comcenter/mycomment.do', //我的评论
 		commentreply: baseUrl + 'comcenter/commentreply.do', //回复评论
 		

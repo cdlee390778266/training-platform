@@ -177,7 +177,8 @@
                 method: 'startexe',
                 data: {
                   type:'quotes',
-                  exeName: item.handleData
+                  exeName: item.handleData,
+                  account: item.handleData == 'option' ? this.$utils.CONFIG.mainAccount2.acct : this.$utils.CONFIG.mainAccount1.acct
                 }
               }
               this.$utils.handleExe(json, function(){}, function(){})
@@ -243,12 +244,13 @@
                 }
                 that.$utils.getJson(that.$utils.CONFIG.api.editEmail, function(res) {
                   if(res.succflag == 0) {
-                    that.$utils.showTip('error', '', '', '', res.message);
+                    that.$utils.showTip('success', '', '', res.message);
+                    that.email.dialogFormVisible = false;
                     that.$refs['bindEmailForm'].resetFields();
                   }else {
-                    that.$utils.showTip('error', '', '', '', res.message);
+                    that.$utils.showTip('error', '', '', res.message);
                   }
-                }, function() {}, editEmailData)
+                }, function() {}, editEmailData, false, {token: that.$utils.CONFIG.token})
               } else {
                 return false;
               }

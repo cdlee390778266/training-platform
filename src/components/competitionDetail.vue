@@ -509,7 +509,7 @@
 	                  	that.saveRace.stustatus = 1;
 	                  	that.signUp.dialogFormVisible = false;
 	                  }else {
-	                    that.$utils.showTip('error', '', '', '', res.message);
+	                    that.$utils.showTip('error', '', '', res.message);
 	                  }
 	                }, function() {}, signUpData, false, {token: that.$utils.CONFIG.token})
 	              } else {
@@ -523,7 +523,7 @@
 	              	if(res.succflag == 0) {
 	              		that.tabs.tabs.sort.tableData = res.data;
 	              	}else {
-	                	that.$utils.showTip('error', '', '', '', res.message);
+	                	that.$utils.showTip('error', '', '', res.message);
 	              	}
 	            }, function() {}, that.tabs.tabs.sort.searchVal, true, {token: that.$utils.CONFIG.token})
 	        },
@@ -534,7 +534,7 @@
 	              	if(res.succflag == 0) {
 	                	that.tabs.tabs.notice.tableData = res.data;
 	              	}else {
-	                	that.$utils.showTip('error', '', '', '', res.message);
+	                	that.$utils.showTip('error', '', '', res.message);
 	              	}
 	            }, function() {}, that.tabs.tabs.notice.searchVal, true, {token: that.$utils.CONFIG.token})
 	      	},
@@ -547,7 +547,7 @@
 						if(res.succflag == 0) {
 							that.tabs.tabs.notice.currentMsgDetail= res.data;
 						}else {
-							this.$utils.showTip('error', '', '', '', res.message);
+							this.$utils.showTip('error', '', '', res.message);
 						}
 					}, function() {}, {msgid: row.id}, false, {token: that.$utils.CONFIG.token})
 	      		}
@@ -571,7 +571,7 @@
               	if(res.succflag == 0) {
                 	
               	}else {
-                	that.$utils.showTip('error', '', '', '', res.message);
+                	that.$utils.showTip('error', '', '', res.message);
               	}
             }, function() {}, {raceid: that.saveRace.usagecode}, true, {token: that.$utils.CONFIG.token})
 
@@ -584,7 +584,7 @@
               	if(res.succflag == 0) {
                 	that.tabs.tabs.sort.tableData = res.data;
               	}else {
-                	that.$utils.showTip('error', '', '', '', res.message);
+                	that.$utils.showTip('error', '', '', res.message);
               	}
             }, function() {}, that.tabs.tabs.sort.searchVal, true, {token: that.$utils.CONFIG.token})
 
@@ -596,7 +596,7 @@
               	if(res.succflag == 0) {
                 	that.tabs.tabs.notice.tableData = res.data;
               	}else {
-                	that.$utils.showTip('error', '', '', '', res.message);
+                	that.$utils.showTip('error', '', '', res.message);
               	}
             }, function() {}, that.tabs.tabs.notice.searchVal, true, {token: that.$utils.CONFIG.token})
 		}

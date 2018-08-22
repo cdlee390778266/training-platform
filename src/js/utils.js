@@ -10,7 +10,9 @@ Utils.$http = axios;
 
 Utils.$store = store;
 
-Utils.sha1 = sha1;
+Utils.sha1 = function(val) {
+	return sha1(val.toString());
+}
 
 Utils.CONFIG = CONFIG;
 

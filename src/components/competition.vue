@@ -25,8 +25,9 @@
 				    	<el-row :gutter="20">
 							<el-col :span="12" v-for="(item, index) in tabs.tabs.simulation.dataList" :key="index">
 								<div class="simulation-item">
-									<div class="simulation-bar">{{item.racename  | strLen(32)}} <router-link :to="'/competition/detail/detail/' + item.usagecode">查看详情</router-link></div>
-									<div class="simulation-img" :style="'background-image: url(' + item.url + ');'"></div>
+									<div class="simulation-bar">{{item.racename  | strLen(32)}} <a @click="jump(item, 'detail')">查看详情</a></div>
+									<div class="simulation-img" :style="'background-image: url(' + item.url + ');'" v-if="item.url"></div>
+									<div class="simulation-img" :style="'background-image: url(' + tabs.tabs.simulation.defaultImg + ');'" v-else></div>
 									<el-row :gutter="20" class="simulation-text">
 										<template v-if="item.racestatus != 41">
 											<el-col :span="8">
@@ -50,7 +51,7 @@
 									</el-row>
 									<div class="simulation-trade">
 										当前排名：<span>{{item.ranking}}</span>
-										<router-link :to="'/competition/detail/sort/' + item.usagecode">查看排行榜</router-link>
+										<a @click="jump(item, 'sort')">查看排行榜</a>
 
 										<el-button type="danger" v-for="(acct, index) in item.fuacct" :key="index" @click="trade(item, acct)">{{acct.fuaccttype == 1 ? '竞赛交易' : '期权交易'}}</el-button>
 									</div>
@@ -88,7 +89,8 @@
 				    	</div>
 				    	<div class="list">
 				    		<div class="list-item" v-for="(item, index) in tabs.tabs.list.data.list" @click="jump(item, 'detail')">
-				    			<div class="list-item-l" :style="'background-image: url(' + item.url + ');'"></div>
+				    			<div class="list-item-l" :style="'background-image: url(' + item.url + ');'" v-if="item.url"></div>
+				    			<div class="list-item-l" :style="'background-image: url(' + tabs.tabs.list.data.defaultImg + ');'" v-else></div>
 				    			<div class="list-item-c">
 				    				<h2>{{item.racename}}</h2>
 				    				<p><strong>主办方：</strong>{{item.hostunit}}</p>
@@ -177,6 +179,71 @@
 	</div>
 </template>
 <script>
+	//行情
+	var getHq = function(that) {
+		//上证指数、沪深300 行情 
+		var shHqPostData = {
+		 	serviceid: "snapshot",
+			body: {
+			  	marketid: "0",
+			  	stockcode: ["000001","000300"]
+		 	}
+		}
+		that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
+         	if(res.status == 0) {
+            	res.data.forEach( function(e, i) {
+            		if(shHqPostData.body.stockcode[0] === e.code) {
+            			that.lattice[0].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+            		}
+            		if(shHqPostData.body.stockcode[1] === e.code) {
+            			that.lattice[3].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+            		}
+            	});
+          	}
+        }, function() {}, shHqPostData, false)
+
+        //深证指数、创业板指 行情
+		var scHqPostData = {
+		 	serviceid: "snapshot",
+			 	body: {
+			  	marketid: "1",
+			  	stockcode: ["399001","399006"]
+		 	}
+		}
+		that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
+         	if(res.status == 0) {
+            	res.data.forEach( function(e, i) {
+            		if(scHqPostData.body.stockcode[0] === e.code) {
+            			that.lattice[1].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+            		}
+            		if(scHqPostData.body.stockcode[1] === e.code) {
+            			that.lattice[2].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+            		}
+            	});
+          	}
+        }, function() {}, scHqPostData, false)
+	}
+	//我的模拟赛事
+	var getRacelist = function(that) {
+		 that.$utils.getJson(that.$utils.CONFIG.api.myRacelist, function(res) {
+         	if(res.succflag == 0) {
+            	that.tabs.tabs.simulation.dataList = res.data;
+          	}else {
+          		that.$utils.showTip('error', '', '', res.message);
+          	}
+        }, function() {}, {}, true, {token: that.$utils.CONFIG.token})
+	}
+	//赛事列表
+	var getList = function(that) {
+		 that.$utils.getJson(that.$utils.CONFIG.api.competitionList, function(res) {
+         	if(res.succflag == 0) {
+            	that.tabs.tabs.list.data.list = res.data.list;
+            	that.tabs.tabs.list.data.page = res.page;
+          	}else {
+          		that.$utils.showTip('error', '', '', res.message);
+          	}
+        }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
+	}
 	export default {
 		data() {
 			return {
@@ -262,7 +329,7 @@
 					status: '',
 					racename: '',
 					page: {
-						start: "1",
+						start: "0",
 						size: this.$utils.CONFIG.pageSize
 					},
 				},
@@ -271,46 +338,8 @@
 					tabs: {
 						simulation: {
 							name: '我的模拟赛事',
-							dataList: [
-								{
-									usagecode: '1',
-									racename: '2018四川模拟炒股大赛2018四川模拟炒股大赛2018四川模拟炒股大赛2018四川模拟炒股大赛2018四川模拟炒股大赛',
-									url: require('../assets/images/img3.png'),
-									racestatus: 0,
-									dayupdown: '-0.49%',
-									dayincome: '15.22',
-									totalincomerate: '11.3125',
-									ranking: 25,
-									raceDesc: '只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加',
-									fuacct:[
-										{
-											fuaccttype: "1",
-											fuacct: "1000103600"
-										},
-										{
-											fuaccttype: "2",
-											fuacct: "1000103600"
-										}
-									]
-								},
-								{
-									usagecode: '1',
-									racename: '2018四川模拟炒股大赛2018四川模拟炒股大赛2018四川模拟炒股大赛2018四川模拟炒股大赛2018四川模拟炒股大赛',
-									url: require('../assets/images/img3.png'),
-									racestatus: 41,
-									dayupdown: '-0.49%',
-									dayincome: '15.22',
-									totalincomerate: '11.3125',
-									ranking: 25,
-									raceDesc: '只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加只有地球人可以参加',
-									fuacct:[
-										{
-											fuaccttype: "2",
-											fuacct: "1000103600"
-										}
-									]
-								}
-							]
+							defaultImg: require('../assets/images/img3.png'),
+							dataList: []
 						},
 						list: {
 							name: '赛事列表',
@@ -409,105 +438,39 @@
 								]
 							},
 							data: {
+								defaultImg: require('../assets/images/img2.png'),
 								list: [
-									{
-										usagecode: '0',
-										url: require('../assets/images/img2.png'),
-										racename: '西南财经大学模拟炒股大赛',
-										hostunit: '西南财经大学',
-										type: '公开赛',
-										entrystatus: 40,
-										racestatus: 40,
-										entrystarttime: '2018-06-28',
-										entryendtime: '2018-09-10',
-										racestarttime: '2018-06-28',
-										raceendtime: '2018-09-10',
-										stustatus: 0,
-										ranking: '',
-										fuacct:[
-											{
-												fuaccttype: "1",
-												fuacct: "1000103600"
-											},
-											{
-												fuaccttype: "2",
-												fuacct: "1000103600"
-											}
-										]
-									},
-									{
-										usagecode: '0',
-										url: require('../assets/images/img2.png'),
-										racename: '西南财经大学模拟炒股大赛',
-										hostunit: '西南财经大学',
-										type: '公开赛',
-										entrystatus: 40,
-										racestatus: 40,
-										entrystarttime: '2018-06-28',
-										entryendtime: '2018-09-10',
-										racestarttime: '2018-06-28',
-										raceendtime: '2018-09-10',
-										stustatus: 2,
-										ranking: '',
-										fuacct:[
-											{
-												fuaccttype: "1",
-												fuacct: "1000103600"
-											},
-											{
-												fuaccttype: "2",
-												fuacct: "1000103600"
-											}
-										]
-									},
-									{
-										usagecode: '0',
-										url: require('../assets/images/img2.png'),
-										racename: '西南财经大学模拟炒股大赛',
-										hostunit: '西南财经大学',
-										type: '公开赛',
-										entrystatus: 40,
-										racestatus: 40,
-										entrystarttime: '2018-06-28',
-										entryendtime: '2018-09-10',
-										racestarttime: '2018-06-28',
-										raceendtime: '2018-09-10',
-										stustatus: 2,
-										ranking: '',
-										fuacct:[
-											{
-												fuaccttype: "1",
-												fuacct: "1000103600"
-											}
-										]
-									},
-									{
-										usagecode: '0',
-										url: require('../assets/images/img2.png'),
-										racename: '西南财经大学模拟炒股大赛',
-										hostunit: '西南财经大学',
-										type: '公开赛',
-										entrystatus: 40,
-										racestatus: 40,
-										entrystarttime: '2018-06-28',
-										entryendtime: '2018-09-10',
-										racestarttime: '2018-06-28',
-										raceendtime: '2018-09-10',
-										stustatus: 10,
-										ranking: '',
-										fuacct:[
-											{
-												fuaccttype: "2",
-												fuacct: "1000103600"
-											}
-										]
-									},
+									// {
+									// 	usagecode: '0',
+									// 	url: require('../assets/images/img2.png'),
+									// 	racename: '西南财经大学模拟炒股大赛',
+									// 	hostunit: '西南财经大学',
+									// 	type: '公开赛',
+									// 	entrystatus: 40,
+									// 	racestatus: 40,
+									// 	entrystarttime: '2018-06-28',
+									// 	entryendtime: '2018-09-10',
+									// 	racestarttime: '2018-06-28',
+									// 	raceendtime: '2018-09-10',
+									// 	stustatus: 0,
+									// 	ranking: '',
+									// 	fuacct:[
+									// 		{
+									// 			fuaccttype: "1",
+									// 			fuacct: "1000103600"
+									// 		},
+									// 		{
+									// 			fuaccttype: "2",
+									// 			fuacct: "1000103600"
+									// 		}
+									// 	]
+									// }
 								],
 								page: {
 									start: 0,
 									size: 0,
 									responsenum: 0,
-									responsetotal: 100
+									responsetotal: 0
 								}
 							}
 						}
@@ -533,7 +496,15 @@
 		},
 		methods: {
 			trade(item, acct) {
-				console.log(item);
+				var json = {
+	                method: 'startexe',
+	                data: {
+	                  	type:'quotes',
+	                  	exeName: acct.fuaccttype == 1 ? 'shares' : 'option',
+	                  	account: acct.fuacct
+	                }
+	            }
+	            this.$utils.handleExe(json, function(){}, function(){})
 			},
 			changeCondition(data, item) {
 				if(data.isActive) return;
@@ -552,7 +523,7 @@
 	             	if(res.succflag == 0) {
 	                	that.tabs.tabs.list.dataList = res.data;
 	              	}else {
-	              		that.$utils.showTip('error', '', '', '', res.message);
+	              		that.$utils.showTip('error', '', '', res.message);
 	              	}
 	            }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
 			},
@@ -564,7 +535,7 @@
 	             	if(res.succflag == 0) {
 	                	that.tabs.tabs.list.dataList = res.data;
 	              	}else {
-	              		that.$utils.showTip('error', '', '', '', res.message);
+	              		that.$utils.showTip('error', '', '', res.message);
 	              	}
 	            }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
 			},
@@ -574,7 +545,7 @@
 						this.$router.push({ path: '/competition/detail/detail/', query: item});
 						break;
 					case 'entry':  //进入我的赛事
-						this.$router.push('/admin/home');
+						this.$router.push({ path: '/admin/home', query: {raceid: item.usagecode}});
 						break;
 					case 'sort':   //赛事排名
 						this.$router.push({ path: '/competition/detail/sort', query: item});
@@ -623,7 +594,7 @@
 	                  	that.saveSignData.stustatus = 1;
 	                  	that.signUp.dialogFormVisible = false;
 	                  }else {
-	                    that.$utils.showTip('error', '', '', '', res.message);
+	                    that.$utils.showTip('error', '', '', res.message);
 	                  }
 	                }, function() {}, signUpData, false, {token: that.$utils.CONFIG.token})
 	              } else {
@@ -638,101 +609,23 @@
 	             	if(res.succflag == 0) {
 	                	that.tabs.tabs.list.dataList = res.data;
 	              	}else {
-	              		that.$utils.showTip('error', '', '', '', res.message);
+	              		that.$utils.showTip('error', '', '', res.message);
 	              	}
 	            }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
 	        }
 		},
 		created() {
 			var that = this;
-			//上证指数、沪深300 行情 
-			var shHqPostData = {
-			 	serviceid: "snapshot",
-				body: {
-				  	marketid: "0",
-				  	stockcode: ["000001","000300"]
-			 	}
-			}
-			that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
-             	if(res.status == 0) {
-                	res.data.forEach( function(e, i) {
-                		if(shHqPostData.body.stockcode[0] === e.code) {
-                			that.lattice[0].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
-                		}
-                		if(shHqPostData.body.stockcode[1] === e.code) {
-                			that.lattice[3].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
-                		}
-                	});
-              	}
-            }, function() {}, shHqPostData, false)
-
-            //深证指数、创业板指 行情
-			var scHqPostData = {
-			 	serviceid: "snapshot",
-				 	body: {
-				  	marketid: "1",
-				  	stockcode: ["399001","399006"]
-			 	}
-			}
-			that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
-             	if(res.status == 0) {
-                	res.data.forEach( function(e, i) {
-                		if(scHqPostData.body.stockcode[0] === e.code) {
-                			that.lattice[1].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
-                		}
-                		if(scHqPostData.body.stockcode[1] === e.code) {
-                			that.lattice[2].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
-                		}
-                	});
-              	}
-            }, function() {}, scHqPostData, false)
-
+			//行情
+			getHq(that);
             that.timer = setInterval(function() {
-            	that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
-	             	if(res.status == 0) {
-	                	res.data.forEach( function(e, i) {
-	                		if(shHqPostData.body.stockcode[0] === e.code) {
-	                			that.lattice[0].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
-	                		}
-	                		if(shHqPostData.body.stockcode[1] === e.code) {
-	                			that.lattice[3].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
-	                		}
-	                	});
-	              	}
-	            }, function() {}, shHqPostData, false)
-
-	            that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
-	             	if(res.status == 0) {
-	                	res.data.forEach( function(e, i) {
-	                		if(scHqPostData.body.stockcode[0] === e.code) {
-	                			that.lattice[1].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
-	                		}
-	                		if(scHqPostData.body.stockcode[1] === e.code) {
-	                			that.lattice[2].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
-	                		}
-	                	});
-	              	}
-	            }, function() {}, scHqPostData, false)
-
+            	getHq(that);
             }, 3000)
 
             //模拟赛
-            that.$utils.getJson(that.$utils.CONFIG.api.myRacelist, function(res) {
-             	if(res.succflag == 0) {
-                	that.tabs.tabs.simulation.dataList = res.data;
-              	}else {
-              		that.$utils.showTip('error', '', '', '', res.message);
-              	}
-            }, function() {}, {}, true, {token: that.$utils.CONFIG.token})
-
+           	getRacelist(that);
             //赛事列表
-            that.$utils.getJson(that.$utils.CONFIG.api.competitionList, function(res) {
-             	if(res.succflag == 0) {
-                	that.tabs.tabs.list.dataList = res.data;
-              	}else {
-              		that.$utils.showTip('error', '', '', '', res.message);
-              	}
-            }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
+           	getList(that);
 		},
 		destroyed: function () {
 			clearInterval(this.timer)
