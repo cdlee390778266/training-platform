@@ -82,6 +82,7 @@
 				}
 			};
 			return {
+				univerCode: '',
 				isShowCountDown: false,
 				isCodeLoading: false,
 				count: '',
@@ -162,11 +163,11 @@
 			},
 			submitForm(formName) {
 				var that = this;
-				var universitycode
+				var universitycode;
 				this.$refs[formName].validate((valid) => {
 					if (valid) {
 						var registerData = {
-						 	universitycode: that.$utils.CONFIG.universitycode,
+						 	universitycode: that.univerCode,
 						 	studentid: that.registerForm.ID,
 						 	realname: that.registerForm.name,
 						 	mobile: that.registerForm.phone,
@@ -190,6 +191,16 @@
 			},
 			resetForm(formName) {
 				this.$refs[formName].resetFields();
+			}
+		},
+		created() {
+			var jqueryArr = location.href.split('?')[1].split('&');
+			for(var i = 0; i < jqueryArr.length; i++) {
+				var arr = jqueryArr[i].split('=');
+				if(arr[0] == 'UniverCode') {
+					this.univerCode = arr[1];
+					break;
+				}
 			}
 		}
 	}

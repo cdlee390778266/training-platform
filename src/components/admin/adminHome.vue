@@ -395,6 +395,70 @@
 	        }, function() {}, {}, true, {token: that.$utils.CONFIG.token})
 		}
 	}
+	//我的持仓行情
+	var getHoldPos = function(that) {
+		that.$utils.getJson(that.$utils.CONFIG.api.holdHqList, function(res) {
+          	if(res.succflag == 0) {
+            	//上海行情
+            	var shHqPostData = {
+				 	serviceid: "snapshot",
+					body: {
+					  	marketid: "0",
+					  	stockcode: []
+				 	}
+				}
+				//深圳行情
+				var szHqPostData = {
+				 	serviceid: "snapshot",
+					 	body: {
+					  	marketid: "1",
+					  	stockcode: []
+				 	}
+				}
+				res.data.forEach( function(e, i) {
+					if(e.marketid == 0) {
+						shHqPostData.body.stockcode.push(e.code);
+					}
+					if(e.marketid == 1) {
+						szHqPostData.body.stockcode.push(e.code);
+					}
+				});
+
+            	//根据列表数据查询行情
+            	if(shHqPostData.body.stockcode.length) {
+                	that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
+		             	if(res.status == 0) {
+		                	res.data.forEach( function(e, i) {
+		                		e.range = ((e.now-e.open)/e.open).toFixed(2);
+		                		e.riseAndFall = (e.now-e.open).toFixed(2);
+		                		e.marketcode = 0
+		                	});
+		                	that.diyTable = that.diyTable.concat(res.data);
+		              	}else {
+		              		that.$utils.showTip('error', '', '', res.message);
+		              	}
+		            }, function() {}, shHqPostData, true)
+            	}
+            	if(szHqPostData.body.stockcode.length) {
+                	that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
+		             	if(res.status == 0) {
+		                	res.data.forEach( function(e, i) {
+		                		e.range = ((e.now-e.open)/e.open).toFixed(2);
+		                		e.riseAndFall = (e.now-e.open).toFixed(2);
+		                		e.marketcode = 1;
+		                	});
+		                	that.diyTable = that.diyTable.concat(res.data);
+		              	}else {
+		              		that.$utils.showTip('error', '', '', res.message);
+		              	}
+		            }, function() {}, szHqPostData, true)
+            	}
+
+          	}else {
+            	that.$utils.showTip('error', '', '', res.message);
+          	}
+        }, function() {}, that.searchVal.diy, true, {token: that.$utils.CONFIG.token})
+	}
 
 	//我的持仓
 	var getHold = function(that) {
@@ -412,6 +476,9 @@
             	that.$utils.showTip('error', '', '', res.message);
           	}
         }, function() {}, postHoldData, true, {token: that.$utils.CONFIG.token})
+
+        //行情数据
+        //getHoldPos(that);
 	}
 	export default {
 	components: {

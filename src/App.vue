@@ -33,6 +33,7 @@ export default {
     }
     this.$utils.getLoginData(function(res) {
         alert('登录信息：' + res);
+        var res = JSON.parse(res);
         that.$utils.CONFIG.loginData = res;
         that.$utils.CONFIG.token = that.$utils.CONFIG.loginData.token;
         that.$utils.CONFIG.account = that.$utils.CONFIG.loginData.data.account;

@@ -83,6 +83,35 @@
 					  	  <!-- <el-button class="btn-edit" @click="edit">{{edit ? '取消' : '编辑'}}</el-button> -->
 					  	  <el-button class="btn-add" @click="showAddDialog">添加</el-button>
 					   </div>
+
+					   <!-- 加入策略交易池弹窗 -->
+						<el-dialog title="加入策略交易池" :visible.sync="addPool.dialogVisible" class="addPool" width="600px">
+							<el-table
+							:data="addPool.table"
+							style="width: 100%">
+								<el-table-column
+								prop="commcode"
+								label="代码"
+								width="100">
+								</el-table-column>
+								<el-table-column
+								prop="name"
+								label="简称"
+								width="100">
+								</el-table-column>
+								<el-table-column
+								prop="remark"
+								label="添加理由">
+									<template slot-scope="scope">
+										<el-input v-model="scope.row.remark" placeholder="请输入内容"></el-input>
+									</template>
+								</el-table-column>
+							</el-table>
+							<span slot="footer" class="dialog-footer">
+						    <el-button type="primary" @click="addToPool">确 定</el-button>
+						    <el-button @click="addPool.dialogVisible = false">取 消</el-button>
+						  </span>
+						</el-dialog>
 					</div>
 					<div class="table-item" v-show="activeTab == 'pool'">
 						<el-table
@@ -90,7 +119,7 @@
 					    @cell-click="expand"
 					    ref="clTable"
 					    style="width: 100%">
-					    <el-table-column type="expand" prop="handleList" v-if="searchVal.pool.status != 'DEL'">
+					    <el-table-column type="expand" prop="handleList">
 					      <template slot-scope="scope">
 					        <div class="expand-item" v-if="scope.row.handleList.length">
 					        	<div class="expand-item-left">
@@ -158,143 +187,129 @@
 					    </el-table-column> -->
 					  </el-table>
 					  <div class="handle">
-					  	  <el-button class="btn-add" @click="showAddDialog('recovery')" v-if="searchVal.pool.status == 'DEL'">恢复</el-button>
+					  	  <el-button class="btn-add" v-if="searchVal.pool.status == 'DEL'">恢复</el-button>
 					  	  <el-button class="btn-del" @click="showDelDialog" v-if="searchVal.pool.status == ''">删除</el-button>
 					  	  <!-- <el-button class="btn-export">导入</el-button> -->
 					   </div>
+
+					   <!-- 编辑弹窗 -->
+						<el-dialog title="编辑选股理由" :visible.sync="modify.dialogVisible" class="modify" width="600px">
+							<el-form :model="modify.modifyForm.stock" :rules="modify.modifyRules" ref="modify">
+					          <el-form-item prop="remark">
+					            <el-input type="textarea" v-model="modify.modifyForm.stock.remark" placeholder="请输入选股理由"></el-input>
+					          </el-form-item>
+					        </el-form>
+							<span slot="footer" class="dialog-footer">
+						    <el-button type="primary" @click="modifySubmit('modify')">确 定</el-button>
+						    <el-button @click="modify.dialogVisible = false">取 消</el-button>
+						  </span>
+						</el-dialog>
+						<!-- 删除弹窗 -->
+						<el-dialog title="删除股票" :visible.sync="del.dialogVisible" class="del" width="600px">
+							<el-table
+							:data="del.table"
+							style="width: 100%">
+								<el-table-column
+								prop="commcode"
+								label="代码"
+								width="100">
+								</el-table-column>
+								<el-table-column
+								prop="name"
+								label="简称"
+								width="100">
+								</el-table-column>
+								<el-table-column
+								prop="remark"
+								label="删除理由">
+									<template slot-scope="scope">
+										<el-input v-model="scope.row.remark" placeholder="请输入内容"></el-input>
+									</template>
+								</el-table-column>
+							</el-table>
+							<span slot="footer" class="dialog-footer">
+						    <el-button type="danger" @click="delSubmit">删 除</el-button>
+						    <el-button @click="del.dialogVisible = false">取 消</el-button>
+						  </span>
+						</el-dialog>
 					</div>
-					<!-- 加入策略交易池弹窗 -->
-					<el-dialog title="加入策略交易池" :visible.sync="addPool.dialogVisible" class="addPool" width="600px">
-						<el-table
-						:data="addPool.table"
-						style="width: 100%">
-							<el-table-column
-							prop="commcode"
-							label="代码"
-							width="100">
-							</el-table-column>
-							<el-table-column
-							prop="name"
-							label="简称"
-							width="100">
-							</el-table-column>
-							<el-table-column
-							prop="remark"
-							label="添加理由">
-								<template slot-scope="scope">
-									<el-input v-model="scope.row.remark" placeholder="请输入内容"></el-input>
-								</template>
-							</el-table-column>
-						</el-table>
-						<span slot="footer" class="dialog-footer">
-					    <el-button type="primary" @click="addToPool">确 定</el-button>
-					    <el-button @click="addPool.dialogVisible = false">取 消</el-button>
-					  </span>
-					</el-dialog>
-					<!-- 编辑弹窗 -->
-					<el-dialog title="编辑选股理由" :visible.sync="modify.dialogVisible" class="modify" width="600px">
-						<el-form :model="modify.modifyForm.stock" :rules="modify.modifyRules" ref="modify">
-				          <el-form-item prop="remark">
-				            <el-input type="textarea" v-model="modify.modifyForm.stock.remark" placeholder="请输入选股理由"></el-input>
-				          </el-form-item>
-				        </el-form>
-						<span slot="footer" class="dialog-footer">
-					    <el-button type="primary" @click="modifySubmit('modify', saveRow)">确 定</el-button>
-					    <el-button @click="modify.dialogVisible = false">取 消</el-button>
-					  </span>
-					</el-dialog>
-					<!-- 删除弹窗 -->
-					<el-dialog title="删除股票" :visible.sync="del.dialogVisible" class="del" width="600px">
-						<el-table
-						:data="del.table"
-						style="width: 100%">
-							<el-table-column
-							prop="commcode"
-							label="代码"
-							width="100">
-							</el-table-column>
-							<el-table-column
-							prop="name"
-							label="简称"
-							width="100">
-							</el-table-column>
-							<el-table-column
-							prop="remark"
-							label="删除理由">
-								<template slot-scope="scope">
-									<el-input v-model="scope.row.remark" placeholder="请输入内容"></el-input>
-								</template>
-							</el-table-column>
-						</el-table>
-						<span slot="footer" class="dialog-footer">
-					    <el-button type="danger" @click="delSubmit">删 除</el-button>
-					    <el-button @click="del.dialogVisible = false">取 消</el-button>
-					  </span>
-					</el-dialog>
 				</div>
 			</div>
 		</div>
 	</div>
 </template>
 <script>
+	//行情
+	var getHq = function(that, hqData, type) {
+		//上海行情
+    	var shHqPostData = {
+		 	serviceid: "snapshot",
+			body: {
+			  	marketid: "0",
+			  	stockcode: []
+		 	}
+		}
+		//深圳行情
+		var szHqPostData = {
+		 	serviceid: "snapshot",
+			 	body: {
+			  	marketid: "1",
+			  	stockcode: []
+		 	}
+		}
+		hqData.forEach( function(e, i) {
+			if(type == 'diy') {
+				if(e.marketid == 0) {
+					shHqPostData.body.stockcode.push(e.code);
+				}
+				if(e.marketid == 1) {
+					szHqPostData.body.stockcode.push(e.code);
+				}
+			}
+			if(type == 'pool') {
+				if(e.marketcode == 0) {
+					shHqPostData.body.stockcode.push(e.commcode);
+				}
+				if(e.marketcode == 1) {
+					szHqPostData.body.stockcode.push(e.commcode);
+				}
+			}
+		});
+
+    	//根据列表数据查询行情
+    	if(shHqPostData.body.stockcode.length) {
+        	that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
+             	if(res.status == 0) {
+                	res.data.forEach( function(e, i) {
+                		e.range = ((e.now-e.open)/e.open).toFixed(2);
+                		e.riseAndFall = (e.now-e.open).toFixed(2);
+                		e.marketcode = 0
+                	});
+                	type == 'diy' ? that.diyTable = that.diyTable.concat(res.data) : that.clTable = that.clTable.concat(res.data);
+              	}else {
+              		that.$utils.showTip('error', '', '', res.message);
+              	}
+            }, function() {}, shHqPostData, true)
+    	}
+    	if(szHqPostData.body.stockcode.length) {
+        	that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
+             	if(res.status == 0) {
+                	res.data.forEach( function(e, i) {
+                		e.range = ((e.now-e.open)/e.open).toFixed(2);
+                		e.riseAndFall = (e.now-e.open).toFixed(2);
+                		e.marketcode = 1;
+                	});
+                	type == 'diy' ? that.diyTable = that.diyTable.concat(res.data) : that.clTable = that.clTable.concat(res.data);
+              	}else {
+              		that.$utils.showTip('error', '', '', res.message);
+              	}
+            }, function() {}, szHqPostData, true)
+    	}
+	}
 	var getDiyTable = function(that) {
 		that.$utils.getJson(that.$utils.CONFIG.api.stockList, function(res) {
           	if(res.succflag == 0) {
-            	//上海行情
-            	var shHqPostData = {
-				 	serviceid: "snapshot",
-					body: {
-					  	marketid: "0",
-					  	stockcode: []
-				 	}
-				}
-				//深圳行情
-				var szHqPostData = {
-				 	serviceid: "snapshot",
-					 	body: {
-					  	marketid: "1",
-					  	stockcode: []
-				 	}
-				}
-				res.data.forEach( function(e, i) {
-					if(e.marketid == 0) {
-						shHqPostData.body.stockcode.push(e.code);
-					}
-					if(e.marketid == 1) {
-						szHqPostData.body.stockcode.push(e.code);
-					}
-				});
-
-            	//根据列表数据查询行情
-            	if(shHqPostData.body.stockcode.length) {
-                	that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
-		             	if(res.status == 0) {
-		                	res.data.forEach( function(e, i) {
-		                		e.range = ((e.now-e.open)/e.open).toFixed(2);
-		                		e.riseAndFall = (e.now-e.open).toFixed(2);
-		                		e.marketcode = 0
-		                	});
-		                	that.diyTable = that.diyTable.concat(res.data);
-		              	}else {
-		              		that.$utils.showTip('error', '', '', res.message);
-		              	}
-		            }, function() {}, shHqPostData, true)
-            	}
-            	if(szHqPostData.body.stockcode.length) {
-                	that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
-		             	if(res.status == 0) {
-		                	res.data.forEach( function(e, i) {
-		                		e.range = ((e.now-e.open)/e.open).toFixed(2);
-		                		e.riseAndFall = (e.now-e.open).toFixed(2);
-		                		e.marketcode = 1;
-		                	});
-		                	that.diyTable = that.diyTable.concat(res.data);
-		              	}else {
-		              		that.$utils.showTip('error', '', '', res.message);
-		              	}
-		            }, function() {}, szHqPostData, true)
-            	}
-
+            	getHq(that, res.data, 'diy');
           	}else {
             	that.$utils.showTip('error', '', '', res.message);
           	}
@@ -303,65 +318,7 @@
 	var getClTable = function(that) {
 		that.$utils.getJson(that.$utils.CONFIG.api.clStockList, function(res) {
           	if(res.succflag == 0) {
-            	//上海行情
-            	var shHqPostData = {
-				 	serviceid: "snapshot",
-					body: {
-					  	marketid: "0",
-					  	stockcode: []
-				 	}
-				}
-				//深圳行情
-				var szHqPostData = {
-				 	serviceid: "snapshot",
-					 	body: {
-					  	marketid: "1",
-					  	stockcode: []
-				 	}
-				}
-				res.data.forEach( function(e, i) {
-					if(e.marketcode == 0) {
-						shHqPostData.body.stockcode.push(e.commcode);
-					}
-					if(e.marketcode == 1) {
-						szHqPostData.body.stockcode.push(e.commcode);
-					}
-				});
-
-            	//根据列表数据查询行情
-            	if(shHqPostData.body.stockcode.length) {
-                	that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
-		             	if(res.status == 0) {
-		                	res.data.forEach( function(e, i) {
-		                		e.range = ((e.now-e.open)/e.open).toFixed(2);
-		                		e.riseAndFall = (e.now-e.open).toFixed(2);
-		                		e.marketcode = 0;
-		                		e.handleList = [];
-		                		e.hadLoading = false;
-		                	});
-		                	that.clTable = that.clTable.concat(res.data);
-		              	}else {
-		              		that.$utils.showTip('error', '', '', res.message);
-		              	}
-		            }, function() {}, shHqPostData, true)
-            	}
-            	if(szHqPostData.body.stockcode.length) {
-                	that.$utils.getJson(that.$utils.CONFIG.api.hq, function(res) {
-		             	if(res.status == 0) {
-		                	res.data.forEach( function(e, i) {
-		                		e.range = ((e.now-e.open)/e.open).toFixed(2);
-		                		e.riseAndFall = (e.now-e.open).toFixed(2);
-		                		e.marketcode = 1;
-		                		e.handleList = [];
-		                		e.hadLoading = false;
-		                	});
-		                	that.clTable = that.clTable.concat(res.data);
-		              	}else {
-		              		that.$utils.showTip('error', '', '', res.message);
-		              	}
-		            }, function() {}, szHqPostData, true)
-            	}
-
+          		getHq(that, res.data, 'pool');
           	}else {
             	that.$utils.showTip('error', '', '', res.message);
           	}
@@ -372,9 +329,6 @@
 			return {
 				activeTab: 'diy',
 				currenAccount: {},
-				saveRow: {},
-				saveAddRow: {},
-				handdlePoolType: '',
 				searchVal: {
 					account: '',
 					diy: {},
@@ -485,44 +439,24 @@
 						break;
 				}
 			},
-			showAddDialog(type) {
+			showAddDialog() {
 				var that = this;
-				that.addPool.table = [];
-				if(type == 'recovery') {
-					that.handdlePoolType = 'recovery';
-					if(!that.$refs.clTable.selection.length) {
-						that.$utils.showTip('error', 'error', '-1030');
-						return;
-					}
-					that.$refs.clTable.selection.forEach(function(e, i) {
-						var obj = {}
-						obj.account = that.searchVal.account;
-						obj.stid = 1;
-						obj.poolno = 1;
-						obj.marketcode = e.marketcode;
-						obj.commcode = e.code;
-						obj.name = e.name;
-						obj.remark = '';
-						that.addPool.table.push(obj);
-					})
-				}else {
-					that.handdlePoolType = '';
-					if(!that.$refs.diyTable.selection.length) {
-						that.$utils.showTip('error', 'error', '-1030');
-						return;
-					}
-					that.$refs.diyTable.selection.forEach(function(e, i) {
-						var obj = {}
-						obj.account = that.searchVal.account;
-						obj.stid = 1;
-						obj.poolno = 1;
-						obj.marketcode = e.marketcode;
-						obj.commcode = e.code;
-						obj.name = e.name;
-						obj.remark = '';
-						that.addPool.table.push(obj);
-					})
+				if(!that.$refs.diyTable.selection.length) {
+					that.$utils.showTip('error', 'error', '-1030');
+					return;
 				}
+				that.addPool.table = [];
+				that.$refs.diyTable.selection.forEach(function(e, i) {
+					var obj = {}
+					obj.account = that.searchVal.account;
+					obj.stid = 1;
+					obj.poolno = 1;
+					obj.marketcode = e.marketcode;
+					obj.commcode = e.code;
+					obj.name = e.name;
+					obj.remark = '';
+					that.addPool.table.push(obj);
+				})
 				that.addPool.dialogVisible = true;
 			},
 			addToPool() {
@@ -530,28 +464,14 @@
 				that.$utils.getJson(that.$utils.CONFIG.api.addPool, function(res) {
 	              	if(res.succflag == 0) {
 	                	that.$utils.showTip('success', '', '', res.message);
-	                	if(that.handdlePoolType == 'recovery') {	//恢复
-	                		that.$refs.clTable.clearSelection();
-	                		that.addPool.table.forEach(function(e) {
-		                		for(var i = 0; i < that.clTable.length; i++) {
-		                			if(e.commcode == that.clTable[i].code) {
-		                				that.clTable.splice(i, 1);
-		                				break;
-		                			}
-		                		}
-		                	})
-	                	}else {
-	                		that.$refs.diyTable.clearSelection();
-	                	}
+	                	that.addPool.dialogVisible = false;
 	              	}else {
 	                	that.$utils.showTip('error', '', '', res.message);
 	              	}
-	              	that.addPool.dialogVisible = false;
 	            }, function() {}, {commodity: that.addPool.table}, true, {token: that.$utils.CONFIG.token})
 			},
 			expand(row) {
 				var that = this;
-				if(that.searchVal.pool.status == 'DEL') return;
 				var postData = {
 					account: that.searchVal.account,
 					stid: "1",
@@ -560,15 +480,15 @@
 					commcode: row.code
 				}
 				that.$refs.clTable.toggleRowExpansion(row);
-				if(row.hadLoading) return;
-				row.hadLoading = true;
-				that.$utils.getJson(that.$utils.CONFIG.api.stoprecList, function(res) {
-	              	if(res.succflag == 0) {
-	                	row.handleList = res.data.reverse();
-	              	}else {
-	                	that.$utils.showTip('error', '', '', res.message);
-	              	}
-	            }, function() {}, postData, true, {token: that.$utils.CONFIG.token})
+				// if(row.hadLoading) return;
+				// row.hadLoading = true;
+				// that.$utils.getJson(that.$utils.CONFIG.api.stoprecList, function(res) {
+	   //            	if(res.succflag == 0) {
+	   //              	row.handleList = res.data.reverse();
+	   //            	}else {
+	   //              	that.$utils.showTip('error', '', '', res.message);
+	   //            	}
+	   //          }, function() {}, postData, true, {token: that.$utils.CONFIG.token})
 			},
 			showModifyDialog(reason, row) {
 				this.modify.dialogVisible = true;
@@ -577,29 +497,15 @@
 				this.modify.modifyForm.stock.remark = reason.remark;
 				this.modify.modifyForm.stock.marketcode = row.marketcode;
 				this.modify.modifyForm.stock.commcode = row.code;
-				this.saveRow = row;
 			},
-			modifySubmit(formName, row) {
+			modifySubmit(formName) {
 	            var that = this;
 	            this.$refs[formName].validate((valid) => {
 	              if (valid) {
 	                that.$utils.getJson(that.$utils.CONFIG.api.stockUpd, function(res) {
 		              	if(res.succflag == 0) {
-		              		var postData = {
-								account: that.searchVal.account,
-								stid: "1",
-								poolno: "1",
-								marketcode: row.marketcode,
-								commcode: row.code
-							}
-							that.$utils.getJson(that.$utils.CONFIG.api.stoprecList, function(res) {
-				              	if(res.succflag == 0) {
-				                	row.handleList = res.data.reverse();
-				                	console.log(row.handleList);
-				              	}else {
-				                	that.$utils.showTip('error', '', '', res.message);
-				              	}
-				            }, function() {}, postData, true, {token: that.$utils.CONFIG.token})
+
+		              		that.modify.modifyForm.currentHandleList[0].remark =  that.modify.modifyForm.stock.remark;
 		              	}else {
 		                	that.$utils.showTip('error', '', '', res.message);
 		              	}

@@ -1,4 +1,5 @@
-var baseUrl = 'http://192.168.1.213:9080/fests/';
+//var baseUrl = 'http://192.168.1.213:9080/fests/';
+var baseUrl = 'http://192.168.16.42:8080/';
 
 const CONFIG = {
 	cookieKey: 'user',
@@ -26,7 +27,9 @@ const CONFIG = {
 					accts: [
 						{
 							type: 1,
-							acct: "10001201876175",
+							//acct: "0001",
+							acct: "1000103600",
+							//acct: "10001201876175",
 							acctname: "沪深A股交易资金账户"
 						}
 					]
@@ -58,10 +61,10 @@ const CONFIG = {
 		},
 		message: "",
 		succflag: 0,
-		token: "ac312617c15ffd3afd1501d5c40741459591019aa7bf44d18588c75f88cbba8c"
+		token: "2ed5b51f59e9fb69f19d5a2c1258ba711ee82c4bab152f2d5369d20c2b3535c0"
 	},
 	codeTime: 60,	//验证码倒计时时间
-	pageSize: 20,
+	pageSize: 10,
 	api: {
 		code: baseUrl + 'comm/obtainVerifycode.do', //验证码
 		register: baseUrl + 'comm/register.do', //注册
@@ -73,8 +76,8 @@ const CONFIG = {
 		editTel: baseUrl + 'my/edittel.do', //修改手机号
 
 		hq: 'http://192.168.1.213:9080/quotescenter/service', //行情
-		myRacelist: 'http://192.168.16.31:8080/fests/' + 'competition/myracelist.do', //模拟赛列表
-		competitionList: 'http://192.168.16.31:8080/fests/' + 'competition/list.do', //赛事列表
+		myRacelist: baseUrl + 'competition/myracelist.do', //模拟赛列表
+		competitionList: baseUrl + 'competition/list.do', //赛事列表
 		signUp: baseUrl + 'competition/signup.do', //赛事报名
 		competitionDetail: baseUrl + 'competition/racedetail.do', //赛事详情
 		competitionSort: baseUrl + 'competition/raceranking.do', //赛事详情
@@ -91,9 +94,10 @@ const CONFIG = {
 		stockUpd: baseUrl + 'ststock/stockUpd.do', //修改“选股理由”
 		stockDel: baseUrl + 'ststock/stockDel.do', //策略信息删除商品
 
-		lineList: 'http://192.168.16.40:8080/' + 'chart/indexlist.do', //指数列表
-		profit: 'http://192.168.16.40:8080/' + 'chart/profit.do', //走势图
-		hold: 'http://192.168.16.40:8080/' + 'chart/hold.do', //持仓饼图
+		lineList: baseUrl + 'chart/indexlist.do', //指数列表
+		profit: baseUrl + 'chart/profit.do', //走势图
+		hold: baseUrl + 'chart/hold.do', //持仓饼图
+		holdHqList: baseUrl + 'transaction/myholding.do', //持仓行情列表
 		comment: baseUrl + 'comcenter/mycomment.do', //我的评论
 		commentreply: baseUrl + 'comcenter/commentreply.do', //回复评论
 		

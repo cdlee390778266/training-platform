@@ -67,16 +67,16 @@
 							</el-form>
 						</el-dialog>
 				    </el-tab-pane>
-				    <el-tab-pane :label="tabs.tabs.sort.name" name="sort" class="sort">
+				    <el-tab-pane :label="tabs.tabs.sort.name" name="sort" class="sort" v-if="saveRace.stustatus != 0 && saveRace.fuacct.length">
 				    	<div class="sort-head">
 				    		<el-form ref="form"  label-width="80px" :inline="true">
 				    			<el-form-item label="市场类型">
 								    <el-select v-model="tabs.tabs.sort.searchVal.mkttype" placeholder="请选择" @change="changeCondition">
 									    <el-option
 									      v-for="item in tabs.tabs.sort.form.type"
-									      :key="item.value"
-									      :label="item.label"
-									      :value="item.value">
+									      :key="item.fuacct"
+									      :label="item.fuaccttype == 1 ? '股票市场' : '期权市场'"
+									      :value="item.fuaccttype">
 									    </el-option>
 									</el-select>
 								</el-form-item>
@@ -175,7 +175,8 @@
 						  	<el-pagination
 							  background
 							  layout="prev, pager, next"
-							  :total="1000"
+							  :total="tabs.tabs.notice.tableData.page.responsetotal"
+							  :page-size="tabs.tabs.notice.tableData.page.size"
 							  @current-change="pageChange">
 							</el-pagination>
 				    	</div>
@@ -203,6 +204,27 @@
 	</div>
 </template>
 <script>
+	//赛事排名
+	var getSort = function(that) {
+		that.$utils.getJson(that.$utils.CONFIG.api.competitionSort, function(res) {
+          	if(res.succflag == 0) {
+            	that.tabs.tabs.sort.tableData = res.data;
+          	}else {
+            	that.$utils.showTip('error', '', '', res.message);
+          	}
+        }, function() {}, that.tabs.tabs.sort.searchVal, true, {token: that.$utils.CONFIG.token})
+	}
+	//赛事公告
+	var getNotice = function(that) {
+		that.$utils.getJson(that.$utils.CONFIG.api.msglist, function(res) {
+          	if(res.succflag == 0) {
+            	that.tabs.tabs.notice.tableData.list = res.list;
+            	that.tabs.tabs.notice.tableData.page = res.page;
+          	}else {
+            	that.$utils.showTip('error', '', '', res.message);
+          	}
+        }, function() {}, that.tabs.tabs.notice.searchVal, true, {token: that.$utils.CONFIG.token})
+	}
 	export default {
 		data() {
 			return {
@@ -250,124 +272,24 @@
 						]
 					}
 				},
-				test1: [	//test
-				        {
-				          ranking: '1',
-				          studentname: '豌豆荚',
-				          dailyincomerate: '+0.64%',
-				          weeklyincomerate: '+0.64%',
-				          monthincomerate: '0.00%',
-				          totalincomerate: '-44.38%',
-				          totalincome: 25648.33,
-				          operatetimes: 32568799.33,
-				          nativeassetvalue: 32568799.33,
-				          positionmarketamount: 32568799.33,
-				        },
-				        {
-				          ranking: '1',
-				          studentname: '豌豆荚',
-				          dailyincomerate: '+0.64%',
-				          weeklyincomerate: '+0.64%',
-				          monthincomerate: '0.00%',
-				          totalincomerate: '-44.38%',
-				          totalincome: 25648.33,
-				          operatetimes: 32568799.33,
-				          nativeassetvalue: 32568799.33,
-				          positionmarketamount: 32568799.33,
-				        },
-				        {
-				          ranking: '1',
-				          studentname: '豌豆荚',
-				          dailyincomerate: '+0.64%',
-				          weeklyincomerate: '+0.64%',
-				          monthincomerate: '0.00%',
-				          totalincomerate: '-44.38%',
-				          totalincome: 25648.33,
-				          operatetimes: 32568799.33,
-				          nativeassetvalue: 32568799.33,
-				          positionmarketamount: 32568799.33,
-				        },
-				        {
-				          ranking: '1',
-				          studentname: '豌豆荚',
-				          dailyincomerate: '+0.64%',
-				          weeklyincomerate: '+0.64%',
-				          monthincomerate: '0.00%',
-				          totalincomerate: '-44.38%',
-				          totalincome: 25648.33,
-				          operatetimes: 32568799.33,
-				          nativeassetvalue: 32568799.33,
-				          positionmarketamount: 32568799.33,
-				        }
-			    ],
-			    test2: {
-					list: [
-						{
-							id: 1,
-							title: "站内测试消息",
-							typeid: 1,
-							typename: "系统消息",
-							publishtime: "2018-08-10 12:32:21",
-							nexusid: "111111",
-							readflag: 1,
-							topflag: 0
-						},
-						{
-							id: 1,
-							title: "站内测试消息",
-							typeid: 1,
-							typename: "系统消息",
-							publishtime: "2018-08-10 12:32:21",
-							nexusid: "111111",
-							readflag: 1,
-							topflag: 1
-						},
-						{
-							id: 1,
-							title: "站内测试消息",
-							typeid: 1,
-							typename: "系统消息",
-							publishtime: "2018-08-10 12:32:21",
-							nexusid: "111111",
-							readflag: 1,
-							topflag: 0
-						},
-						{
-							id: 1,
-							title: "站内测试消息",
-							typeid: 1,
-							typename: "系统消息",
-							publishtime: "2018-08-10 12:32:21",
-							nexusid: "111111",
-							readflag: 1,
-							topflag: 0
-						}
-					],
-					page: {
-						start: 0,
-						size: 20,
-						responsetotal: 105,
-						responsenum: 20
-					}
-				},
 				tabs: {
 					activeTab: 'detail',
 					tabs: {
 						detail: {
 							name: '赛事详情',
 							data: {
-								racename: '四川省精英大学模拟炒股',
-								racedesc: '“四川省模拟炒股”第三届全国大学生金融挑战赛火热开赛悬赏百万，等你来战！',
-								entrystarttime: '2018年06月30日',
-								entryendtime: '2018年07月30日',
-								racestarttime: '2018年06月30日',
-								raceendtime: '2018年06月30日',
-								initfund: '200,000.00',
-								tradekind: '沪深A股市场的股票',
-								hostunit: '四川省教育厅',
-								status: -1,
-								attention: '只能四川省高校学生才能参加，前十名会有奖励',
-								entrynum: 1000
+								racename: '',
+								racedesc: '',
+								entrystarttime: '',
+								entryendtime: '',
+								racestarttime: '',
+								raceendtime: '',
+								initfund: '',
+								tradekind: '',
+								hostunit: '',
+								status: '',
+								attention: '',
+								entrynum: ''
 							}
 						},
 						sort: {
@@ -382,16 +304,7 @@
 							},
 							tableData: [],
 			    			form: {
-			    				type: [
-		    						{
-		    							value: 1,
-		    							label: '股票市场',
-		    						},
-		    						{
-		    							value: 2,
-		    							label: '期权市场',
-		    						}
-		    					],
+			    				type: [],
 			    				sort: [
 		    						{
 							          value: 'DIR',
@@ -432,7 +345,7 @@
 							name: '赛事公告',
 							searchVal: {
 								page: {
-									start: "1",
+									start: 0,
 									size: this.$utils.CONFIG.pageSize
 							 	},
 								type: ''
@@ -442,24 +355,13 @@
 						        ],
 						        page: {
 									start: 0,
-									size: 20,
-									responsetotal: 105,
-									responsenum: 20
+									size: this.$utils.CONFIG.pageSize,
+									responsetotal: 0,
+									responsenum: 0
 								}
 					        },
 					        dialogVisible: false,
-					        currentMsgDetail: {
-					        	msgid: 1,
-								typeid: 1,
-								typename: "系统消息",
-								title: "委托系统维护中",
-								publishtime: "2018-08-10 12:32:21",
-								publisher: "张三",
-								nexusid: "111111",
-								readflag: 1,
-								topflag: 0,
-								content: "给你带来不便请谅解。10月10日到10月13日股票行情系统维护中，给你带来不便请谅解。"
-					        }
+					        currentMsgDetail: {}
 			    		}
 					}
 				}
@@ -519,29 +421,18 @@
 	        },
 	        changeCondition() {
 	        	var that = this;
-	        	that.$utils.getJson(that.$utils.CONFIG.api.competitionSort, function(res) {
-	              	if(res.succflag == 0) {
-	              		that.tabs.tabs.sort.tableData = res.data;
-	              	}else {
-	                	that.$utils.showTip('error', '', '', res.message);
-	              	}
-	            }, function() {}, that.tabs.tabs.sort.searchVal, true, {token: that.$utils.CONFIG.token})
+	        	getSort(that);
 	        },
 	        pageChange(currentPage) {
 				var that = this;
 				that.tabs.tabs.notice.searchVal.page.start = (currentPage - 1) * that.tabs.tabs.notice.searchVal.page.size;
-				that.$utils.getJson(that.$utils.CONFIG.api.msglist, function(res) {
-	              	if(res.succflag == 0) {
-	                	that.tabs.tabs.notice.tableData = res.data;
-	              	}else {
-	                	that.$utils.showTip('error', '', '', res.message);
-	              	}
-	            }, function() {}, that.tabs.tabs.notice.searchVal, true, {token: that.$utils.CONFIG.token})
+				getNotice(that);
 	      	},
 	      	handleMsg(row, event, column) {
 	      		var that = this;
 	      		that.tabs.tabs.notice.dialogVisible = true;
-	      		if(!row.id) {
+	      		console.log(row)
+	      		if(typeof row.id != 'undefined') {
 	      			that.tabs.tabs.notice.currentMsgDetail.isLoading = true;
 	      			that.$utils.getJson(that.$utils.CONFIG.api.msg, function(res) {
 						if(res.succflag == 0) {
@@ -563,42 +454,27 @@
 				that.tabs.activeTab = that.$route.params.type;
 			}
 
-			if(that.$route.query.usagecode == undefined) return;
+			that.saveRace = that.$route.query.data ? JSON.parse(that.$route.query.data) : {};
+			if(that.saveRace.usagecode == 'undefined') return;
 
-			that.saveRace = that.$route.query;
 			//赛事详情
 			that.$utils.getJson(that.$utils.CONFIG.api.competitionDetail, function(res) {
               	if(res.succflag == 0) {
-                	
+                	that.tabs.tabs.detail.data = res.data;
               	}else {
                 	that.$utils.showTip('error', '', '', res.message);
               	}
             }, function() {}, {raceid: that.saveRace.usagecode}, true, {token: that.$utils.CONFIG.token})
 
             //赛事排名
-            //test
-            that.tabs.tabs.sort.tableData = that.test1;
-            //
-            that.tabs.tabs.sort.searchVal.raceid = that.saveRace.usagecode;
-			that.$utils.getJson(that.$utils.CONFIG.api.competitionSort, function(res) {
-              	if(res.succflag == 0) {
-                	that.tabs.tabs.sort.tableData = res.data;
-              	}else {
-                	that.$utils.showTip('error', '', '', res.message);
-              	}
-            }, function() {}, that.tabs.tabs.sort.searchVal, true, {token: that.$utils.CONFIG.token})
-
+            if(that.saveRace.stustatus != 0 && that.saveRace.fuacct.length) {
+            	that.tabs.tabs.sort.form.type = that.saveRace.fuacct;
+				that.tabs.tabs.sort.searchVal.mkttype = that.tabs.tabs.sort.form.type[0].fuaccttype;
+				that.tabs.tabs.sort.searchVal.raceid = that.saveRace.usagecode;
+            	getSort(that);
+            }
             //赛事公告
-            //test
-            that.tabs.tabs.notice.tableData = that.test2;
-            //
-			that.$utils.getJson(that.$utils.CONFIG.api.msglist, function(res) {
-              	if(res.succflag == 0) {
-                	that.tabs.tabs.notice.tableData = res.data;
-              	}else {
-                	that.$utils.showTip('error', '', '', res.message);
-              	}
-            }, function() {}, that.tabs.tabs.notice.searchVal, true, {token: that.$utils.CONFIG.token})
+			getNotice(that);
 		}
 	}
 </script>

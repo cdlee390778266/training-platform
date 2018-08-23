@@ -24,8 +24,8 @@
 				    <el-tab-pane :label="tabs.tabs.simulation.name" name="simulation">
 				    	<el-row :gutter="20">
 							<el-col :span="12" v-for="(item, index) in tabs.tabs.simulation.dataList" :key="index">
-								<div class="simulation-item">
-									<div class="simulation-bar">{{item.racename  | strLen(32)}} <a @click="jump(item, 'detail')">查看详情</a></div>
+								<div class="simulation-item" @click="jump(item, 'entry')">
+									<div class="simulation-bar">{{item.racename  | strLen(32)}} <a @click.stop="jump(item, 'detail')">查看详情</a></div>
 									<div class="simulation-img" :style="'background-image: url(' + item.url + ');'" v-if="item.url"></div>
 									<div class="simulation-img" :style="'background-image: url(' + tabs.tabs.simulation.defaultImg + ');'" v-else></div>
 									<el-row :gutter="20" class="simulation-text">
@@ -51,9 +51,9 @@
 									</el-row>
 									<div class="simulation-trade">
 										当前排名：<span>{{item.ranking}}</span>
-										<a @click="jump(item, 'sort')">查看排行榜</a>
+										<a @click.stop="jump(item, 'sort')">查看排行榜</a>
 
-										<el-button type="danger" v-for="(acct, index) in item.fuacct" :key="index" @click="trade(item, acct)">{{acct.fuaccttype == 1 ? '竞赛交易' : '期权交易'}}</el-button>
+										<el-button type="danger" v-for="(acct, index) in item.fuacct" :key="index" @click.stop="trade(item, acct)">{{acct.fuaccttype == 1 ? '竞赛交易' : '期权交易'}}</el-button>
 									</div>
 								</div>
 							</el-col>
@@ -243,6 +243,26 @@
           		that.$utils.showTip('error', '', '', res.message);
           	}
         }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
+	}
+	//生成11位随机数
+	var saveRandom = ''
+	var random = function() {
+		saveRandom = Math.floor(Math.random() * 10000000000);
+		return saveRandom;
+	}
+	//图片验证码
+	var getPicCode = function(that) {
+		that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
+			if(res.succflag == 0) {
+				console.log(res)
+				that.signUp.codeUrl = res.data.image;
+			}else {
+				that.$utils.showTip('error', 'error', '-1022');
+			}
+			that.isCodeLoading = false;
+		}, function() {
+			that.isCodeLoading = false;
+		}, {objectid: random(), type: "3"}, false)
 	}
 	export default {
 		data() {
@@ -439,33 +459,7 @@
 							},
 							data: {
 								defaultImg: require('../assets/images/img2.png'),
-								list: [
-									// {
-									// 	usagecode: '0',
-									// 	url: require('../assets/images/img2.png'),
-									// 	racename: '西南财经大学模拟炒股大赛',
-									// 	hostunit: '西南财经大学',
-									// 	type: '公开赛',
-									// 	entrystatus: 40,
-									// 	racestatus: 40,
-									// 	entrystarttime: '2018-06-28',
-									// 	entryendtime: '2018-09-10',
-									// 	racestarttime: '2018-06-28',
-									// 	raceendtime: '2018-09-10',
-									// 	stustatus: 0,
-									// 	ranking: '',
-									// 	fuacct:[
-									// 		{
-									// 			fuaccttype: "1",
-									// 			fuacct: "1000103600"
-									// 		},
-									// 		{
-									// 			fuaccttype: "2",
-									// 			fuacct: "1000103600"
-									// 		}
-									// 	]
-									// }
-								],
+								list: [],
 								page: {
 									start: 0,
 									size: 0,
@@ -518,68 +512,38 @@
 				var that = this;
 				that.searchVal[data.type] = data.value;
 				//that.searchVal.racename = '';
-				that.searchVal.page.start = 1;
-				that.$utils.getJson(that.$utils.CONFIG.api.competitionList, function(res) {
-	             	if(res.succflag == 0) {
-	                	that.tabs.tabs.list.dataList = res.data;
-	              	}else {
-	              		that.$utils.showTip('error', '', '', res.message);
-	              	}
-	            }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
+				that.searchVal.page.start = 0;
+				getList(that);
 			},
 			search() {
 				if(!this.searchVal.racename) return;
 				var that = this;
-				that.searchVal.page.start = 1;
-				that.$utils.getJson(that.$utils.CONFIG.api.competitionList, function(res) {
-	             	if(res.succflag == 0) {
-	                	that.tabs.tabs.list.dataList = res.data;
-	              	}else {
-	              		that.$utils.showTip('error', '', '', res.message);
-	              	}
-	            }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
+				that.searchVal.page.start = 0;
+				getList(that);
 			},
 			jump(item, type) {
 				switch (type) {
 					case 'detail':  //比赛详情
-						this.$router.push({ path: '/competition/detail/detail/', query: item});
+						this.$router.push({ path: '/competition/detail/detail/', query: {data: JSON.stringify(item)}});
 						break;
 					case 'entry':  //进入我的赛事
 						this.$router.push({ path: '/admin/home', query: {raceid: item.usagecode}});
 						break;
 					case 'sort':   //赛事排名
-						this.$router.push({ path: '/competition/detail/sort', query: item});
+						this.$router.push({ path: '/competition/detail/sort', query: {data: JSON.stringify(item)}});
 						break;
 				}
 			},
 			refreshCode() {
 				var that = this;
-				that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
-					if(res.succflag == 0) {
-						that.signUp.codeUrl = res.data.image;
-					}else {
-						that.$utils.showTip('error', 'error', '-1022');
-					}
-					that.isCodeLoading = false;
-				}, function() {
-					that.isCodeLoading = false;
-				}, {objectid: '', type: "3"}, false)
+				getPicCode(that);
 			},
 			openDialog(item) {
 				var that = this;
 				that.signUp.dialogFormVisible = true;
 				that.signUp.usagecode = item.usagecode;
 				that.saveSignData = item;
-				that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
-					if(res.succflag == 0) {
-						that.signUp.codeUrl = res.data.image;
-					}else {
-						that.$utils.showTip('error', 'error', '-1022');
-					}
-					that.isCodeLoading = false;
-				}, function() {
-					that.isCodeLoading = false;
-				}, {objectid: '', type: "3"}, false)
+				getPicCode(that);
 			},
 			submitForm(formName) {
 	            var that = this;
@@ -587,7 +551,8 @@
 	              if (valid) {
 	                var signUpData = {
 						raceid: that.saveSignData.usagecode,
-						vcode: that.signUp.signUpForm.code
+						verifycode: that.signUp.signUpForm.code,
+						objectid: saveRandom
 	                }
 	                that.$utils.getJson(that.$utils.CONFIG.api.signUp, function(res) {
 	                  if(res.succflag == 0) {
@@ -605,22 +570,16 @@
 	        changePage(currentPage) {
 	        	var that = this;
 				that.searchVal.page.start = (currentPage - 1) * that.searchVal.page.size;
-				that.$utils.getJson(that.$utils.CONFIG.api.competitionList, function(res) {
-	             	if(res.succflag == 0) {
-	                	that.tabs.tabs.list.dataList = res.data;
-	              	}else {
-	              		that.$utils.showTip('error', '', '', res.message);
-	              	}
-	            }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
+				getList(that);
 	        }
 		},
 		created() {
 			var that = this;
 			//行情
-			getHq(that);
-            that.timer = setInterval(function() {
-            	getHq(that);
-            }, 3000)
+			// getHq(that);
+   //          that.timer = setInterval(function() {
+   //          	getHq(that);
+   //          }, 3000)
 
             //模拟赛
            	getRacelist(that);
@@ -916,7 +875,6 @@
 	        margin: 20px auto;
 	        margin-bottom: 60px;
 	        img {
-	          width: 92px;
 	          height: 32px;
 	          position: absolute;
 	          top: 4px;

@@ -53,6 +53,7 @@
 							background
 							layout="prev, pager, next"
 							:total="item.data.page.responsetotal"
+							:page-size="item.data.page.size"
 							@current-change="pageChange">
 							</el-pagination>
 				    	</el-tab-pane>
@@ -81,26 +82,32 @@
 	</div>
 </template>
 <script>
+	var getMsgList = function(that, postData) {
+		that.currentMsg.isLoading = true;
+		that.$utils.getJson(that.$utils.CONFIG.api.msglist, function(res) {
+			if(res.succflag == 0) {
+				res.list.forEach(function(item, index) {
+					item.detail = {};
+					item.detail.isLoading = false;
+				})
+				that.currentMsg.data.list = res.list;
+				that.currentMsg.data.page = res.page;
+			}else {
+				that.$utils.showTip('error', '', '', res.message);
+			}
+			that.currentMsg.isLoading = false;
+		}, function() {
+			that.currentMsg.isLoading = false;
+		}, postData, false, {token: that.$utils.CONFIG.token})
+	}
 	export default {
 		data() {
 			return {
-				pageSize: 20,
+				pageSize: this.$utils.CONFIG.pageSize,
 				activeTab: '',
 				currentMsg: {},
 				msg: [],
 				dialogVisible: false,
-				defaultMsgDetail: {
-					msgid: 1,
-					typeid: 1,
-					typename: "系统消息",
-					title: "委托系统维护中",
-					publishtime: "2018-08-10 12:32:21",
-					publisher: "张三",
-					nexusid: "111111",
-					readflag: 1,
-					topflag: 0,
-					content: "给你带来不便请谅解。10月10日到10月13日股票行情系统维护中，给你带来不便请谅解。"
-				},
 				currentMsgDetail: {}
 			}
 		},
@@ -117,25 +124,14 @@
 				}
 				//如果没有数据获取数据
 				if(!that.currentMsg.data.list.length) {
-					var postData = {
+					var postData= {
 						page: {
-							start: "1",
+							start: 0,
 							size: that.pageSize
 					 	},
 						type: that.currentMsg.id
 					}
-					that.currentMsg.isLoading = true;
-					that.$utils.getJson(that.$utils.CONFIG.api.msglist, function(res) {
-						if(res.succflag == 0) {
-							that.currentMsg.data.list = res.data.list;
-							that.currentMsg.data.page = res.data.page;
-						}else {
-							this.$utils.showTip('error', '', '', res.message);
-						}
-						that.currentMsg.isLoading = false;
-					}, function() {
-						that.currentMsg.isLoading = false;
-					}, postData, false, {token: that.$utils.CONFIG.token})
+					getMsgList(that, postData);
 				}
 			},
 			pageChange(currentPage) {
@@ -147,18 +143,7 @@
 				 	},
 					type: that.currentMsg.id
 				}
-				that.currentMsg.isLoading = true;
-				that.$utils.getJson(that.$utils.CONFIG.api.msglist, function(res) {
-					if(res.succflag == 0) {
-						that.currentMsg.data.list = res.data.list;
-						that.currentMsg.data.page = res.data.page;
-					}else {
-						this.$utils.showTip('error', '', '', res.message);
-					}
-					that.currentMsg.isLoading = false;
-				}, function() {
-					that.currentMsg.isLoading = false;
-				}, postData, false, {token: that.$utils.CONFIG.token})
+				getMsgList(that, postData);
 	      	},
 	      	handleMsg(row, event, column) {
 	      		var that = this;
@@ -168,7 +153,7 @@
 	      			that.currentMsgDetail.isLoading = true;
 	      			that.$utils.getJson(that.$utils.CONFIG.api.msg, function(res) {
 						if(res.succflag == 0) {
-							that.currentMsgDetail= row.detail = that.defaultMsgDetail;
+							that.currentMsgDetail= row.detail = res.data;
 						}else {
 							this.$utils.showTip('error', '', '', res.message);
 						}
@@ -188,38 +173,24 @@
 					res.data.list.forEach(function(item, index) {
 						item.isLoading = false;
 						item.data = {};
+						item.id = item.id.toString();
 						item.data.list = [];
 						item.data.page = {}
-						item.data.page.responsetotal = 1;
+						item.data.page.responsetotal = 0;
 					})
 					that.msg = res.data.list;
 					that.currentMsg = that.msg[0];
 					that.activeTab = that.currentMsg.id;
 					//获取第一类型消息
 					if(that.msg.length) {
-						var postData = {
+						var postData= {
 							page: {
-								start: "1",
+								start: 0,
 								size: that.pageSize
 						 	},
 							type: that.currentMsg.id
 						}
-						that.currentMsg.isLoading = true;
-						that.$utils.getJson(that.$utils.CONFIG.api.msglist, function(res) {
-							if(res.succflag == 0) {
-								res.data.list.forEach(function(item, index) {
-									item.detail = {};
-									item.detail.isLoading = false;
-								})
-								that.currentMsg.data.list = res.data.list;
-								that.currentMsg.data.page = res.data.page;
-							}else {
-								that.$utils.showTip('error', '', '', res.message);
-							}
-							that.currentMsg.isLoading = false;
-						}, function() {
-							that.currentMsg.isLoading = false;
-						}, postData, false, {token: that.$utils.CONFIG.token})
+						getMsgList(that, postData);
 					}
 
 				}else {
