@@ -173,7 +173,7 @@ Utils.getJson = function(url, success, error, params = {}, isShowPop=true, urlPa
 	Utils.$http({
 			method: 'post',
 			url: url,
-			timeout: 3000,
+			timeout: 1000,
 			data: params,
 			params: urlParams
 		})

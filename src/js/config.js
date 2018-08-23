@@ -96,8 +96,10 @@ const CONFIG = {
 
 		lineList: baseUrl + 'chart/indexlist.do', //指数列表
 		profit: baseUrl + 'chart/profit.do', //走势图
+		acctsummary: baseUrl + 'query/acctsummary.do', //我的资产
 		hold: baseUrl + 'chart/hold.do', //持仓饼图
 		holdHqList: baseUrl + 'transaction/myholding.do', //持仓行情列表
+		mytasrecord: baseUrl + 'transaction/mytasrecord.do', //交易记录
 		comment: baseUrl + 'comcenter/mycomment.do', //我的评论
 		commentreply: baseUrl + 'comcenter/commentreply.do', //回复评论
 		

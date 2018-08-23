@@ -95,7 +95,7 @@
 					    	</div>
 					    	<div class="holdPos-bar">
 					    		持仓明细
-					    		<a><el-button type="danger" @click="trade(tabs.holdPos.account)">去交易</el-button></a>
+					    		<router-link to="/home"><el-button type="danger">去交易</el-button></router-link>
 					    	</div>
 					    	<div class="tab-body">
 					    		<el-table
@@ -247,7 +247,7 @@
 					    </el-tab-pane>
 					    <el-tab-pane label="赛事排名" name="sort" class="sort">
 					    	<div class="sort-head">
-							    <el-select v-model="tabs.sort.selectVal" placeholder="请选择" @change="changeSort">
+							    <el-select v-model="tabs.sort.selectVal" placeholder="请选择">
 								    <el-option
 								      v-for="item in tabs.sort.selectOpts"
 								      :key="item.value"
@@ -305,7 +305,11 @@
 								      label="持仓市值">
 								    </el-table-column>
 							  	</el-table>
-							  	
+							  	<el-pagination
+								  background
+								  layout="prev, pager, next"
+								  :total="1000">
+								</el-pagination>
 					    	</div>
 					    </el-tab-pane>
 					</el-tabs>
@@ -341,10 +345,24 @@
 	import CONFIG from '../../js/config'
 	import qlHead from '../common/head.vue'
 	//重置页码起始
-	var resetPageStart = function(that) {
-		that.tabs.holdPos.page.start = 0;
-		that.tabs.history.page.start = 0;
-		that.tabs.sort.page.start = 0;
+	var resetPostData = function(that) {
+		that.accountRaceId = that.account.raceid;
+    	that.tabs.holdPos.account = that.account.accts[0];
+    	that.tabs.holdPos.accountAcct = that.tabs.holdPos.account.acct;
+    	//资产
+    	that.tabs.assets.postData = {};
+    	//饼状图
+    	that.tabs.holdPos.postChartData.raceid = that.account.raceid;
+		that.tabs.holdPos.postChartData.acct = that.tabs.holdPos.account.acct;
+		that.tabs.holdPos.postChartData.type = that.tabs.holdPos.account.type;
+		//持仓
+		that.tabs.holdPos.postData.page.start = 0;
+		//交易历史
+		that.tabs.history.postData.page.start = 0;
+		//排名
+		that.tabs.sort.postData.raceid = that.account.raceid;
+		that.tabs.sort.postData.mkttype =  that.account.accts[0].type;
+		
 	}
 	//我的评论
 	var getComment = function(that) {
@@ -467,9 +485,6 @@
 	}
 	//我的资产
 	var getAssets = function(that) {
-		var postData = {
-
-		}
 		that.$utils.getJson(that.$utils.CONFIG.api.acctsummary, function(res) {
           	if(res.succflag == 0) {
             	that.tabs.assets.data.data[1] = res.data.today;
@@ -479,18 +494,11 @@
           	}else {
             	that.$utils.showTip('error', '', '', res.message);
           	}
-        }, function() {}, postData, true, {token: that.$utils.CONFIG.token})
+        }, function() {}, that.tabs.assets.postData, true, {token: that.$utils.CONFIG.token})
 	}
 	//我的持仓
 	var getHold = function(that) {
-		//饼状图
-		var postData = {
-			raceid: that.account.raceid,
-			acct: that.tabs.holdPos.account.acct,
-			type: that.tabs.holdPos.account.type
-		}
-		console.log('postData:')
-		console.log(postData)
+		console.log(that.tabs.holdPos.postChartData)
 		//饼状图
     	that.$utils.getJson(that.$utils.CONFIG.api.hold, function(res) {
           	if(res.succflag == 0) {
@@ -498,20 +506,14 @@
           	}else {
             	that.$utils.showTip('error', '', '', res.message);
           	}
-        }, function() {}, postData, true, {token: that.$utils.CONFIG.token})
+        }, function() {}, that.tabs.holdPos.postChartData, true, {token: that.$utils.CONFIG.token})
 
         //行情数据
         getHoldPos(that);
 	}
 	//我的持仓行情
 	var getHoldPos = function(that) {
-		var postData = {
-			page: {
-				start: that.tabs.holdPos.page.start,
-				size: that.tabs.holdPos.page.size
-			}
-		}
-		console.log(postData)
+		console.log(that.tabs.holdPos.postData)
 		//获取持仓行情列表
 		that.$utils.getJson(that.$utils.CONFIG.api.holdHqList, function(res) {
           	if(res.succflag == 0) {
@@ -520,21 +522,11 @@
           	}else {
             	that.$utils.showTip('error', '', '', res.message);
           	}
-        }, function() {}, postData, true, {token: that.$utils.CONFIG.token})
+        }, function() {}, that.tabs.holdPos.postData, true, {token: that.$utils.CONFIG.token})
 	}
 	//我的交易记录
 	var getHistory = function(that) {
-		var postData = {
-			histransaction: that.tabs.history.form.trade ? 1 : 0,
-			hisentrustment: that.tabs.history.form.entrust ? 1 : 0,
-			starttime: that.tabs.history.form.daterange,
-			endtime: that.tabs.history.form.daterange,
-			page: {
-				start: that.tabs.history.page.start,
-				size: that.tabs.history.page.size
-			}
-		}
-		console.log(postData)
+		console.log(that.tabs.history.postData)
 		that.$utils.getJson(that.$utils.CONFIG.api.mytasrecord, function(res) {
           	if(res.succflag == 0) {
             	that.tabs.assets.data.data[1] = res.data.today;
@@ -544,29 +536,22 @@
           	}else {
             	that.$utils.showTip('error', '', '', res.message);
           	}
-        }, function() {}, postData, true, {token: that.$utils.CONFIG.token})
+        }, function() {}, that.tabs.history.postData, true, {token: that.$utils.CONFIG.token})
 	}
 	//排名
 	var getSort = function(that) {
-		var postData = {
-			raceid: that.account.raceid,
-			mkttype: that.account.accts[0].type,
-			orderby: {
-				field: that.tabs.sort.selectVal,
-				sort: 'DESC'
-			}
-		}
+		console.log(that.tabs.sort.postData)
 		that.$utils.getJson(that.$utils.CONFIG.api.competitionSort, function(res) {
           	if(res.succflag == 0) {
             	that.tabs.tabs.sort.tableData = res.data;
           	}else {
             	that.$utils.showTip('error', '', '', res.message);
           	}
-        }, function() {}, postData, true, {token: that.$utils.CONFIG.token})
+        }, function() {}, that.tabs.sort.postData, true, {token: that.$utils.CONFIG.token})
 	}
 	//刷新数据
 	var refreshData = function(that) {
-		resetPageStart(that);
+		resetPostData(that);
 		//走势图
  		getLine(that);
  		//我的评论
@@ -706,6 +691,7 @@
     	activeTab: 'holdPos',
     	tabs: {
     		assets: {
+    			postData: {},
     			data: {
     				day: [
 	    				{
@@ -772,6 +758,17 @@
     		holdPos: {
     			account: {},
     			accountAcct: '',
+    			postChartData: {
+					raceid: '',
+					acct: '',
+					type: ''
+				},
+    			postData: {
+					page: {
+						start: 0,
+						size: this.$utils.CONFIG.pageSize
+					}
+				},
     			chart: {
     				options: {
     					legend: {
@@ -839,6 +836,16 @@
 		            }
 		          }]
 		        },
+		        postData: {
+					histransaction: 0,
+					hisentrustment: 0,
+					starttime: '',
+					endtime: '',
+					page: {
+						start: 0,
+						size: this.$utils.CONFIG.pageSize
+					}
+				},
 		        tableData: [
 			        {
 			          date: '2018-07-03',
@@ -859,7 +866,15 @@
 				}
     		},
     		sort: {
-		        selectOpts: [
+    			postData: {
+					raceid: '',
+					mkttype: 1,
+					orderby: {
+						field: 'DIR',
+						sort: 'DESC'
+					}
+				},
+				selectOpts: [
 					{
 			          value: 'DIR',
 			          label: '日涨跌幅'
@@ -892,7 +907,7 @@
 			          value: 'PMA',
 			          label: '持仓市值'
 			        }
-		        ],
+				],
 		        tableData: [
 			        {
 			          sort: '5',
@@ -961,10 +976,10 @@
 			switch(that.activeTab) {
 	 			case 'holdPos': //我的持仓
 	 				that.tabs.holdPos.page.start = (currentPage - 1) * that.tabs.holdPos.page.size;
-	 				getHoldPos(that);
+	 				getHold(that);
 	 				break;
 	 			case 'history': //我的交易记录
-	 				that.tabs.history.page.start = (currentPage - 1) * that.tabs.history.page.size;
+	 				that.tabs.history.postData.page.start = (currentPage - 1) * that.tabs.history.postData.page.size;
 	 				getHistory(that);
 	 				break;
 	 			case 'sort': //赛事排名
@@ -974,12 +989,12 @@
 	 		}
     	},
     	searchHistory() {
-    		var that = this;
-    		that.tabs.history.page.start = 0;
-    		getHistory(that);
-    	},
-    	changeSort() {
-    		getSort(this);
+    		this.tabs.history.postData.histransaction =  this.tabs.history.form.trade ? 1 : 0;
+			this.tabs.history.postData.hisentrustment = this.tabs.history.form.entrust ? 1 : 0;
+			this.tabs.history.postData.starttime = this.tabs.history.form.daterange;
+			this.tabs.history.postData.endtime =  this.tabs.history.form.daterange;
+			this.tabs.history.postData.page.start = 0;
+    		getHistory(this);
     	},
     	changeMainAccount(val) {	//切换账号
     		var that = this;
@@ -993,6 +1008,7 @@
 	    	that.accountRaceId = that.account.raceid;
 	    	that.tabs.holdPos.account = that.account.accts[0];
 	    	that.tabs.holdPos.accountAcct = that.tabs.holdPos.account.acct;
+	    	resetPostData(that);
     		refreshData(that);
     	},
     	changeHoldAccount(val) {	//我的持仓切换账号
@@ -1003,7 +1019,9 @@
 	    			break;
 	    		}
 	    	}
-	    	that.tabs.holdPos.page.start = 0;
+			that.tabs.holdPos.postChartData.acct = that.tabs.holdPos.account.acct;
+			that.tabs.holdPos.postChartData.type = that.tabs.holdPos.account.type;
+	    	that.tabs.holdPos.postData.page.start = 0;
 	 		//我的持仓
 	 		getHold(that);
     	}
@@ -1046,10 +1064,9 @@
 	    		}
 	    	}
     	}
-    	that.accountRaceId = that.account.raceid;
-    	that.tabs.holdPos.account = that.account.accts[0];
-    	that.tabs.holdPos.accountAcct = that.tabs.holdPos.account.acct;
-    	that.tabs.sort.selectVal = that.tabs.sort.selectOpts[0].value;
+    	
+    	resetPostData(that);
+
     	refreshData(that);
     }
   }
