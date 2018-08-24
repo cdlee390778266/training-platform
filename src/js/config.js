@@ -1,5 +1,5 @@
-//var baseUrl = 'http://192.168.1.213:9080/fests/';
-var baseUrl = 'http://192.168.16.42:8080/';
+var baseUrl = 'http://192.168.1.213:9080/fests/';
+//var baseUrl = 'http://192.168.16.42:8080/';
 
 const CONFIG = {
 	cookieKey: 'user',
@@ -28,7 +28,7 @@ const CONFIG = {
 						{
 							type: 1,
 							//acct: "0001",
-							acct: "1000103600",
+							acct: "10001201845648",
 							//acct: "10001201876175",
 							acctname: "沪深A股交易资金账户"
 						}
@@ -96,13 +96,13 @@ const CONFIG = {
 
 		lineList: baseUrl + 'chart/indexlist.do', //指数列表
 		profit: baseUrl + 'chart/profit.do', //走势图
-		acctsummary: baseUrl + 'query/acctsummary.do', //我的资产
+		mySummary: baseUrl + 'query/mysummary.do', //我的资产
 		hold: baseUrl + 'chart/hold.do', //持仓饼图
-		holdHqList: baseUrl + 'transaction/myholding.do', //持仓行情列表
-		mytasrecord: baseUrl + 'transaction/mytasrecord.do', //交易记录
+		myHold: baseUrl + 'query/myhold.do', //持仓行情列表
+		myTrade: baseUrl + 'query/mytrade.do', //历史成交单
+		myApply: baseUrl + 'query/myapply.do', //历史委托单
 		comment: baseUrl + 'comcenter/mycomment.do', //我的评论
 		commentreply: baseUrl + 'comcenter/commentreply.do', //回复评论
-		
 	},
 	defaultFaceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
 	ajaxCount: 0,

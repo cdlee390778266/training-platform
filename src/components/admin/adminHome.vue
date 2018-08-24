@@ -57,20 +57,32 @@
 						        width="180">
 						      </el-table-column>
 						      <el-table-column
-						        prop="profit"
+						        prop="rate"
 						        label="当日盈利率">
 						      </el-table-column>
 						      <el-table-column
-						        prop="loss"
+						        prop="profit"
 						        label="当日盈亏">
 						      </el-table-column>
 						      <el-table-column
-						        prop="assets"
-						        label="昨日资产">
+						        prop="asset"
+						        label="昨日资产"
+						        v-if="table[1].asset">
 						      </el-table-column>
 						      <el-table-column
-						        prop="increase"
-						        label="当日上证涨幅">
+						        prop="index"
+						        label="排名"
+						        v-if="table[1].index">
+						      </el-table-column>
+						      <el-table-column
+						        prop="tradetimes"
+						        label="交易次数"
+						        v-if="table[1].tradetimes">
+						      </el-table-column>
+						      <el-table-column
+						        prop="startasset"
+						        label="起始资产"
+						        v-if="table[1].startasset">
 						      </el-table-column>
 						    </el-table>
 					    </el-tab-pane>
@@ -100,9 +112,7 @@
 					    	<div class="tab-body">
 					    		<el-table
 							    :data="tabs.holdPos.tableData"
-							    style="width: 100%"
-							    :default-sort = "{prop: 'date', order: 'descending'}"
-							    >
+							    style="width: 100%">
 								    <el-table-column
 								      prop="code"
 								      label="股票代码"
@@ -114,44 +124,64 @@
 								      sortable>
 								    </el-table-column>
 								    <el-table-column
-								      prop="holdPos"
+								      prop="holdtype"
+								      label="持仓类别"
+								      sortable
+								      v-if="tabs.holdPos.tableData[0].holdtype">
+								    </el-table-column>
+								    <el-table-column
+								      prop="type"
+								      label="合约类型"
+								      sortable
+								      v-if="tabs.holdPos.tableData[0].type">
+								    </el-table-column>
+								    <el-table-column
+								      prop="hold"
 								      sortable
 								      label="持仓量">
 								    </el-table-column>
 								    <el-table-column
-								      prop="date"
-								      sortable
-								      label="建仓时间">
-								    </el-table-column>
-								    <el-table-column
 								      prop="cost"
 								      sortable
-								      label="盈亏成本">
+								      label="成本价">
 								    </el-table-column>
 								    <el-table-column
-								      prop="price"
+								      prop="marketvalue"
+								      sortable
+								      label="证券市值">
+								    </el-table-column>
+								    <el-table-column
+								      prop="now"
 								      sortable
 								      label="现价">
 								    </el-table-column>
 								    <el-table-column
-								      prop="increase"
+								      prop="costbalance"
 								      sortable
-								      label="今日涨幅">
+								      label="持仓成本">
 								    </el-table-column>
 								    <el-table-column
-								      prop="marketValue"
+								      prop="incomebalance"
 								      sortable
-								      label="股票市值">
+								      label="盈亏金额">
 								    </el-table-column>
 								    <el-table-column
-								      prop="profitAndLoss"
+								      prop="incomerate"
 								      sortable
-								      label="盈亏率">
+								      label="盈亏比率"
+								      v-if="tabs.holdPos.tableData[0].incomerate">
 								    </el-table-column>
 								    <el-table-column
-								      prop="float"
+								      prop="exerciseincome"
+								      label="行权盈亏"
 								      sortable
-								      label="浮动盈亏">
+								      v-if="tabs.holdPos.tableData[0].exerciseincome">
+								    </el-table-column>
+								    <el-table-column
+								      prop="dutyusedbail"
+								      label="保证金占用"
+								      sortable
+								      v-if="tabs.holdPos.tableData[0].dutyusedbail">
 								    </el-table-column>
 							  	</el-table>
 							  	<el-pagination
@@ -166,9 +196,19 @@
 					    <el-tab-pane label="我的交易记录" name="history">
 					    	<div class="tab-head">
 					    		<el-form :inline="true" :model="tabs.history.form" class="demo-form-inline">
+					    			<el-form-item label="市场类型">
+						    			<el-select v-model="tabs.history.accountAcct" placeholder="请选择" @change="changeHistoryAccount" >
+											<el-option
+											v-for="(item, index) in account.accts"
+											:key="index"
+											:label="item.type == 1 ? '股票市场' : '期权市场'"
+											:value="item.acct">
+											</el-option>
+										</el-select>
+									</el-form-item>
 								  <el-form-item class="tabs-checkbox">
-								    <el-checkbox label="成交历史" v-model="tabs.history.form.trade"></el-checkbox>
-								    <el-checkbox label="历史委托" v-model="tabs.history.form.entrust"></el-checkbox>
+								  	<el-radio v-model="tabs.history.form.tableType" label="0">历史成交</el-radio>
+  									<el-radio v-model="tabs.history.form.tableType" label="1">历史委托</el-radio>
 								  </el-form-item>
 								  <el-form-item label="时间">
 								    <el-date-picker
@@ -247,65 +287,76 @@
 					    </el-tab-pane>
 					    <el-tab-pane label="赛事排名" name="sort" class="sort">
 					    	<div class="sort-head">
-							    <el-select v-model="tabs.sort.selectVal" placeholder="请选择" @change="changeSort">
-								    <el-option
-								      v-for="item in tabs.sort.selectOpts"
-								      :key="item.value"
-								      :label="item.label"
-								      :value="item.value">
-								    </el-option>
-								</el-select>
+					    		<el-form :inline="true">
+					    		<el-form-item label="市场类型">
+					    			<el-select v-model="tabs.sort.accountAcct" placeholder="请选择" @change="changeSortAccount" >
+										<el-option
+										v-for="(item, index) in account.accts"
+										:key="index"
+										:label="item.type == 1 ? '股票市场' : '期权市场'"
+										:value="item.acct">
+										</el-option>
+									</el-select>
+								</el-form-item>
+								<el-form-item label="指标排名">
+								    <el-select v-model="tabs.sort.selectVal" placeholder="请选择" @change="changeSort">
+									    <el-option
+									      v-for="item in tabs.sort.selectOpts"
+									      :key="item.value"
+									      :label="item.label"
+									      :value="item.value">
+									    </el-option>
+									</el-select>
+								</el-form-item>
+								</el-form>
 					    	</div>
 					    	<div class="tab-body">
 					    		<el-table
 							    :data="tabs.sort.tableData"
-							    style="width: 100%"
-							    :default-sort = "{prop: 'date', order: 'descending'}"
-							    >
+							    style="width: 100%">
 								    <el-table-column
-								      prop="sort"
+								      prop="ranking"
 								      label="排名"
 								    >
 								    </el-table-column>
 								    <el-table-column
-								      prop="name"
+								      prop="studentname"
 								      label="用户名"
 								  >
 								    </el-table-column>
 								    <el-table-column
-								      prop="dayRate"
+								      prop="dailyincomerate"
 								      label="日涨跌幅">
 								    </el-table-column>
 								    <el-table-column
-								      prop="weekRate"
+								      prop="weeklyincomerate"
 								      label="周收益率">
 								    </el-table-column>
 								    <el-table-column
-								      prop="monthRate"
+								      prop="monthincomerate"
 								      label="月收益率">
 								    </el-table-column>
 								    <el-table-column
-								      prop="totalRate"
+								      prop="totalincomerate"
 								      label="总收益率">
 								    </el-table-column>
 								    <el-table-column
-								      prop="total"
-								      label="总收益">
+								      prop="totalincome"
+								      label="总收益(元)">
 								    </el-table-column>
 								    <el-table-column
-								      prop="marketValue"
+								      prop="nativeassetvalue"
 								      label="单位净值">
 								    </el-table-column>
 								    <el-table-column
-								      prop="marketValue"
+								      prop="operatetimes"
 								      label="操作次数">
 								    </el-table-column>
 								    <el-table-column
-								      prop="marketValue"
+								      prop="positionmarketamount"
 								      label="持仓市值">
 								    </el-table-column>
 							  	</el-table>
-							  	
 					    	</div>
 					    </el-tab-pane>
 					</el-tabs>
@@ -341,10 +392,17 @@
 	import CONFIG from '../../js/config'
 	import qlHead from '../common/head.vue'
 	//重置页码起始
-	var resetPageStart = function(that) {
+	var reset = function(that) {
+		that.tabs.assets.data = that.tabs.assets.defaultData;
+
 		that.tabs.holdPos.page.start = 0;
+		that.tabs.holdPos.tableData = that.tabs.holdPos.defaultTableData;
+
 		that.tabs.history.page.start = 0;
+		that.tabs.history.tableData = [];
+
 		that.tabs.sort.page.start = 0;
+		that.tabs.sort.tableData = [];
 	}
 	//我的评论
 	var getComment = function(that) {
@@ -468,14 +526,22 @@
 	//我的资产
 	var getAssets = function(that) {
 		var postData = {
-
+			raceid: that.account.raceid
 		}
-		that.$utils.getJson(that.$utils.CONFIG.api.acctsummary, function(res) {
+		that.$utils.getJson(that.$utils.CONFIG.api.mySummary, function(res) {
           	if(res.succflag == 0) {
-            	that.tabs.assets.data.data[1] = res.data.today;
-            	that.tabs.assets.data.week[1] = res.data.week;
-            	that.tabs.assets.data.month[1] = res.data.month;
-            	that.tabs.assets.data.assets[1] = res.data.history;
+          		if(res.data.today) {
+            		that.tabs.assets.data.toDay[1] = res.data.today;
+          		}
+          		if(res.data.week) {
+          			that.tabs.assets.data.week[1] = res.data.week;
+          		}
+            	if(res.data.month) {
+            		that.tabs.assets.data.month[1] = res.data.month;
+            	}
+            	if(res.data.history) {
+            		that.tabs.assets.data.assets[1] = res.data.history;
+            	}
           	}else {
             	that.$utils.showTip('error', '', '', res.message);
           	}
@@ -506,14 +572,16 @@
 	//我的持仓行情
 	var getHoldPos = function(that) {
 		var postData = {
+			acct: that.tabs.holdPos.account.acct,
+			type: that.tabs.holdPos.account.type,
 			page: {
 				start: that.tabs.holdPos.page.start,
-				size: that.tabs.holdPos.page.size
+				size: that.$utils.CONFIG.pageSize
 			}
 		}
 		console.log(postData)
 		//获取持仓行情列表
-		that.$utils.getJson(that.$utils.CONFIG.api.holdHqList, function(res) {
+		that.$utils.getJson(that.$utils.CONFIG.api.myHold, function(res) {
           	if(res.succflag == 0) {
           		that.tabs.holdPos.tableData = res.data.list;
             	that.tabs.holdPos.page = res.page;
@@ -522,25 +590,33 @@
           	}
         }, function() {}, postData, true, {token: that.$utils.CONFIG.token})
 	}
+	//格式化时间
+	var formate = function(dataStr) {
+		if(!dataStr) return '';
+		var date = new Date(dataStr);
+		var year   = date.getFullYear();
+		var month  = date.getMonth()+1 < 10 ? 0  + '' + (date.getMonth()+1) : date.getMonth()+1;
+		var day    = date.getDate() < 10 ? 0  + '' + date.getDate() : date.getDate();
+		return year+"-"+month+"-"+day;
+	}
 	//我的交易记录
 	var getHistory = function(that) {
 		var postData = {
-			histransaction: that.tabs.history.form.trade ? 1 : 0,
-			hisentrustment: that.tabs.history.form.entrust ? 1 : 0,
-			starttime: that.tabs.history.form.daterange,
-			endtime: that.tabs.history.form.daterange,
+			acct: that.tabs.history.account.acct,
+			type: that.tabs.history.account.type,
+			starttime: that.tabs.history.form.daterange ? formate(that.tabs.history.form.daterange[0]) : '',
+			endtime: that.tabs.history.form.daterange ? formate(that.tabs.history.form.daterange[1]) : '',
 			page: {
 				start: that.tabs.history.page.start,
-				size: that.tabs.history.page.size
+				size: that.$utils.CONFIG.pageSize
 			}
 		}
+		var api = that.tabs.history.form.tableType == 1 ? that.$utils.CONFIG.api.myApply : that.$utils.CONFIG.api.myTrade;
 		console.log(postData)
-		that.$utils.getJson(that.$utils.CONFIG.api.mytasrecord, function(res) {
+		that.$utils.getJson(api, function(res) {
           	if(res.succflag == 0) {
-            	that.tabs.assets.data.data[1] = res.data.today;
-            	that.tabs.assets.data.week[1] = res.data.week;
-            	that.tabs.assets.data.month[1] = res.data.month;
-            	that.tabs.assets.data.assets[1] = res.data.history;
+            	that.tabs.history.tableData = res.data.list;
+            	that.tabs.history.page = res.page;
           	}else {
             	that.$utils.showTip('error', '', '', res.message);
           	}
@@ -556,6 +632,7 @@
 				sort: 'DESC'
 			}
 		}
+		console.log(postData);
 		that.$utils.getJson(that.$utils.CONFIG.api.competitionSort, function(res) {
           	if(res.succflag == 0) {
             	that.tabs.tabs.sort.tableData = res.data;
@@ -566,7 +643,6 @@
 	}
 	//刷新数据
 	var refreshData = function(that) {
-		resetPageStart(that);
 		//走势图
  		getLine(that);
  		//我的评论
@@ -706,68 +782,65 @@
     	activeTab: 'holdPos',
     	tabs: {
     		assets: {
-    			data: {
-    				day: [
-	    				{
-	    				  text: '当日账户',
-				          profit: '当日盈利率',
-				          loss: '当日盈亏',
-				          assets: '昨日资产',
-				          increase: '当日上证涨幅'
-				        },
-				        {
-				          profit: '-1.10%',
-				          loss: '-2.22%',
-				          assets: '10000',
-				          increase: '10%'
-				        }
+    			defaultData: {
+    				toDay: [
+    					{
+    						text: '当日账户',
+    						rate: '当日盈利率',
+							profit: '当日盈亏',
+							asset: '昨日资产'
+    					},
+    					{
+							rate: '--',
+							profit: '--',
+							asset: '--'
+			        	}
 			        ],
 			        week: [
-	    				{
-	    				  text: '当日账户',
-				          profit: '当日盈利率',
-				          loss: '当日盈亏',
-				          assets: '昨日资产',
-				          increase: '当日上证涨幅'
-				        },
-				        {
-				          profit: '-1.10%',
-				          loss: '-2.22%',
-				          assets: '10000',
-				          increase: '10%'
-				        }
+			        	{
+			        		text: '本周账户',
+							rate: '本周盈利率',
+							profit: '本周盈利',
+							index: '本周排名',
+							tradetimes: '本周操作次数'
+			        	},
+			        	{
+							rate: '--',
+							profit: '--',
+							index: '--',
+							tradetimes: '--'
+			        	}
 			        ],
 			        month: [
-	    				{
-	    				  text: '当日账户',
-				          profit: '当日盈利率',
-				          loss: '当日盈亏',
-				          assets: '昨日资产',
-				          increase: '当日上证涨幅'
-				        },
-				        {
-				          profit: '-1.10%',
-				          loss: '-2.22%',
-				          assets: '10000',
-				          increase: '10%'
-				        }
+			        	{
+			        		text: '本月账户',
+							rate: '本月盈利率',
+							profit: '本月盈利',
+							index: '本月排名',
+							tradetimes: '本月操作次数'
+			        	},
+			        	{
+							rate: '--',
+							profit: '--',
+							index: '--',
+							tradetimes: '--'
+			        	}
 			        ],
-			        assets: [
-	    				{
-	    				  text: '当日账户',
-				          profit: '当日盈利率',
-				          loss: '当日盈亏',
-				          assets: '昨日资产',
-				          increase: '当日上证涨幅'
-				        },
-				        {
-				          profit: '-1.10%',
-				          loss: '-2.22%',
-				          assets: '10000',
-				          increase: '10%'
-				        }
-			        ]
-    			}
+			        history: [
+			        	{
+			        		text: '资产状况',
+							rate: '总盈利率',
+							profit: '总盈亏',
+							startasset: '起始资产'
+				    	},
+			        	{
+							rate: '--',
+							profit: '--',
+							startasset: '--'
+				    	}
+				    ]
+    			},
+    			data: {}
     		},
     		holdPos: {
     			account: {},
@@ -785,20 +858,24 @@
     				},
     				chartData: {}
     			},
-		        tableData: [
+		        defaultTableData: [
 			        {
-			          code: '000651',
-			          name: '格力空调',
-			          holdPos: 500,
-			          date: '2018-04-23',
-			          cost: 49.66,
-			          price: 44.38,
-			          marketValue: 23010.00,
-			          increase: '1.61%',
-			          profitAndLoss: '-7.33%',
-			          float: '-1819.81'
+			          code: '--',
+			          name: '--',
+			          hold: '--',
+			          cost: '--',
+			          marketvalue: '--',
+			          now: '--',
+			          costbalance: '--',
+			          incomebalance: '--',
+			          incomerate: '--',
+			          holdtype: '--',
+			          type: '--',
+			          exerciseincome: '--',
+			          dutyusedbail: '--'
 			        }
 		        ],
+    			tableData: [],
 		        page: {
 					start: 0,
 					size: this.$utils.CONFIG.pageSize,
@@ -807,9 +884,10 @@
 				}
     		},
     		history: {
+    			account: {},
+    			accountAcct: {},
 		        form: {
-		          trade: '',
-		          entrust: '',
+		          tableType: '0',
 		          daterange: ''
 		        },
 		        dateRangeOptions: {
@@ -839,18 +917,7 @@
 		            }
 		          }]
 		        },
-		        tableData: [
-			        {
-			          date: '2018-07-03',
-			          code: '000658',
-			          name: '蓝海华腾',
-			          handle: '卖出',
-			          nums: 10900,
-			          price: 17.08,
-			          total: 186172.33,
-			          status: '已成交'
-			        }
-		        ],
+		        tableData: [],
 		        page: {
 					start: 0,
 					size: this.$utils.CONFIG.pageSize,
@@ -859,6 +926,8 @@
 				}
     		},
     		sort: {
+    			account: {},
+    			accountAcct: {},
 		        selectOpts: [
 					{
 			          value: 'DIR',
@@ -893,18 +962,7 @@
 			          label: '持仓市值'
 			        }
 		        ],
-		        tableData: [
-			        {
-			          sort: '5',
-			          name: '豌豆荚',
-			          dayRate: '+0.64%',
-			          weekRate: '+0.64%',
-			          monthRate: '0.00%',
-			          totalRate: '-44.38%',
-			          total: 25648.33,
-			          marketValue: 32568799.33
-			        }
-		        ],
+		        tableData: [],
 		        page: {
 					start: 0,
 					size: this.$utils.CONFIG.pageSize,
@@ -947,28 +1005,43 @@
 	        }
 	    },
 		handleClick(tab, event) {
-			console.log(tab, event);
-		},
-		onSubmit() {
-			console.log('submit!');
-		},
-    	
-		refresh() {
-			console.log('refresh')
+			var that = this;
+	 		switch(that.activeTab) {
+	 			case 'assets': 	//我的资产
+	 				if(!that.tabs.assets.data.toDay[1].rate || that.tabs.assets.data.toDay[1].rate == '--' ) {
+	 					getAssets(that);
+	 				}
+	 				break;
+	 			case 'holdPos': //我的持仓
+	 				if(!that.tabs.holdPos.tableData[0] || that.tabs.holdPos.tableData[0].code == '--') {
+	 					getHold(that);
+	 				}
+	 				break;
+	 			case 'history': //我的交易记录
+	 				if(!that.tabs.history.tableData[0]) {
+	 					getHistory(that);
+	 				}
+	 				break;
+	 			case 'sort': //赛事排名
+	 				if(!that.tabs.sort.tableData[0]) {
+	 					getSort(that);
+	 				}
+	 				break;
+	 		}
 		},
 		changePage(currentPage) {	//翻页
 			var that = this;
 			switch(that.activeTab) {
 	 			case 'holdPos': //我的持仓
-	 				that.tabs.holdPos.page.start = (currentPage - 1) * that.tabs.holdPos.page.size;
+	 				that.tabs.holdPos.page.start = (currentPage - 1) * that.$utils.CONFIG.pageSize;
 	 				getHoldPos(that);
 	 				break;
 	 			case 'history': //我的交易记录
-	 				that.tabs.history.page.start = (currentPage - 1) * that.tabs.history.page.size;
+	 				that.tabs.history.page.start = (currentPage - 1) * that.$utils.CONFIG.pageSize;
 	 				getHistory(that);
 	 				break;
 	 			case 'sort': //赛事排名
-	 				that.tabs.sort.page.start = (currentPage - 1) * that.tabs.sort.page.size;
+	 				that.tabs.sort.page.start = (currentPage - 1) * that.$utils.CONFIG.pageSize;
 	 				getSort(that);
 	 				break;
 	 		}
@@ -991,8 +1064,9 @@
 	    		}
 	    	}
 	    	that.accountRaceId = that.account.raceid;
-	    	that.tabs.holdPos.account = that.account.accts[0];
-	    	that.tabs.holdPos.accountAcct = that.tabs.holdPos.account.acct;
+    		that.tabs.holdPos.account = that.tabs.history.account =  that.tabs.sort.account = that.account.accts[0];
+    		that.tabs.holdPos.accountAcct = that.tabs.history.accountAcct = that.tabs.sort.accountAcct = that.tabs.holdPos.account.acct;
+    		reset(that);
     		refreshData(that);
     	},
     	changeHoldAccount(val) {	//我的持仓切换账号
@@ -1006,6 +1080,30 @@
 	    	that.tabs.holdPos.page.start = 0;
 	 		//我的持仓
 	 		getHold(that);
+    	},
+    	changeHistoryAccount(val) {	//历史交易切换账号
+    		var that = this;
+    		for(var i = 0; i < that.account.accts.length; i++) {
+	    		if(val == that.account.accts[i].acct) {
+	    			this.tabs.history.account = that.account.accts[i];
+	    			break;
+	    		}
+	    	}
+	    	that.tabs.holdPos.page.start = 0;
+	 		//我的持仓
+	 		getHistory(that);
+    	},
+    	changeSortAccount(val) {	//排序切换账号
+    		var that = this;
+    		for(var i = 0; i < that.account.accts.length; i++) {
+	    		if(val == that.account.accts[i].acct) {
+	    			this.tabs.sort.account = that.account.accts[i];
+	    			break;
+	    		}
+	    	}
+	    	that.tabs.sort.page.start = 0;
+	 		//我的持仓
+	 		getHistory(that);
     	}
     },
 	watch: {
@@ -1047,9 +1145,11 @@
 	    	}
     	}
     	that.accountRaceId = that.account.raceid;
-    	that.tabs.holdPos.account = that.account.accts[0];
-    	that.tabs.holdPos.accountAcct = that.tabs.holdPos.account.acct;
+    	that.tabs.holdPos.account = that.tabs.history.account =  that.tabs.sort.account = that.account.accts[0];
+    	that.tabs.holdPos.accountAcct = that.tabs.history.accountAcct = that.tabs.sort.accountAcct = that.tabs.holdPos.account.acct;
     	that.tabs.sort.selectVal = that.tabs.sort.selectOpts[0].value;
+
+    	reset(that);
     	refreshData(that);
     }
   }
