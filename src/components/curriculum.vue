@@ -2,74 +2,123 @@
 	<div class="curriculum">
 		<div class="ql-wrapper">
 			<div class="curriculum-body">
-				<div class="list">
-					<div class="search">
-			    		<div class="search-l">
-			    			<div class="search-item" v-for="(item, index) in curriculum.search.condition">
-			    				<div class="search-item-type">
-			    					{{item.name}}
-			    				</div>
-			    				<div class="search-item-list">
-			    					<span v-for="(data, index) in item.list" :class="{active: data.isActive}">{{data.name}}</span>
-			    				</div>
-			    			</div>
-							<div class="search-item">
-			    				<div class="search-item-type"></div>
-			    				<div class="search-item-list">
-							        <el-form>
-							          <el-form-item>
-							            <el-input placeholder="输入比赛名称"></el-input>
-							            <el-button type="primary" size="small" class="codeBtn">搜索</el-button>
-							          </el-form-item>
-							        </el-form>
-			    				</div>
-			    			</div>
-			    		</div>
-			    		<div class="search-r">
-			    			<strong>16</strong>
-			    			<span>比赛总数</span>
-			    		</div>
-			    	</div>
-			    	<div class="list">
-			    		<div class="list-item" v-for="(item, index) in curriculum.dataList">
-			    			<div class="list-item-l" :style="'background-image: url(' + item.url + ');'"></div>
-			    			<div class="list-item-c">
-			    				<h2>{{item.name}}</h2>
-			    				<p><strong>主办方：</strong>{{item.host}}</p>
-			    				<p><strong>比赛性质：</strong>{{item.type}}</p>
-			    				<p><strong>报名状态：</strong>{{item.signUpStatus}}</p>
-			    				<p><strong>比赛状态：</strong>{{item.matchDateStatus}}</p>
-			    				<p v-if="item.sort"><strong>当前排名：</strong>{{item.sort}}</p>
-			    				<p class="mt10"><strong>报名时间：</strong>{{item.signUpDate}}</p>
-			    				<p><strong>比赛时间：</strong>{{item.matchDate}}</p>
-			    			</div>
-			    			<div class="list-item-r">
-			    				<router-link :to="'/curriculum/detail/detail/' + item.id" class="bt1">查看赛事详情</router-link>
-			    				<router-link :to="'f'" class="bt2">进入我的比赛</router-link>
-			    				<router-link :to="'/curriculum/detail/sort/' + item.id" class="bt3">查看赛事排名</router-link>
-			    				<router-link :to="'f'" class="bt4">立即参加</router-link>
-			    			</div>
-			    		</div>
-			    		<div class="pager-wrapper">
-			    			<el-pagination
-							  background
-							  layout="prev, pager, next"
-							  :total="1000">
-							</el-pagination>
-			    		</div>
-			    	</div>
-				</div>
+				<div class="search">
+		    		<div class="search-l">
+		    			<div class="search-item" v-for="(item, index) in list.search.condition">
+		    				<div class="search-item-type">
+		    					{{item.name}}
+		    				</div>
+		    				<div class="search-item-list">
+		    					<span v-for="(data, index) in item.list" @click="changeCondition(data, item.list)" :class="{active: data.isActive}">{{data.name}}</span>
+		    				</div>
+		    			</div>
+						<div class="search-item">
+		    				<div class="search-item-type"></div>
+		    				<div class="search-item-list">
+						        <el-form>
+						          <el-form-item>
+						            <el-input placeholder="输入课程名称" v-model="searchVal.racename"></el-input>
+						            <el-button type="primary" size="small" class="codeBtn" @click="search">搜索</el-button>
+						          </el-form-item>
+						        </el-form>
+		    				</div>
+		    			</div>
+		    		</div>
+		    		<div class="search-r">
+		    			<strong>{{list.data.page.responsetotal}}</strong>
+		    			<span>课程总数</span>
+		    		</div>
+		    	</div>
+		    	<div class="list">
+		    		<div class="list-item" v-for="(item, index) in list.data.list" @click="jump(item, 'detail')">
+		    			<div class="list-item-l" :style="'background-image: url(' + item.url + ');'" v-if="item.url"></div>
+		    			<div class="list-item-l" :style="'background-image: url(' + list.data.defaultImg + ');'" v-else></div>
+		    			<div class="list-item-c">
+		    				<h2>{{item.racename}}</h2>
+		    				<p><strong>课程老师：</strong>{{item.hostunit}}</p>
+		    				<p><strong>课程内容：</strong>{{item.type}}</p>
+		    				<p>
+		    					<strong>课程时间：</strong>
+		    					11
+		    				</p>
+		    				<p>
+		    					<strong>课程状态：</strong>
+								<template v-if="item.racestatus == 41">
+		    						比赛中
+		    					</template>
+		    					<template v-else-if="item.racestatus == 40">
+		    						临时闭赛
+		    					</template>
+		    					<template v-else-if="item.racestatus == 4999">
+		    						比赛结束
+		    					</template>
+		    					<template v-else>
+		    						其他状态（等待开赛）
+		    					</template>
+		    				</p>
+		    				<p v-if="item.stustatus != 10">
+		    					<strong>我的状态：</strong>
+		    					<template v-if="item.stustatus == 0">
+		    						未报名
+		    					</template>
+		    					<template v-else-if="item.stustatus == 1">
+		    						已报名（未开赛）
+		    					</template>
+		    					<template v-else-if="item.stustatus == 2">
+		    						比赛中
+		    					</template>
+		    					<template v-else>
+		    						比赛结束
+		    					</template>
+		    				</p>
+		    				<p v-if="item.ranking"><strong>当前排名：</strong>{{item.ranking}}</p>
+		    			</div>
+		    			<div class="list-item-r">
+		    				<el-button class="bt2" @click.stop="jump(item, 'entry')" v-if="item.stustatus != 0">进入我的课程</el-button>
+							<el-button class="bt3" @click.stop="jump(item, 'sort')" v-if="item.stustatus == 2 || item.stustatus == 10">查看课程排名</el-button>
+		    				<el-button type="danger" v-if="item.stustatus == 2" v-for="(acct, index) in item.fuacct" :key="index" @click.stop="trade(item, acct)">{{acct.fuaccttype == 1 ? '竞赛交易' : '期权交易'}}</el-button>
+		    			</div>
+		    		</div>
+		    		<div class="pager-wrapper">
+		    			<el-pagination
+						  background
+						  layout="prev, pager, next"
+						  :total="list.data.page.responsetotal" @current-change="changePage" :page-size="searchVal.page.size">
+						</el-pagination>
+		    		</div>
+		    	</div>
 			</div>
 		</div>
 	</div>
 </template>
 <script>
+	//赛事列表
+	var getList = function(that) {
+		that.$utils.getJson(that.$utils.CONFIG.api.competitionList, function(res) {
+         	if(res.succflag == 0) {
+            	that.list.data.list = res.data.list;
+            	that.list.data.page = res.page;
+          	}else {
+          		that.$utils.showTip('error', '', '', res.message);
+          	}
+        }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
+	}
 	export default {
 		data() {
 			return {
-				curriculum: {
+				timer: '',
+				searchVal: {
+					markettype: '',
+					visitamount: '',
+					status: '',
+					racename: '',
+					page: {
+						start: "0",
+						size: this.$utils.CONFIG.pageSize
+					},
+				},
+				list: {
 					search: {
-						searchVal: '',
 						condition: [
 							{
 								name: '课程老师',
@@ -77,16 +126,9 @@
 								list: [
 									{
 										name: '全部',
-										value: '00',
-										isActive: true
-									},
-									{
-										name: '张老师',
-										value: '01'
-									},
-									{
-										name: '王老师',
-										value: '02'
+										value: '',
+										type: 'hostunit',
+										isActive: false
 									}
 								]
 							},
@@ -96,15 +138,9 @@
 								list: [
 									{
 										name: '全部',
-										value: '10'
-									},
-									{
-										name: '沪深A股',
-										value: '11'
-									},
-									{
-										name: '期权',
-										value: '12'
+										value: '',
+										type: 'markettype',
+										isActive: false
 									}
 								]
 							},
@@ -114,86 +150,143 @@
 								list: [
 									{
 										name: '全部',
-										value: '20'
-									},
-									{
-										name: '开课程',
-										value: '21'
-									},
-									{
-										name: '已结束',
-										value: '22'
+										value: '',
+										type: 'status',
+										isActive: false
 									}
 								]
 							}
 						]
 					},
-					dataList: [
-						{
-							id: '0',
-							url: require('../assets/images/img2.png'),
-							name: '西南财经大学模拟炒股大赛',
-							host: '西南财经大学',
-							type: '公开赛',
-							signUpStatus: '进行中',
-							matchDateStatus: '报名中',
-							signUpDate: '2018-06-28--2018-09-10',
-							matchDate: '2018-06-28--2018-09-10'
-						},
-						{
-							id: '0',
-							url: require('../assets/images/img2.png'),
-							name: '西南财经大学模拟炒股大赛',
-							host: '西南财经大学',
-							type: '公开赛',
-							signUpStatus: '进行中',
-							matchDateStatus: '报名中',
-							signUpDate: '2018-06-28--2018-09-10',
-							matchDate: '2018-06-28--2018-09-10'
-						},
-						{
-							id: '0',
-							url: require('../assets/images/img2.png'),
-							name: '西南财经大学模拟炒股大赛',
-							host: '西南财经大学',
-							type: '公开赛',
-							signUpStatus: '进行中',
-							matchDateStatus: '报名中',
-							sort: 100,
-							signUpDate: '2018-06-28--2018-09-10',
-							matchDate: '2018-06-28--2018-09-10'
-						},
-						{
-							id: '0',
-							url: require('../assets/images/img2.png'),
-							name: '西南财经大学模拟炒股大赛',
-							host: '西南财经大学',
-							type: '公开赛',
-							signUpStatus: '进行中',
-							matchDateStatus: '报名中',
-							signUpDate: '2018-06-28--2018-09-10',
-							matchDate: '2018-06-28--2018-09-10'
-						},
-						{
-							id: '0',
-							url: require('../assets/images/img2.png'),
-							name: '西南财经大学模拟炒股大赛',
-							host: '西南财经大学',
-							type: '公开赛',
-							signUpStatus: '进行中',
-							matchDateStatus: '报名中',
-							signUpDate: '2018-06-28--2018-09-10',
-							matchDate: '2018-06-28--2018-09-10'
+					data: {
+						defaultImg: require('../assets/images/img2.png'),
+						list: [],
+						page: {
+							start: 0,
+							size: 0,
+							responsenum: 0,
+							responsetotal: 0
 						}
-					]
-				}
+					}
+				},
 			}
+		},
+		methods: {
+			trade(item, acct) {
+				var json = {
+	                method: 'startexe',
+	                data: {
+	                  	type:'quotes',
+	                  	exeName: acct.fuaccttype == 1 ? 'shares' : 'option',
+	                  	account: acct.fuacct
+	                }
+	            }
+	            this.$utils.handleExe(json, function(){}, function(){})
+			},
+			changeCondition(data, item) {
+				if(data.isActive) return;
+				item.forEach(function(e, i) {
+					if(data.value == e.value) {
+						e.isActive = true;
+					}else {
+						e.isActive = false;
+					}
+				})
+				var that = this;
+				that.searchVal[data.type] = data.value;
+				//that.searchVal.racename = '';
+				that.searchVal.page.start = 0;
+				getList(that);
+			},
+			search() {
+				if(!this.searchVal.racename) return;
+				var that = this;
+				that.searchVal.page.start = 0;
+				getList(that);
+			},
+			jump(item, type) {
+				switch (type) {
+					case 'detail':  //比赛详情
+						this.$router.push({ path: '/curriculum/detail/detail/', query: {data: JSON.stringify(item)}});
+						break;
+					case 'entry':  //进入我的赛事
+						this.$router.push({ path: '/admin/home', query: {raceid: item.usagecode}});
+						break;
+					case 'sort':   //赛事排名
+						this.$router.push({ path: '/curriculum/detail/sort', query: {data: JSON.stringify(item)}});
+						break;
+				}
+			},
+	        changePage(currentPage) {
+	        	var that = this;
+				that.searchVal.page.start = (currentPage - 1) * that.searchVal.page.size;
+				getList(that);
+	        }
+		},
+		created() {
+			var that = this;
+			//获取条件
+			that.$utils.getJson(that.$utils.CONFIG.api.cumSetting, function(res) {
+	         	if(res.succflag == 0) {
+	            	console.log(res);
+	          	}else {
+	          		that.$utils.showTip('error', '', '', res.message);
+	          	}
+	        }, function() {}, that.searchVal, true, {token: that.$utils.CONFIG.token})
+            //赛事列表
+           	getList(that);
 		}
 	}
 </script>
 <style lang="scss">
 	.curriculum {
 		padding-top: 0;
+		.swiper-container {
+			width: 100%;
+			min-width: 1200px;
+		}
+		.activity {
+			margin-top: 10px;
+			.el-col {
+				position: relative;
+				height: 196px;
+				background-size: cover;
+				span {
+					position: absolute;
+					left: 0;
+					bottom: 0;
+					right: 0;
+					height: 50px;
+					line-height: 50px;
+					padding: 0 10px;
+					color: #fff;
+					font-size: 16px;
+					background: rgba(27, 27, 27, .6);
+				}
+			}
+		}
+		.lattice {
+			margin-top: 20px;
+			.el-col {
+				position: relative;
+				height: 140px;
+				div {
+					height: 140px;
+					padding: 30px;
+					background: #fff;
+					border: 1px solid #dde1e6;
+					h2 {
+						font-size: 18px;
+						font-weight: normal;
+						margin-bottom: 30px;
+					}
+					strong {
+						font-size: 14px;
+						color: #e20026;
+					}
+				}
+			}
+		}
 		.curriculum-body {
 			margin-bottom: 100px;
 			.el-tabs {
@@ -234,6 +327,7 @@
 					background-size: cover;
 				}
 				.simulation-text {
+					height: 53px;
 					strong {
 						display: block;
 						padding: 0 15px;
@@ -259,9 +353,21 @@
 					height: 40px;
 					line-height: 40px;
 					margin-top: 30px;
+					color: #4e4e4e;
+					span {
+						color: #e30129;
+					}
+					a {
+						color: #5091fa;
+						margin-left: 20px;
+					}
 					.el-button--danger {
 						float: right;
+						margin-left: 20px;
 						background: #e30129;
+						span {
+							color: #fff;
+						}
 					}
 				}
 			}
@@ -278,9 +384,9 @@
 					.search-item {
 						display: flex;
 						margin-bottom: 40px;
-						line-height: 30px;
 						.search-item-type {
 							width: 88px;
+							line-height: 30px;
 							font-weight: bold;
 							color: #4e4e4e;
 						}
@@ -313,6 +419,7 @@
 										background: #5091fa;
 										span {
 											width: auto;
+											line-height: 22px;
 										}
 									}
 								}
@@ -342,13 +449,13 @@
 				margin-top: 20px;
 				.list-item {
 					display: flex;
-					height: 256px;
+					height: 296px;
 					margin-top: 10px;
 					padding: 20px;
 					border: 1px solid #dde1e6;
 					background: #fff;
 					.list-item-l {
-						width: 320px;
+						width: 360px;
 						background-size: cover;
 					}
 					.list-item-c {
@@ -367,12 +474,16 @@
 					}
 					.list-item-r {
 						width: 140px;
-						a {
+						padding-top: 40px;
+						text-align: center;
+						a, button {
 							display: inline-block;
 							width: 110px;
 							height: 40px;
 							line-height: 40px;
 							text-align: center;
+							padding: 0;
+							margin-left: 0;
 							margin-bottom: 10px;
 							color: #fff;
 							border-radius: 4px;
@@ -405,5 +516,25 @@
 				margin: 40px auto;
 			}
 		}
+		.signUp {
+	      .el-form {
+	        width: 490px;
+	        margin: 20px auto;
+	        margin-bottom: 60px;
+	        img {
+	          height: 32px;
+	          position: absolute;
+	          top: 4px;
+	          right: 5px;
+	        }
+	        .el-button--primary {
+	          width: 100%;
+	          margin-top: 20px;
+	        }
+	        .el-form-item {
+	          margin-bottom: 25px;
+	        }
+	      }
+	    }
 	}
 </style>

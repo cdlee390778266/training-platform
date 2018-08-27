@@ -8,6 +8,7 @@ const Competition  = () => import('../components/competition.vue')
 const CompetitionDeail  = () => import('../components/competitionDetail.vue')
 const StockSelection  = () => import('../components/stockselection.vue')
 const Live  = () => import('../components/live.vue')
+const Base  = () => import('../components/base.vue')
 const Curriculum  = () => import('../components/curriculum.vue')
 const CurriculumDetail  = () => import('../components/curriculumDetail.vue')
 
@@ -84,16 +85,22 @@ const router = new Router({
           meta: { title: '财经直播'}
         },
         {
+          path: '/base',
+          name: 'base',
+          component: Base,
+          meta: { title: '知识库'}
+        },
+        {
           path: '/curriculum',
           name: 'curriculum',
           component: Curriculum,
           meta: { title: '教学课程'}
         },
         {
-          path: '/curriculum/detail/:type/:id',
+          path: '/curriculum/detail/:type',
           name: 'curriculumDetail',
           component: CurriculumDetail,
-          meta: { title: '教学课程'}
+          meta: { title: '课程详情'}
         },
         {
           path: '/msgCenter',

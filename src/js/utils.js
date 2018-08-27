@@ -173,12 +173,15 @@ Utils.getJson = function(url, success, error, params = {}, isShowPop=true, urlPa
 	Utils.$http({
 			method: 'post',
 			url: url,
-			timeout: 1000,
+			timeout: 5000,
 			data: params,
 			params: urlParams
 		})
 		.then(function(res){
-			if(!(--Utils.ajaxCount) && isShowPop) {
+			// if(!(--Utils.ajaxCount) && isShowPop) {
+			// 	loadingInstance.close()
+			// }
+			if(isShowPop) {
 				loadingInstance.close()
 			}
             if(typeof success == 'function') success(res.data)

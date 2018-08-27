@@ -49,7 +49,7 @@
 					    		<h2>注意事项</h2>
 					    		<div>{{tabs.tabs.detail.data.attention}}</div>
 					    	</div>
-					    	<div class="detail-item" v-if="saveRace.stustatus == 0">
+					    	<div class="detail-item" v-if="tabs.tabs.detail.data.entryStatus == 0">
 					    		<el-button type="primary" @click="openDialog">立即报名</el-button>
 					    	</div>
 					    </div>
@@ -67,7 +67,7 @@
 							</el-form>
 						</el-dialog>
 				    </el-tab-pane>
-				    <el-tab-pane :label="tabs.tabs.sort.name" name="sort" class="sort" v-if="saveRace.stustatus != 0 && saveRace.fuacct.length">
+				    <el-tab-pane :label="tabs.tabs.sort.name" name="sort" class="sort" v-if="tabs.tabs.detail.data.entryStatus == 1 && saveRace.fuacct.length">
 				    	<div class="sort-head">
 				    		<el-form ref="form"  label-width="80px" :inline="true">
 				    			<el-form-item label="市场类型">
@@ -225,6 +225,26 @@
           	}
         }, function() {}, that.tabs.tabs.notice.searchVal, true, {token: that.$utils.CONFIG.token})
 	}
+	//生成11位随机数
+	var saveRandom = ''
+	var random = function() {
+		saveRandom = Math.floor(Math.random() * 10000000000);
+		return saveRandom;
+	}
+	//图片验证码
+	var getPicCode = function(that) {
+		that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
+			if(res.succflag == 0) {
+				console.log(res)
+				that.signUp.codeUrl = res.data.image;
+			}else {
+				that.$utils.showTip('error', 'error', '-1022');
+			}
+			that.isCodeLoading = false;
+		}, function() {
+			that.isCodeLoading = false;
+		}, {objectid: random(), type: "3"}, false)
+	}
 	export default {
 		data() {
 			return {
@@ -348,7 +368,7 @@
 									start: 0,
 									size: this.$utils.CONFIG.pageSize
 							 	},
-								type: ''
+								type: '1'
 							},
 					        tableData: {
 					        	list: [
@@ -373,30 +393,12 @@
 			},
 			refreshCode() {
 				var that = this;
-				that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
-					if(res.succflag == 0) {
-						that.signUp.codeUrl = res.data.image;
-					}else {
-						that.$utils.showTip('error', 'error', '-1022');
-					}
-					that.isCodeLoading = false;
-				}, function() {
-					that.isCodeLoading = false;
-				}, {objectid: '', type: "3"}, false)
+				getPicCode(that);
 			},
 			openDialog(item) {
 				var that = this;
 				that.signUp.dialogFormVisible = true;
-				that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
-					if(res.succflag == 0) {
-						that.signUp.codeUrl = res.data.image;
-					}else {
-						that.$utils.showTip('error', 'error', '-1022');
-					}
-					that.isCodeLoading = false;
-				}, function() {
-					that.isCodeLoading = false;
-				}, {objectid: '', type: "3"}, false)
+				getPicCode(that);
 			},
 			submitForm(formName) {
 	            var that = this;
@@ -404,11 +406,12 @@
 	              if (valid) {
 	                var signUpData = {
 						raceid: that.saveRace.usagecode,
-						vcode: that.signUp.signUpForm.code
+						verifycode: that.signUp.signUpForm.code,
+						objectid: saveRandom
 	                }
 	                that.$utils.getJson(that.$utils.CONFIG.api.signUp, function(res) {
 	                  if(res.succflag == 0) {
-	                  	that.saveRace.stustatus = 1;
+	                  	that.tabs.tabs.detail.data.entryStatus = 1;
 	                  	that.signUp.dialogFormVisible = false;
 	                  }else {
 	                    that.$utils.showTip('error', '', '', res.message);
@@ -431,7 +434,6 @@
 	      	handleMsg(row, event, column) {
 	      		var that = this;
 	      		that.tabs.tabs.notice.dialogVisible = true;
-	      		console.log(row)
 	      		if(typeof row.id != 'undefined') {
 	      			that.tabs.tabs.notice.currentMsgDetail.isLoading = true;
 	      			that.$utils.getJson(that.$utils.CONFIG.api.msg, function(res) {
@@ -456,23 +458,23 @@
 
 			that.saveRace = that.$route.query.data ? JSON.parse(that.$route.query.data) : {};
 			if(that.saveRace.usagecode == 'undefined') return;
-
 			//赛事详情
 			that.$utils.getJson(that.$utils.CONFIG.api.competitionDetail, function(res) {
               	if(res.succflag == 0) {
                 	that.tabs.tabs.detail.data = res.data;
+                	//赛事排名
+		            if(that.tabs.tabs.detail.data.fuacct) {
+		            	that.tabs.tabs.sort.form.type = that.tabs.tabs.detail.data.fuacct;
+						that.tabs.tabs.sort.searchVal.mkttype = that.tabs.tabs.sort.form.type[0].fuaccttype;
+						that.tabs.tabs.sort.searchVal.raceid = that.saveRace.usagecode;
+						that.saveRace.fuacct = that.tabs.tabs.detail.data.fuacct;
+		            	getSort(that);
+		            }
               	}else {
                 	that.$utils.showTip('error', '', '', res.message);
               	}
             }, function() {}, {raceid: that.saveRace.usagecode}, true, {token: that.$utils.CONFIG.token})
 
-            //赛事排名
-            if(that.saveRace.stustatus != 0 && that.saveRace.fuacct.length) {
-            	that.tabs.tabs.sort.form.type = that.saveRace.fuacct;
-				that.tabs.tabs.sort.searchVal.mkttype = that.tabs.tabs.sort.form.type[0].fuaccttype;
-				that.tabs.tabs.sort.searchVal.raceid = that.saveRace.usagecode;
-            	getSort(that);
-            }
             //赛事公告
 			getNotice(that);
 		}

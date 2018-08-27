@@ -2,384 +2,391 @@
 	<div class="ahome">
 		<ql-head :nav="nav"></ql-head>
 		<div class="ql-wrapper">
-			<div class="ahome-top">
-				<div class="ahome-left">
-					<el-select v-model="accountRaceId" placeholder="请选择" size="small" @change="changeMainAccount">
-					    <el-option
-					      v-for="(item, index) in accountList"
-					      :key="index"
-					      :label="item.name"
-					      :value="item.raceid">
-					    </el-option>
-					</el-select>
-					<div class="chart-wrapper">
-						<ve-line
-							height="300px"
-							:title="chartOpts.title"
-							:yAxis="chartOpts.yAxis"
-							:legend="chartOpts.legend"
-							:data="chartOpts.data"
-						    :colors="chartOpts.colors"
-						    :data-zoom="chartOpts.dataZoom"
-						    :tooltip="chartOpts.tooltip"
-						    :settings="chartOpts.chartSettings"
-						    >
-						</ve-line>
+			<div v-if="hadRace">
+				<div class="ahome-top">
+					<div class="ahome-left">
+						<el-select v-model="accountRaceId" placeholder="请选择" size="small" @change="changeMainAccount">
+						    <el-option
+						      v-for="(item, index) in accountList"
+						      :key="index"
+						      :label="item.name"
+						      :value="item.raceid">
+						    </el-option>
+						</el-select>
+						<div class="chart-wrapper">
+							<ve-line
+								height="300px"
+								:title="chartOpts.title"
+								:yAxis="chartOpts.yAxis"
+								:legend="chartOpts.legend"
+								:data="chartOpts.data"
+							    :colors="chartOpts.colors"
+							    :data-zoom="chartOpts.dataZoom"
+							    :tooltip="chartOpts.tooltip"
+							    :settings="chartOpts.chartSettings"
+							    >
+							</ve-line>
+						</div>
 					</div>
-				</div>
-				<div class="ahome-right">
-					<h1>账户信息</h1>
-					<div class="info-body">
-						<p><strong>资金账号</strong>{{account.name}}</p>
-						<p><strong>账号类型</strong>{{account.usage == 0 ? '常规账户' : '竞赛账户'}}</p>
-						<p><strong>加入时间</strong>2018-4-23</p>
-						<div class="handle">
-						  	<span class="link" @click="jumpToDetail(account.raceid)">赛事详情</span>
-						  	<span v-for="item in account.accts" @click="trade(item)">{{item.type == 1 ? '股票市场' : '期权市场'}}</span>
+					<div class="ahome-right">
+						<h1>账户信息</h1>
+						<div class="info-body">
+							<p><strong>资金账号</strong>{{account.name}}</p>
+							<p><strong>账号类型</strong>{{account.usage == 0 ? '常规账户' : '竞赛账户'}}</p>
+							<p><strong>加入时间</strong>2018-4-23</p>
+							<div class="handle">
+							  	<span class="link" @click="jumpToDetail(account.raceid)">赛事详情</span>
+							  	<span v-for="item in account.accts" @click="trade(item)">{{item.type == 1 ? '股票市场' : '期权市场'}}</span>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-			<div class="ahome-body">
-				<div class="ahome-left">
-					<el-tabs v-model="activeTab" @tab-click="handleClick" class="ahome-tabs">
-					    <el-tab-pane label="我的资产" name="assets" class="assets">
-					    	<el-table
-						      :data="table"
-						      :span-method="objectSpanMethod"
-						      :show-header="false"
-						      border
-						      style="width: 100%; margin-top: 20px" v-for="(table, index) in tabs.assets.data" :key="index">
-						      <el-table-column
-						        prop="text"
-						        label=""
-						        class-name="assets-title"
-						        width="180">
-						      </el-table-column>
-						      <el-table-column
-						        prop="rate"
-						        label="当日盈利率">
-						      </el-table-column>
-						      <el-table-column
-						        prop="profit"
-						        label="当日盈亏">
-						      </el-table-column>
-						      <el-table-column
-						        prop="asset"
-						        label="昨日资产"
-						        v-if="table[1].asset">
-						      </el-table-column>
-						      <el-table-column
-						        prop="index"
-						        label="排名"
-						        v-if="table[1].index">
-						      </el-table-column>
-						      <el-table-column
-						        prop="tradetimes"
-						        label="交易次数"
-						        v-if="table[1].tradetimes">
-						      </el-table-column>
-						      <el-table-column
-						        prop="startasset"
-						        label="起始资产"
-						        v-if="table[1].startasset">
-						      </el-table-column>
-						    </el-table>
-					    </el-tab-pane>
-					    <el-tab-pane label="我的持仓" name="holdPos">
-					    	<div class="tab-head holdPos-changeAccount">
-					    		<div class="tab-head-text">持仓分布</div>
-					    		<el-form :inline="true">
-									<el-form-item class="tabs-checkbox" label="市场类型">
-										<el-select v-model="tabs.holdPos.accountAcct" placeholder="请选择" @change="changeHoldAccount">
-											<el-option
-											v-for="(item, index) in account.accts"
-											:key="index"
-											:label="item.type == 1 ? '股票市场' : '期权市场'"
-											:value="item.acct">
-											</el-option>
-										</el-select>
-									</el-form-item>
-								</el-form>
-					    	</div>
-					    	<div class="tab-chart">
-					    		<ve-ring :data="tabs.holdPos.chart.chartData"  ref="veRing" :legend="tabs.holdPos.chart.options.legend" ></ve-ring>
-					    	</div>
-					    	<div class="holdPos-bar">
-					    		持仓明细
-					    		<a><el-button type="danger" @click="trade(tabs.holdPos.account)">去交易</el-button></a>
-					    	</div>
-					    	<div class="tab-body">
-					    		<el-table
-							    :data="tabs.holdPos.tableData"
-							    style="width: 100%">
-								    <el-table-column
-								      prop="code"
-								      label="股票代码"
-								      sortable>
-								    </el-table-column>
-								    <el-table-column
-								      prop="name"
-								      label="股票名称"
-								      sortable>
-								    </el-table-column>
-								    <el-table-column
-								      prop="holdtype"
-								      label="持仓类别"
-								      sortable
-								      v-if="tabs.holdPos.tableData[0].holdtype">
-								    </el-table-column>
-								    <el-table-column
-								      prop="type"
-								      label="合约类型"
-								      sortable
-								      v-if="tabs.holdPos.tableData[0].type">
-								    </el-table-column>
-								    <el-table-column
-								      prop="hold"
-								      sortable
-								      label="持仓量">
-								    </el-table-column>
-								    <el-table-column
-								      prop="cost"
-								      sortable
-								      label="成本价">
-								    </el-table-column>
-								    <el-table-column
-								      prop="marketvalue"
-								      sortable
-								      label="证券市值">
-								    </el-table-column>
-								    <el-table-column
-								      prop="now"
-								      sortable
-								      label="现价">
-								    </el-table-column>
-								    <el-table-column
-								      prop="costbalance"
-								      sortable
-								      label="持仓成本">
-								    </el-table-column>
-								    <el-table-column
-								      prop="incomebalance"
-								      sortable
-								      label="盈亏金额">
-								    </el-table-column>
-								    <el-table-column
-								      prop="incomerate"
-								      sortable
-								      label="盈亏比率"
-								      v-if="tabs.holdPos.tableData[0].incomerate">
-								    </el-table-column>
-								    <el-table-column
-								      prop="exerciseincome"
-								      label="行权盈亏"
-								      sortable
-								      v-if="tabs.holdPos.tableData[0].exerciseincome">
-								    </el-table-column>
-								    <el-table-column
-								      prop="dutyusedbail"
-								      label="保证金占用"
-								      sortable
-								      v-if="tabs.holdPos.tableData[0].dutyusedbail">
-								    </el-table-column>
-							  	</el-table>
-							  	<el-pagination
-								background
-								layout="prev, pager, next"
-								:total="tabs.holdPos.page.responsetotal"
-								:page-size="tabs.holdPos.page.size"
-								@current-change="changePage">
-								</el-pagination>
-					    	</div>
-					    </el-tab-pane>
-					    <el-tab-pane label="我的交易记录" name="history">
-					    	<div class="tab-head">
-					    		<el-form :inline="true" :model="tabs.history.form" class="demo-form-inline">
-					    			<el-form-item label="市场类型">
-						    			<el-select v-model="tabs.history.accountAcct" placeholder="请选择" @change="changeHistoryAccount" >
-											<el-option
-											v-for="(item, index) in account.accts"
-											:key="index"
-											:label="item.type == 1 ? '股票市场' : '期权市场'"
-											:value="item.acct">
-											</el-option>
-										</el-select>
-									</el-form-item>
-								  <el-form-item class="tabs-checkbox">
-								  	<el-radio v-model="tabs.history.form.tableType" label="0">历史成交</el-radio>
-  									<el-radio v-model="tabs.history.form.tableType" label="1">历史委托</el-radio>
-								  </el-form-item>
-								  <el-form-item label="时间">
-								    <el-date-picker
-								      v-model="tabs.history.form.daterange"
-								      type="daterange"
-								      align="center"
-								      unlink-panels
-								      range-separator="至"
-								      start-placeholder="起始时间"
-								      end-placeholder="终止时间"
-								      :picker-options="tabs.history.dateRangeOptions">
-								    </el-date-picker>
-								  </el-form-item>
-								  <el-form-item>
-								    <el-button type="primary" @click="searchHistory">查询</el-button>
-								  </el-form-item>
-								</el-form>
-					    	</div>
-					    	<div class="tab-body">
-					    		<el-table
-							    :data="tabs.history.tableData"
-							    style="width: 100%"
-							    :default-sort = "{prop: 'date', order: 'descending'}"
-							    >
-							    	<el-table-column
-								      prop="date"
-								      sortable
-								      label="成交时间">
-								    </el-table-column>
-								    <el-table-column
-								      prop="code"
-								      label="股票代码"
-								      sortable
-								      width="180">
-								    </el-table-column>
-								    <el-table-column
-								      prop="name"
-								      label="股票名称"
-								      sortable
-								      width="180">
-								    </el-table-column>
-								    <el-table-column
-								      prop="handle"
-								      sortable
-								      label="操作">
-								    </el-table-column>
-								    <el-table-column
-								      prop="nums"
-								      sortable
-								      label="成交数量">
-								    </el-table-column>
-								    <el-table-column
-								      prop="price"
-								      sortable
-								      label="成交价">
-								    </el-table-column>
-								    <el-table-column
-								      prop="total"
-								      sortable
-								      label="成交金额">
-								    </el-table-column>
-								    <el-table-column
-								      prop="status"
-								      sortable
-								      label="交易状态">
-								    </el-table-column>
-							  	</el-table>
-							  	<el-pagination
-								background
-								layout="prev, pager, next"
-								:total="tabs.history.page.responsetotal"
-								:page-size="tabs.history.page.size"
-								@current-change="changePage">
-								</el-pagination>
-					    	</div>
-					    </el-tab-pane>
-					    <el-tab-pane label="赛事排名" name="sort" class="sort">
-					    	<div class="sort-head">
-					    		<el-form :inline="true">
-					    		<el-form-item label="市场类型">
-					    			<el-select v-model="tabs.sort.accountAcct" placeholder="请选择" @change="changeSortAccount" >
-										<el-option
-										v-for="(item, index) in account.accts"
-										:key="index"
-										:label="item.type == 1 ? '股票市场' : '期权市场'"
-										:value="item.acct">
-										</el-option>
-									</el-select>
-								</el-form-item>
-								<el-form-item label="指标排名">
-								    <el-select v-model="tabs.sort.selectVal" placeholder="请选择" @change="changeSort">
-									    <el-option
-									      v-for="item in tabs.sort.selectOpts"
-									      :key="item.value"
-									      :label="item.label"
-									      :value="item.value">
-									    </el-option>
-									</el-select>
-								</el-form-item>
-								</el-form>
-					    	</div>
-					    	<div class="tab-body">
-					    		<el-table
-							    :data="tabs.sort.tableData"
-							    style="width: 100%">
-								    <el-table-column
-								      prop="ranking"
-								      label="排名"
+				<div class="ahome-body">
+					<div class="ahome-left">
+						<el-tabs v-model="activeTab" @tab-click="handleClick" class="ahome-tabs">
+						    <el-tab-pane label="我的资产" name="assets" class="assets">
+						    	<el-table
+							      :data="table"
+							      :span-method="objectSpanMethod"
+							      :show-header="false"
+							      border
+							      style="width: 100%; margin-top: 20px" v-for="(table, index) in tabs.assets.data" :key="index">
+							      <el-table-column
+							        prop="text"
+							        label=""
+							        class-name="assets-title"
+							        width="180">
+							      </el-table-column>
+							      <el-table-column
+							        prop="rate"
+							        label="当日盈利率">
+							      </el-table-column>
+							      <el-table-column
+							        prop="profit"
+							        label="当日盈亏">
+							      </el-table-column>
+							      <el-table-column
+							        prop="asset"
+							        label="昨日资产"
+							        v-if="table[1].asset">
+							      </el-table-column>
+							      <el-table-column
+							        prop="index"
+							        label="排名"
+							        v-if="table[1].index">
+							      </el-table-column>
+							      <el-table-column
+							        prop="tradetimes"
+							        label="交易次数"
+							        v-if="table[1].tradetimes">
+							      </el-table-column>
+							      <el-table-column
+							        prop="startasset"
+							        label="起始资产"
+							        v-if="table[1].startasset">
+							      </el-table-column>
+							    </el-table>
+						    </el-tab-pane>
+						    <el-tab-pane label="我的持仓" name="holdPos">
+						    	<div class="tab-head holdPos-changeAccount">
+						    		<div class="tab-head-text">持仓分布</div>
+						    		<el-form :inline="true">
+										<el-form-item class="tabs-checkbox" label="市场类型">
+											<el-select v-model="tabs.holdPos.accountAcct" placeholder="请选择" @change="changeHoldAccount">
+												<el-option
+												v-for="(item, index) in account.accts"
+												:key="index"
+												:label="item.type == 1 ? '股票市场' : '期权市场'"
+												:value="item.acct">
+												</el-option>
+											</el-select>
+										</el-form-item>
+									</el-form>
+						    	</div>
+						    	<div class="tab-chart" v-if="tabs.holdPos.chart.chartData">
+						    		<ve-ring :data="tabs.holdPos.chart.chartData"  ref="veRing" :legend="tabs.holdPos.chart.options.legend"></ve-ring>
+						    	</div>
+						    	<div class="holdPos-bar">
+						    		持仓明细
+						    		<a><el-button type="danger" @click="trade(tabs.holdPos.account)">去交易</el-button></a>
+						    	</div>
+						    	<div class="tab-body">
+						    		<el-table
+								    :data="tabs.holdPos.tableData"
+								    style="width: 100%">
+									    <el-table-column
+									      prop="code"
+									      label="股票代码"
+									      sortable>
+									    </el-table-column>
+									    <el-table-column
+									      prop="name"
+									      label="股票名称"
+									      sortable>
+									    </el-table-column>
+									    <el-table-column
+									      prop="holdtype"
+									      label="持仓类别"
+									      sortable
+									      v-if="tabs.holdPos.tableData[0] && tabs.holdPos.tableData[0].holdtype">
+									    </el-table-column>
+									    <el-table-column
+									      prop="type"
+									      label="合约类型"
+									      sortable
+									      v-if="tabs.holdPos.tableData[0] && tabs.holdPos.tableData[0].type">
+									    </el-table-column>
+									    <el-table-column
+									      prop="hold"
+									      sortable
+									      label="持仓量">
+									    </el-table-column>
+									    <el-table-column
+									      prop="cost"
+									      sortable
+									      label="成本价">
+									    </el-table-column>
+									    <el-table-column
+									      prop="marketvalue"
+									      sortable
+									      label="证券市值">
+									    </el-table-column>
+									    <el-table-column
+									      prop="now"
+									      sortable
+									      label="现价">
+									    </el-table-column>
+									    <el-table-column
+									      prop="costbalance"
+									      sortable
+									      label="持仓成本">
+									    </el-table-column>
+									    <el-table-column
+									      prop="incomebalance"
+									      sortable
+									      label="盈亏金额">
+									    </el-table-column>
+									    <el-table-column
+									      prop="incomerate"
+									      sortable
+									      label="盈亏比率"
+									      v-if="tabs.holdPos.tableData[0] && tabs.holdPos.tableData[0].incomerate">
+									    </el-table-column>
+									    <el-table-column
+									      prop="exerciseincome"
+									      label="行权盈亏"
+									      sortable
+									      v-if="tabs.holdPos.tableData[0] && tabs.holdPos.tableData[0].exerciseincome">
+									    </el-table-column>
+									    <el-table-column
+									      prop="dutyusedbail"
+									      label="保证金占用"
+									      sortable
+									      v-if="tabs.holdPos.tableData[0] && tabs.holdPos.tableData[0].dutyusedbail">
+									    </el-table-column>
+								  	</el-table>
+								  	<el-pagination
+									background
+									layout="prev, pager, next"
+									:total="tabs.holdPos.page.responsetotal"
+									:page-size="tabs.holdPos.page.size"
+									:current-page.sync="tabs.holdPos.currentPage"
+									@current-change="changePage">
+									</el-pagination>
+						    	</div>
+						    </el-tab-pane>
+						    <el-tab-pane label="我的交易记录" name="history">
+						    	<div class="tab-head">
+						    		<el-form :inline="true" :model="tabs.history.form" class="demo-form-inline">
+						    			<el-form-item label="市场类型">
+							    			<el-select v-model="tabs.history.accountAcct" placeholder="请选择" @change="changeHistoryAccount" >
+												<el-option
+												v-for="(item, index) in account.accts"
+												:key="index"
+												:label="item.type == 1 ? '股票市场' : '期权市场'"
+												:value="item.acct">
+												</el-option>
+											</el-select>
+										</el-form-item>
+									  <el-form-item class="tabs-checkbox">
+									  	<el-radio v-model="tabs.history.form.tableType" label="0">历史成交</el-radio>
+	  									<el-radio v-model="tabs.history.form.tableType" label="1">历史委托</el-radio>
+									  </el-form-item>
+									  <el-form-item label="时间">
+									    <el-date-picker
+									      v-model="tabs.history.form.daterange"
+									      type="daterange"
+									      align="center"
+									      unlink-panels
+									      range-separator="至"
+									      start-placeholder="起始时间"
+									      end-placeholder="终止时间"
+									      :picker-options="tabs.history.dateRangeOptions">
+									    </el-date-picker>
+									  </el-form-item>
+									  <el-form-item>
+									    <el-button type="primary" @click="searchHistory">查询</el-button>
+									  </el-form-item>
+									</el-form>
+						    	</div>
+						    	<div class="tab-body">
+						    		<el-table
+								    :data="tabs.history.tableData"
+								    style="width: 100%"
 								    >
-								    </el-table-column>
-								    <el-table-column
-								      prop="studentname"
-								      label="用户名"
-								  >
-								    </el-table-column>
-								    <el-table-column
-								      prop="dailyincomerate"
-								      label="日涨跌幅">
-								    </el-table-column>
-								    <el-table-column
-								      prop="weeklyincomerate"
-								      label="周收益率">
-								    </el-table-column>
-								    <el-table-column
-								      prop="monthincomerate"
-								      label="月收益率">
-								    </el-table-column>
-								    <el-table-column
-								      prop="totalincomerate"
-								      label="总收益率">
-								    </el-table-column>
-								    <el-table-column
-								      prop="totalincome"
-								      label="总收益(元)">
-								    </el-table-column>
-								    <el-table-column
-								      prop="nativeassetvalue"
-								      label="单位净值">
-								    </el-table-column>
-								    <el-table-column
-								      prop="operatetimes"
-								      label="操作次数">
-								    </el-table-column>
-								    <el-table-column
-								      prop="positionmarketamount"
-								      label="持仓市值">
-								    </el-table-column>
-							  	</el-table>
-					    	</div>
-					    </el-tab-pane>
-					</el-tabs>
+								    	<el-table-column
+									      prop="time"
+									      sortable
+									      label="成交时间"
+									      width="200">
+									    </el-table-column>
+									    <el-table-column
+									      prop="code"
+									      label="股票代码"
+									      sortable
+									      width="180">
+									    </el-table-column>
+									    <el-table-column
+									      prop="name"
+									      label="股票名称"
+									      sortable
+									      width="180">
+									    </el-table-column>
+									    <el-table-column
+									      prop="bsflag"
+									      sortable
+									      label="操作">
+									    </el-table-column>
+									    <el-table-column
+									      prop="num"
+									      sortable
+									      label="成交数量">
+									    </el-table-column>
+									    <el-table-column
+									      prop="price"
+									      sortable
+									      label="成交价">
+									    </el-table-column>
+									    <el-table-column
+									      prop="amount"
+									      sortable
+									      label="成交金额" v-if="tabs.history.tableData[0] && tabs.history.tableData[0].amount">
+									    </el-table-column>
+									    <el-table-column
+									      prop="status"
+									      sortable
+									      label="交易状态">
+									    </el-table-column>
+								  	</el-table>
+								  	<el-pagination
+									background
+									layout="prev, pager, next"
+									:total="tabs.history.page.responsetotal"
+									:page-size="tabs.history.page.size"
+									:current-page.sync="tabs.history.currentPage"
+									@current-change="changePage">
+									</el-pagination>
+						    	</div>
+						    </el-tab-pane>
+						    <el-tab-pane label="赛事排名" name="sort" class="sort">
+						    	<div class="sort-head">
+						    		<el-form :inline="true">
+						    		<el-form-item label="市场类型">
+						    			<el-select v-model="tabs.sort.accountAcct" placeholder="请选择" @change="changeSortAccount" >
+											<el-option
+											v-for="(item, index) in account.accts"
+											:key="index"
+											:label="item.type == 1 ? '股票市场' : '期权市场'"
+											:value="item.acct">
+											</el-option>
+										</el-select>
+									</el-form-item>
+									<el-form-item label="指标排名">
+									    <el-select v-model="tabs.sort.selectVal" placeholder="请选择" @change="changeSort">
+										    <el-option
+										      v-for="item in tabs.sort.selectOpts"
+										      :key="item.value"
+										      :label="item.label"
+										      :value="item.value">
+										    </el-option>
+										</el-select>
+									</el-form-item>
+									</el-form>
+						    	</div>
+						    	<div class="tab-body">
+						    		<el-table
+								    :data="tabs.sort.tableData"
+								    style="width: 100%">
+									    <el-table-column
+									      prop="ranking"
+									      label="排名"
+									    >
+									    </el-table-column>
+									    <el-table-column
+									      prop="studentname"
+									      label="用户名"
+									  >
+									    </el-table-column>
+									    <el-table-column
+									      prop="dailyincomerate"
+									      label="日涨跌幅">
+									    </el-table-column>
+									    <el-table-column
+									      prop="weeklyincomerate"
+									      label="周收益率">
+									    </el-table-column>
+									    <el-table-column
+									      prop="monthincomerate"
+									      label="月收益率">
+									    </el-table-column>
+									    <el-table-column
+									      prop="totalincomerate"
+									      label="总收益率">
+									    </el-table-column>
+									    <el-table-column
+									      prop="totalincome"
+									      label="总收益(元)">
+									    </el-table-column>
+									    <el-table-column
+									      prop="nativeassetvalue"
+									      label="单位净值">
+									    </el-table-column>
+									    <el-table-column
+									      prop="operatetimes"
+									      label="操作次数">
+									    </el-table-column>
+									    <el-table-column
+									      prop="positionmarketamount"
+									      label="持仓市值">
+									    </el-table-column>
+								  	</el-table>
+						    	</div>
+						    </el-tab-pane>
+						</el-tabs>
+					</div>
+					<div class="ahome-right">
+						<h1>教师点评</h1>
+						<ul class="comment">
+							<li v-for="(item, index) in comment">
+								<div class="comment-head">
+									<span :style="'background-image: url(' + item.faceUrl + ')'" v-if="item.faceUrl"></span>
+									<span :style="'background-image: url(' + defaultFaceUrl + ')'" v-else></span>
+									<strong>{{item.observerName}}</strong>
+									{{item.publishTime | date}}
+								</div>
+								<div class="comment-body">
+									<span>{{item.comment | strLen(36)}}</span>
+								</div>
+								<div class="comment-foot">
+									<router-link :to="'/admin/reply/' + item.id">回复</router-link>
+								</div>
+							</li>
+						</ul>
+					</div>
 				</div>
-				<div class="ahome-right">
-					<h1>教师点评</h1>
-					<ul class="comment">
-						<li v-for="(item, index) in comment">
-							<div class="comment-head">
-								<span :style="'background-image: url(' + item.faceUrl + ')'" v-if="item.faceUrl"></span>
-								<span :style="'background-image: url(' + defaultFaceUrl + ')'" v-else></span>
-								<strong>{{item.observerName}}</strong>
-								{{item.publishTime | date}}
-							</div>
-							<div class="comment-body">
-								<span>{{item.comment | strLen(36)}}</span>
-							</div>
-							<div class="comment-foot">
-								<router-link :to="'/admin/reply/' + item.id">回复</router-link>
-							</div>
-						</li>
-					</ul>
-				</div>
+			</div>
+			<div v-else class="noRace">
+				<h1>没有相关的赛事或课程</h1>
 			</div>
 		</div>
 	</div>
@@ -396,12 +403,16 @@
 		that.tabs.assets.data = that.tabs.assets.defaultData;
 
 		that.tabs.holdPos.page.start = 0;
+		that.tabs.holdPos.currentPage = 0;
+		that.tabs.holdPos.chart.chartData = [];
 		that.tabs.holdPos.tableData = that.tabs.holdPos.defaultTableData;
 
 		that.tabs.history.page.start = 0;
+		that.tabs.history.currentPage = 0;
 		that.tabs.history.tableData = [];
 
 		that.tabs.sort.page.start = 0;
+		that.tabs.sort.currentPage = 0;
 		that.tabs.sort.tableData = [];
 	}
 	//我的评论
@@ -584,7 +595,7 @@
 		that.$utils.getJson(that.$utils.CONFIG.api.myHold, function(res) {
           	if(res.succflag == 0) {
           		that.tabs.holdPos.tableData = res.data.list;
-            	that.tabs.holdPos.page = res.page;
+            	that.tabs.holdPos.page = res.data.page;
           	}else {
             	that.$utils.showTip('error', '', '', res.message);
           	}
@@ -597,7 +608,7 @@
 		var year   = date.getFullYear();
 		var month  = date.getMonth()+1 < 10 ? 0  + '' + (date.getMonth()+1) : date.getMonth()+1;
 		var day    = date.getDate() < 10 ? 0  + '' + date.getDate() : date.getDate();
-		return year+"-"+month+"-"+day;
+		return year+""+month+""+day;
 	}
 	//我的交易记录
 	var getHistory = function(that) {
@@ -626,7 +637,7 @@
 	var getSort = function(that) {
 		var postData = {
 			raceid: that.account.raceid,
-			mkttype: that.account.accts[0].type,
+			mkttype: that.tabs.sort.account.type,
 			orderby: {
 				field: that.tabs.sort.selectVal,
 				sort: 'DESC'
@@ -635,7 +646,7 @@
 		console.log(postData);
 		that.$utils.getJson(that.$utils.CONFIG.api.competitionSort, function(res) {
           	if(res.succflag == 0) {
-            	that.tabs.tabs.sort.tableData = res.data;
+            	that.tabs.sort.tableData = res.data;
           	}else {
             	that.$utils.showTip('error', '', '', res.message);
           	}
@@ -715,7 +726,7 @@
 			  	},
 			  	{
 			  		text: '知识库',
-			  		handleData: '',
+			  		handleData: '/base',
 			  		isExternalLink: false
 			  	}
 			  ],
@@ -730,6 +741,7 @@
 			  isExternalLink: false
             }
 		],
+		hadRace: false,
 		accountRaceId: '',
       	account: {},
       	defaultFaceUrl: CONFIG.defaultFaceUrl,
@@ -876,6 +888,7 @@
 			        }
 		        ],
     			tableData: [],
+    			currentPage: 0,
 		        page: {
 					start: 0,
 					size: this.$utils.CONFIG.pageSize,
@@ -918,6 +931,7 @@
 		          }]
 		        },
 		        tableData: [],
+		        currentPage: 0,
 		        page: {
 					start: 0,
 					size: this.$utils.CONFIG.pageSize,
@@ -963,6 +977,7 @@
 			        }
 		        ],
 		        tableData: [],
+		        currentPage: 0,
 		        page: {
 					start: 0,
 					size: this.$utils.CONFIG.pageSize,
@@ -1049,6 +1064,7 @@
     	searchHistory() {
     		var that = this;
     		that.tabs.history.page.start = 0;
+    		that.tabs.history.currentPage = 0;
     		getHistory(that);
     	},
     	changeSort() {
@@ -1078,6 +1094,8 @@
 	    		}
 	    	}
 	    	that.tabs.holdPos.page.start = 0;
+	    	that.tabs.holdPos.currentPage = 0;
+	    	that.tabs.holdPos.chart.chartData = [];
 	 		//我的持仓
 	 		getHold(that);
     	},
@@ -1090,6 +1108,7 @@
 	    		}
 	    	}
 	    	that.tabs.holdPos.page.start = 0;
+	    	that.tabs.holdPos.currentPage = 0;
 	 		//我的持仓
 	 		getHistory(that);
     	},
@@ -1101,9 +1120,11 @@
 	    			break;
 	    		}
 	    	}
+
 	    	that.tabs.sort.page.start = 0;
-	 		//我的持仓
-	 		getHistory(that);
+	    	that.tabs.sort.currentPage = 0;
+	 		//赛事排名
+	 		getSort(that);
     	}
     },
 	watch: {
@@ -1134,16 +1155,23 @@
     	var raceid = that.$route.query.raceid;
     	//设置账号
     	that.accountList = that.$utils.CONFIG.account;
+    	that.hadRace = false;
     	if(typeof raceid == 'undefined') {
     		that.account = that.accountList[0];
+    		that.hadRace = true;
     	}else {
 	    	for(var i = 0; i < that.accountList.length; i++) {
 	    		if(raceid == that.accountList[i].raceid) {
 	    			that.account = that.accountList[i];
+	    			that.hadRace = true;
 	    			break;
 	    		}
 	    	}
+	    	if(!that.hadRace) {
+	    		that.account = that.accountList[0];
+	    	}
     	}
+
     	that.accountRaceId = that.account.raceid;
     	that.tabs.holdPos.account = that.tabs.history.account =  that.tabs.sort.account = that.account.accts[0];
     	that.tabs.holdPos.accountAcct = that.tabs.history.accountAcct = that.tabs.sort.accountAcct = that.tabs.holdPos.account.acct;
@@ -1402,6 +1430,18 @@
 						margin-right: 20px;
 					}
 				}
+			}
+		}
+		.noRace {
+			padding: 100px 20px;
+			height: 400px;
+			margin-top: 20px;
+			text-align: center;
+			background: #fff;
+			h1 {
+				font-size: 20px;
+				font-weight: normal;
+				color: #999;
 			}
 		}
 	}

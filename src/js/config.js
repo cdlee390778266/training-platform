@@ -1,5 +1,7 @@
-var baseUrl = 'http://192.168.1.213:9080/fests/';
+//var baseUrl = 'http://192.168.1.213:9080/fests/';
 //var baseUrl = 'http://192.168.16.42:8080/';
+var baseUrl = 'http://192.168.16.31:8080/fests/';
+//var baseUrl = 'http://192.168.16.40:8080/';
 
 const CONFIG = {
 	cookieKey: 'user',
@@ -27,10 +29,13 @@ const CONFIG = {
 					accts: [
 						{
 							type: 1,
-							//acct: "0001",
-							acct: "10001201845648",
-							//acct: "10001201876175",
+							acct: "10001201876175",
 							acctname: "沪深A股交易资金账户"
+						},
+						{
+							type: 2,
+							acct: "10001201803534",
+							acctname: "沪深期权交易资产账户"
 						}
 					]
 				},
@@ -40,13 +45,8 @@ const CONFIG = {
 					name: "模拟主账户",
 					accts: [
 						{
-							type: 1,
-							acct: "1000168921",
-							acctname: "沪深A股交易资金账户"
-						},
-						{
 							type: 2,
-							acct: "1000124622",
+							acct: "10001201803534",
 							acctname: "沪深期权交易资产账户"
 						}
 					]
@@ -61,7 +61,8 @@ const CONFIG = {
 		},
 		message: "",
 		succflag: 0,
-		token: "2ed5b51f59e9fb69f19d5a2c1258ba711ee82c4bab152f2d5369d20c2b3535c0"
+		// token: "2ed5b51f59e9fb69f19d5a2c1258ba711ee82c4bab152f2d5369d20c2b3535c0"
+		token: 'ac312617c15ffd3afd1501d5c40741459591019aa7bf44d18588c75f88cbba8c'
 	},
 	codeTime: 60,	//验证码倒计时时间
 	pageSize: 10,
@@ -81,6 +82,11 @@ const CONFIG = {
 		signUp: baseUrl + 'competition/signup.do', //赛事报名
 		competitionDetail: baseUrl + 'competition/racedetail.do', //赛事详情
 		competitionSort: baseUrl + 'competition/raceranking.do', //赛事详情
+
+		cumSetting: baseUrl + 'task/cumsetting.do', //条件
+		taskList: baseUrl + 'task/myracelist.do', //教学课程列表
+		taskDetail: baseUrl + 'task/racedetail.do', //教学课程详情
+		taskRanking: baseUrl + 'task/raceranking.do', //教学课程详情
 
 		msgTypeList: baseUrl + 'msgcenter/typelist.do', //消息类型列表
 		msglist: baseUrl + 'msgcenter/list.do', //消息列表

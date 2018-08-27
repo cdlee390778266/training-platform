@@ -95,7 +95,7 @@
 					  	},
 					  	{
 					  		text: '知识库',
-					  		handleData: '',
+					  		handleData: '/base',
 					  		isExternalLink: false
 					  	}
 					  ],

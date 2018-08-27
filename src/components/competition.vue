@@ -193,10 +193,10 @@
          	if(res.status == 0) {
             	res.data.forEach( function(e, i) {
             		if(shHqPostData.body.stockcode[0] === e.code) {
-            			that.lattice[0].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+            			that.lattice[0].value = e.now + '(' + ((e.now-e.close)/e.close*100).toFixed(2) + '%)';
             		}
             		if(shHqPostData.body.stockcode[1] === e.code) {
-            			that.lattice[3].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+            			that.lattice[3].value = e.now + '(' + ((e.now-e.close)/e.close*100).toFixed(2) + '%)';
             		}
             	});
           	}
@@ -214,10 +214,10 @@
          	if(res.status == 0) {
             	res.data.forEach( function(e, i) {
             		if(scHqPostData.body.stockcode[0] === e.code) {
-            			that.lattice[1].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+            			that.lattice[1].value = e.now + '(' + ((e.now-e.close)/e.close*100).toFixed(2) + '%)';
             		}
             		if(scHqPostData.body.stockcode[1] === e.code) {
-            			that.lattice[2].value = e.now + '-' + e.close + '(' + ((e.now-e.close)/e.close).toFixed(2) + '%)';
+            			that.lattice[2].value = e.now + '(' + ((e.now-e.close)/e.close*100).toFixed(2) + '%)';
             		}
             	});
           	}
@@ -576,10 +576,10 @@
 		created() {
 			var that = this;
 			//行情
-			// getHq(that);
-   //          that.timer = setInterval(function() {
-   //          	getHq(that);
-   //          }, 3000)
+			getHq(that);
+            that.timer = setInterval(function() {
+            	getHq(that);
+            }, 3000)
 
             //模拟赛
            	getRacelist(that);

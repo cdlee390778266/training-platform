@@ -67,17 +67,23 @@
 		:visible.sync="dialogVisible"
 		width="30%"
 		:before-close="handleClose" class="msg-dialog">
-		<div class="el-loading-mask" v-show="currentMsgDetail.isLoading">
-			<div class="el-loading-spinner">
-				<svg viewBox="25 25 50 50" class="circular">
-					<circle cx="50" cy="50" r="20" fill="none" class="path"></circle>
-				</svg>
+			<div class="el-loading-mask" v-show="currentMsgDetail.isLoading">
+				<div class="el-loading-spinner">
+					<svg viewBox="25 25 50 50" class="circular">
+						<circle cx="50" cy="50" r="20" fill="none" class="path"></circle>
+					</svg>
+				</div>
 			</div>
-		</div>
-			<h3>{{currentMsgDetail.title | strLen(20)}}<span>{{currentMsgDetail.publishtime}}</span></h3>
-			<div class="msg-detail">
-				{{currentMsgDetail.content}}
+			<div>
+				<h3>{{currentMsgDetail.title | strLen(20)}}<span>{{currentMsgDetail.publishtime}}</span></h3>
+				<div class="msg-detail">
+					{{currentMsgDetail.content}}
+				</div>
 			</div>
+			<span slot="footer" class="dialog-footer">
+				<el-button type="primary" @click="goDetail" v-show="currentMsg.id != 1">查看详情</el-button>
+				<el-button @click="dialogVisible = false">关 闭</el-button>
+			</span>
 		</el-dialog>
 	</div>
 </template>
@@ -107,6 +113,7 @@
 				activeTab: '',
 				currentMsg: {},
 				msg: [],
+				saveRow: {},
 				dialogVisible: false,
 				currentMsgDetail: {}
 			}
@@ -146,18 +153,43 @@
 				getMsgList(that, postData);
 	      	},
 	      	handleMsg(row, event, column) {
+	      		console.log(row);
 	      		var that = this;
-	      		that.currentMsgDetail = row.detail;
-	      		that.dialogVisible = true;
-	      		if(!row.detail.msgid) {
-	      			that.currentMsgDetail.isLoading = true;
-	      			that.$utils.getJson(that.$utils.CONFIG.api.msg, function(res) {
-						if(res.succflag == 0) {
-							that.currentMsgDetail= row.detail = res.data;
-						}else {
-							this.$utils.showTip('error', '', '', res.message);
-						}
-					}, function() {}, {msgid: row.id}, false, {token: that.$utils.CONFIG.token})
+	      		that.saveRow = row;
+	      		switch(parseInt(this.currentMsg.id)) {
+	      			case 1: 	//公告消息
+			      	case 2: 	//课程消息
+			      	case 3: 	//直播消息
+			      	case 5: 	//赛事消息
+			      		that.currentMsgDetail = row.detail;
+			      		that.dialogVisible = true;
+			      		if(!row.detail.msgid) {
+			      			that.currentMsgDetail.isLoading = true;
+			      			that.$utils.getJson(that.$utils.CONFIG.api.msg, function(res) {
+								if(res.succflag == 0) {
+									that.currentMsgDetail= row.detail = res.data;
+								}else {
+									that.$utils.showTip('error', '', '', res.message);
+								}
+							}, function() {}, {msgid: row.id}, false, {token: that.$utils.CONFIG.token})
+			      		}
+			      		break;
+			      	case 4: 	//文章消息	链接到知识库
+			      		that.$router.push({path: '/base', query: {id: this.saveRow.nexusid}});
+			      		break;
+	      		}
+	      	},
+	      	goDetail() {
+	      		switch(parseInt(this.currentMsg.id)) {
+			      	case 2: 	//课程详情
+			      		this.$router.push({path: '/curriculum/detail/detail', query: {data: JSON.stringify({usagecode: this.saveRow.nexusid})}});
+			      		break;
+			      	case 3: 	//直播详情
+			      		this.$router.push({path: '/live', query: {id: this.saveRow.nexusid}});
+			      		break;
+			      	case 5: 	//赛事详情
+			      		this.$router.push({path: '/competition/detail/detail', query: {data: JSON.stringify({usagecode: this.saveRow.nexusid})}});
+			      		break;
 	      		}
 	      	},
 	      	handleClose(done) {
