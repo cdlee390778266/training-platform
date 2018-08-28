@@ -67,7 +67,7 @@
 							</el-form>
 						</el-dialog>
 				    </el-tab-pane>
-				    <el-tab-pane :label="tabs.tabs.sort.name" name="sort" class="sort" v-if="tabs.tabs.detail.data.entryStatus == 1 && saveRace.fuacct.length">
+				    <el-tab-pane :label="tabs.tabs.sort.name" name="sort" class="sort" v-if="tabs.tabs.detail.data.entryStatus == 1 && saveRace.fuacct && saveRace.fuacct.length">
 				    	<div class="sort-head">
 				    		<el-form ref="form"  label-width="80px" :inline="true">
 				    			<el-form-item label="市场类型">
@@ -463,7 +463,7 @@
               	if(res.succflag == 0) {
                 	that.tabs.tabs.detail.data = res.data;
                 	//赛事排名
-		            if(that.tabs.tabs.detail.data.fuacct) {
+		            if(that.tabs.tabs.detail.data.fuacct && that.tabs.tabs.detail.data.fuacct.length) {
 		            	that.tabs.tabs.sort.form.type = that.tabs.tabs.detail.data.fuacct;
 						that.tabs.tabs.sort.searchVal.mkttype = that.tabs.tabs.sort.form.type[0].fuaccttype;
 						that.tabs.tabs.sort.searchVal.raceid = that.saveRace.usagecode;

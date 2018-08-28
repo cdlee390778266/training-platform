@@ -4,6 +4,7 @@
 			<h1 class="border">
 				<el-button size="small" @click="goBack">
 				<i class="el-icon-arrow-left"></i></el-button>{{tabs.tabs.detail.data.racename}}
+				<div class="entrynum" v-if="tabs.tabs.detail.data.entrynum"><strong>{{tabs.tabs.detail.data.entrynum}}</strong>已参赛人数</div>
 			</h1>
 			<div class="curriculumDetail-body">
 				<el-tabs v-model="tabs.activeTab">
@@ -14,7 +15,7 @@
 					    		<div>{{tabs.tabs.detail.data.racedesc}}</div>
 					    	</div>
 					    	<div class="detail-item">
-					    		<h2>课程安排</h2>
+					    		<h2>赛程安排</h2>
 					    		<div>
 					    			<p>比赛阶段：{{tabs.tabs.detail.data.racestarttime}}~{{tabs.tabs.detail.data.raceendtime}}</p>
 					    		</div>
@@ -23,7 +24,7 @@
 					    		<h2>课程规则</h2>
 					    		<div>
 					    			<p>起始资金：{{tabs.tabs.detail.data.initfund}}元</p>
-					    			<p>交易品种：{{tabs.tabs.detail.data.racestarttime}}~{{tabs.tabs.detail.data.tradekind}}</p>
+					    			<p>交易品种：{{tabs.tabs.detail.data.tradekind}}</p>
 					    		</div>
 					    	</div>
 					    	<div class="detail-item">
@@ -33,10 +34,10 @@
 					    	<div class="detail-item">
 					    		<h2>当前状态</h2>
 					    		<div>
-					    			<template v-if="tabs.tabs.detail.data.status == -1">未开始报名</template>
-					    			<template v-else-if="tabs.tabs.detail.data.status == 0">报名中</template>
-					    			<template v-else-if="tabs.tabs.detail.data.status == 1">比赛中</template>
-					    			<template v-else-if="tabs.tabs.detail.data.status == 2">比赛结束</template>
+					    			<template v-if="tabs.tabs.detail.data.status == 41">开课中</template>
+					    			<template v-else-if="tabs.tabs.detail.data.status == 40">临时闭课</template>
+					    			<template v-else-if="tabs.tabs.detail.data.status == 4999">已结束</template>
+					    			<template v-else-if="tabs.tabs.detail.data.status == 0">其他状态（等待开赛）</template>
 					    		</div>
 					    	</div>
 					    	<div class="detail-item">
@@ -45,9 +46,9 @@
 					    	</div>
 					    </div>
 				    </el-tab-pane>
-				    <el-tab-pane :label="tabs.tabs.sort.name" name="sort" class="sort" v-if="saveRace.stustatus != 0 && saveRace.fuacct.length">
+				    <el-tab-pane :label="tabs.tabs.sort.name" name="sort" class="sort">
 				    	<div class="sort-head">
-				    		<el-form ref="form"  label-width="80px" :inline="true">
+				    		<el-form ref="form"  label-width="80px" :inline="true" v-if="tabs.tabs.sort.form.type && tabs.tabs.sort.form.type.length">
 				    			<el-form-item label="市场类型">
 								    <el-select v-model="tabs.tabs.sort.searchVal.mkttype" placeholder="请选择" @change="changeCondition">
 									    <el-option
@@ -182,9 +183,9 @@
 	</div>
 </template>
 <script>
-	//课程排名
+	//赛事排名
 	var getSort = function(that) {
-		that.$utils.getJson(that.$utils.CONFIG.api.curriculumSort, function(res) {
+		that.$utils.getJson(that.$utils.CONFIG.api.taskRanking, function(res) {
           	if(res.succflag == 0) {
             	that.tabs.tabs.sort.tableData = res.data;
           	}else {
@@ -192,7 +193,7 @@
           	}
         }, function() {}, that.tabs.tabs.sort.searchVal, true, {token: that.$utils.CONFIG.token})
 	}
-	//课程公告
+	//赛事公告
 	var getNotice = function(that) {
 		that.$utils.getJson(that.$utils.CONFIG.api.msglist, function(res) {
           	if(res.succflag == 0) {
@@ -206,39 +207,12 @@
 	export default {
 		data() {
 			return {
-				swiperOption: {
-			        centeredSlides: true,
-			        loop: true,
-			        autoplay: {
-			            delay: 5000
-			        }
-		        },
-				ads: [
-					{
-						id: 0,
-						name: '',
-						url: require('../assets/images/ad1.png'),
-						link: ''
-					},
-					{
-						id: 1,
-						name: '',
-						url: require('../assets/images/ad1.png'),
-						link: ''
-					},
-					{
-						id: 2,
-						name: '',
-						url: require('../assets/images/ad1.png'),
-						link: ''
-					}
-				],
 				saveRace: {},
 				tabs: {
 					activeTab: 'detail',
 					tabs: {
 						detail: {
-							name: '课程详情',
+							name: '赛事详情',
 							data: {
 								racename: '',
 								racedesc: '',
@@ -255,7 +229,7 @@
 							}
 						},
 						sort: {
-							name: '课程排名',
+							name: '赛事排名',
 							searchVal: {
 								raceid: '',
 								mkttype: 1,
@@ -304,13 +278,13 @@
 			    			}
 			    		},
 			    		notice: {
-							name: '课程公告',
+							name: '赛事公告',
 							searchVal: {
 								page: {
 									start: 0,
 									size: this.$utils.CONFIG.pageSize
 							 	},
-								type: '2'
+								type: '1'
 							},
 					        tableData: {
 					        	list: [
@@ -333,37 +307,6 @@
 			goBack() {
 				window.history.go(-1);
 			},
-			refreshCode() {
-				var that = this;
-				getPicCode(that);
-			},
-			openDialog(item) {
-				var that = this;
-				that.signUp.dialogFormVisible = true;
-				getPicCode(that);
-			},
-			submitForm(formName) {
-	            var that = this;
-	            that.$refs[formName].validate((valid) => {
-	              if (valid) {
-	                var signUpData = {
-						raceid: that.saveRace.usagecode,
-						verifycode: that.signUp.signUpForm.code,
-						objectid: saveRandom
-	                }
-	                that.$utils.getJson(that.$utils.CONFIG.api.signUp, function(res) {
-	                  if(res.succflag == 0) {
-	                  	that.saveSignData.stustatus = 1;
-	                  	that.signUp.dialogFormVisible = false;
-	                  }else {
-	                    that.$utils.showTip('error', '', '', res.message);
-	                  }
-	                }, function() {}, signUpData, false, {token: that.$utils.CONFIG.token})
-	              } else {
-	                return false;
-	              }
-	            });
-	        },
 	        changeCondition() {
 	        	var that = this;
 	        	getSort(that);
@@ -376,7 +319,6 @@
 	      	handleMsg(row, event, column) {
 	      		var that = this;
 	      		that.tabs.tabs.notice.dialogVisible = true;
-	      		console.log(row)
 	      		if(typeof row.id != 'undefined') {
 	      			that.tabs.tabs.notice.currentMsgDetail.isLoading = true;
 	      			that.$utils.getJson(that.$utils.CONFIG.api.msg, function(res) {
@@ -401,23 +343,23 @@
 
 			that.saveRace = that.$route.query.data ? JSON.parse(that.$route.query.data) : {};
 			if(that.saveRace.usagecode == 'undefined') return;
-
 			//赛事详情
-			that.$utils.getJson(that.$utils.CONFIG.api.curriculumDetail, function(res) {
+			that.$utils.getJson(that.$utils.CONFIG.api.taskDetail, function(res) {
               	if(res.succflag == 0) {
                 	that.tabs.tabs.detail.data = res.data;
+                	//赛事排名
+		            if(that.tabs.tabs.detail.data.fuacct && that.tabs.tabs.detail.data.fuacct.length) {
+		            	that.tabs.tabs.sort.form.type = that.tabs.tabs.detail.data.fuacct;
+						that.tabs.tabs.sort.searchVal.mkttype = that.tabs.tabs.sort.form.type[0].fuaccttype;
+						that.tabs.tabs.sort.searchVal.raceid = that.saveRace.usagecode;
+						that.saveRace.fuacct = that.tabs.tabs.detail.data.fuacct;
+		            	getSort(that);
+		            }
               	}else {
                 	that.$utils.showTip('error', '', '', res.message);
               	}
             }, function() {}, {raceid: that.saveRace.usagecode}, true, {token: that.$utils.CONFIG.token})
 
-            //赛事排名
-            if(that.saveRace.stustatus != 0 && that.saveRace.fuacct.length) {
-            	that.tabs.tabs.sort.form.type = that.saveRace.fuacct;
-				that.tabs.tabs.sort.searchVal.mkttype = that.tabs.tabs.sort.form.type[0].fuaccttype;
-				that.tabs.tabs.sort.searchVal.raceid = that.saveRace.usagecode;
-            	getSort(that);
-            }
             //赛事公告
 			getNotice(that);
 		}
@@ -443,6 +385,19 @@
 				background: #e8edf2;
 				border: none;
 				margin-right: 50px;
+			}
+			.entrynum {
+				line-height: 26px;
+				font-size: 14px;
+				text-align: center;
+				font-weight: normal;
+				padding-top: 40px;
+				float: right;
+				strong {
+					display: block;
+					font-size: 30px;
+					color: #e30129;
+				}
 			}
 		}
 		.swiper-container {

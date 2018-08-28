@@ -65,6 +65,9 @@
                         </template>
                       </template>
                     </el-dropdown-item>
+                    <el-dropdown-item>
+                      <div @click="loginOut">退出</div>
+                    </el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
             </template>
@@ -256,6 +259,24 @@
               }
             });
           },
+          loginOut() {
+            var that = this;
+            that.$utils.getJson(that.$utils.CONFIG.api.loginOut, function(res) {
+                if(res.succflag == 0) {
+                  var json = {
+                    method: 'startexe',
+                    data: {
+                      type:'quotes',
+                      exeName: 'loginOut',
+                      account: ''
+                    }
+                  }
+                  this.$utils.handleExe(json, function(){}, function(){})
+                }else {
+                  that.$utils.showTip('error', '', '', res.message);
+                }
+              }, function() {}, {}, false, {token: that.$utils.CONFIG.token})
+          }
       }
   	}
 </script>

@@ -21,17 +21,21 @@
 								:legend="chartOpts.legend"
 								:data="chartOpts.data"
 							    :colors="chartOpts.colors"
-							    :data-zoom="chartOpts.dataZoom"
 							    :tooltip="chartOpts.tooltip"
 							    :settings="chartOpts.chartSettings"
 							    >
 							</ve-line>
+							<div class="changeLine">
+								<el-radio v-model="lineType" label="one" @change="changeLine">近一个月</el-radio>
+  								<el-radio v-model="lineType" label="two"  @change="changeLine">近两个月</el-radio>
+  								<el-radio v-model="lineType" label="three"  @change="changeLine">近三个月</el-radio>
+							</div>
 						</div>
 					</div>
 					<div class="ahome-right">
 						<h1>账户信息</h1>
 						<div class="info-body">
-							<p><strong>资金账号</strong>{{account.name}}</p>
+							<p><strong>资金账号</strong>{{account.name | strLen(8)}}</p>
 							<p><strong>账号类型</strong>{{account.usage == 0 ? '常规账户' : '竞赛账户'}}</p>
 							<p><strong>加入时间</strong>2018-4-23</p>
 							<div class="handle">
@@ -45,47 +49,66 @@
 					<div class="ahome-left">
 						<el-tabs v-model="activeTab" @tab-click="handleClick" class="ahome-tabs">
 						    <el-tab-pane label="我的资产" name="assets" class="assets">
-						    	<el-table
-							      :data="table"
-							      :span-method="objectSpanMethod"
-							      :show-header="false"
-							      border
-							      style="width: 100%; margin-top: 20px" v-for="(table, index) in tabs.assets.data" :key="index">
-							      <el-table-column
-							        prop="text"
-							        label=""
-							        class-name="assets-title"
-							        width="180">
-							      </el-table-column>
-							      <el-table-column
-							        prop="rate"
-							        label="当日盈利率">
-							      </el-table-column>
-							      <el-table-column
-							        prop="profit"
-							        label="当日盈亏">
-							      </el-table-column>
-							      <el-table-column
-							        prop="asset"
-							        label="昨日资产"
-							        v-if="table[1].asset">
-							      </el-table-column>
-							      <el-table-column
-							        prop="index"
-							        label="排名"
-							        v-if="table[1].index">
-							      </el-table-column>
-							      <el-table-column
-							        prop="tradetimes"
-							        label="交易次数"
-							        v-if="table[1].tradetimes">
-							      </el-table-column>
-							      <el-table-column
-							        prop="startasset"
-							        label="起始资产"
-							        v-if="table[1].startasset">
-							      </el-table-column>
-							    </el-table>
+						    	<!-- 当日账户 -->
+						    	<table class="assetsTable" cellspacing="0">
+						    		<tr>
+						    			<td rowspan="2" class="assets-title" width="180">当日账户</td>
+						    			<td>当日盈利率</td>
+						    			<td>当日盈亏</td>
+						    			<td>当日资产</td>
+						    		</tr>
+						    		<tr>
+						    			<td>{{(tabs.assets.data.toDay.rate*100).toFixed(2) + '%'}}</td>
+						    			<td>{{tabs.assets.data.toDay.profit}}</td>
+						    			<td>{{tabs.assets.data.toDay.asset}}</td>
+						    		</tr>
+						    	</table>
+						    	<!-- 本周账户 -->
+						    	<table class="assetsTable" cellspacing="0">
+						    		<tr>
+						    			<td rowspan="2" class="assets-title" width="180">本周账户</td>
+						    			<td>本周盈利率</td>
+						    			<td>本周盈亏</td>
+						    			<td>本周排名</td>
+						    			<td>交易次数</td>
+						    		</tr>
+						    		<tr>
+						    			<td>{{(tabs.assets.data.week.rate*100).toFixed(2) + '%'}}</td>
+						    			<td>{{tabs.assets.data.week.profit}}</td>
+						    			<td>{{tabs.assets.data.week.index}}</td>
+						    			<td>{{tabs.assets.data.week.tradetimes}}</td>
+						    		</tr>
+						    	</table>
+						    	<!-- 本月账户 -->
+						    	<table class="assetsTable" cellspacing="0">
+						    		<tr>
+						    			<td rowspan="2" class="assets-title" width="180">本月账户</td>
+						    			<td>本月盈利率</td>
+						    			<td>本月盈亏</td>
+						    			<td>本月排名</td>
+						    			<td>交易次数</td>
+						    		</tr>
+						    		<tr>
+						    			<td>{{(tabs.assets.data.month.rate*100).toFixed(2) + '%'}}</td>
+						    			<td>{{tabs.assets.data.month.profit}}</td>
+						    			<td>{{tabs.assets.data.month.index}}</td>
+						    			<td>{{tabs.assets.data.month.tradetimes}}</td>
+						    		</tr>
+						    	</table>
+						    	<!-- 资产状况 -->
+						    	<table class="assetsTable" cellspacing="0">
+						    		<tr>
+						    			<td rowspan="2" class="assets-title" width="180">资产状况</td>
+						    			<td>总盈利率</td>
+						    			<td>总盈亏</td>
+						    			<td>起始资产</td>
+						    		</tr>
+						    		<tr>
+						    			<td>{{(tabs.assets.data.history.rate*100).toFixed(2) + '%'}}</td>
+						    			<td>{{tabs.assets.data.history.profit}}</td>
+						    			<td>{{tabs.assets.data.history.startasset}}</td>
+						    		</tr>
+						    	</table>
 						    </el-tab-pane>
 						    <el-tab-pane label="我的持仓" name="holdPos">
 						    	<div class="tab-head holdPos-changeAccount">
@@ -167,10 +190,12 @@
 									      label="盈亏金额">
 									    </el-table-column>
 									    <el-table-column
-									      prop="incomerate"
 									      sortable
 									      label="盈亏比率"
 									      v-if="tabs.holdPos.tableData[0] && tabs.holdPos.tableData[0].incomerate">
+									      	<template slot-scope="props">
+									      		{{ props.row.incomerate }}%
+									      	</template>
 									    </el-table-column>
 									    <el-table-column
 									      prop="exerciseincome"
@@ -371,8 +396,8 @@
 								<div class="comment-head">
 									<span :style="'background-image: url(' + item.faceUrl + ')'" v-if="item.faceUrl"></span>
 									<span :style="'background-image: url(' + defaultFaceUrl + ')'" v-else></span>
-									<strong>{{item.observerName}}</strong>
-									{{item.publishTime | date}}
+									<strong>{{item.observername}}</strong>
+									{{item.publishtime}}
 								</div>
 								<div class="comment-body">
 									<span>{{item.comment | strLen(36)}}</span>
@@ -415,11 +440,50 @@
 		that.tabs.sort.currentPage = 0;
 		that.tabs.sort.tableData = [];
 	}
+	// 格式化走势图时间范围
+	var formateLineDate = function(type) {	// one two three
+		var date = new Date();
+		var year   = date.getFullYear();
+		var month  = date.getMonth()+1 < 10 ? 0  + '' + (date.getMonth()+1) : date.getMonth()+1;
+		var day    = date.getDate() < 10 ? 0  + '' + date.getDate() : date.getDate();
+
+		var enddate = year+"-"+month+"-"+day;
+		var startdate = '';
+		switch (type) {
+			case 'one': //近一个月
+				month = month - 1;
+				break;
+			case 'two': //近两个月
+				month = month - 2;
+				break;
+			case 'three': 
+				month = month - 3;
+				break;
+		}
+
+		if(month <= 0) {
+			month = 12 + month;
+			year = year - 1;
+		}
+		month = month < 10 ? 0  + '' + (month) : month;
+		startdate = year+"-"+month+"-"+day;
+
+		return {
+			startdate: startdate,
+			enddate: enddate
+		};
+	}
+	//设置走势图时间范围列表选项
+	var setRangeList = function(that) {
+		that.rangeList.one = formateLineDate('one');
+		that.rangeList.two = formateLineDate('two');
+		that.rangeList.three = formateLineDate('three');
+	}
 	//我的评论
 	var getComment = function(that) {
 		var commentPostData = {
     		page: {
-				start: "1",
+				start: "0",
 				size: "5"
 			},
 			nexusid: that.account.raceid
@@ -435,6 +499,20 @@
 
 	//走势图
 	var getLine = function(that) {
+		switch (that.lineType) {
+			case 'one': //近一个月
+				that.postLineData.startdate = that.rangeList.one.startdate;
+				that.postLineData.enddate = that.rangeList.one.enddate;
+				break;
+			case 'two': //近两个月
+				that.postLineData.startdate = that.rangeList.two.startdate;
+				that.postLineData.enddate = that.rangeList.two.enddate;
+				break;
+			case 'three': 
+				that.postLineData.startdate = that.rangeList.three.startdate;
+				that.postLineData.enddate = that.rangeList.three.enddate;
+				break;
+		}
 		that.postLineData.raceid = that.account.raceid;
 		if(that.postLineData.columns.length) {
 			//走势图
@@ -541,17 +619,17 @@
 		}
 		that.$utils.getJson(that.$utils.CONFIG.api.mySummary, function(res) {
           	if(res.succflag == 0) {
-          		if(res.data.today) {
-            		that.tabs.assets.data.toDay[1] = res.data.today;
+          		if(res.today) {
+            		that.tabs.assets.data.toDay = res.today;
           		}
-          		if(res.data.week) {
-          			that.tabs.assets.data.week[1] = res.data.week;
+          		if(res.week) {
+          			that.tabs.assets.data.week = res.week;
           		}
-            	if(res.data.month) {
-            		that.tabs.assets.data.month[1] = res.data.month;
+            	if(res.month) {
+            		that.tabs.assets.data.month = res.month;
             	}
-            	if(res.data.history) {
-            		that.tabs.assets.data.assets[1] = res.data.history;
+            	if(res.history) {
+            		that.tabs.assets.data.history = res.history;
             	}
           	}else {
             	that.$utils.showTip('error', '', '', res.message);
@@ -746,11 +824,26 @@
       	account: {},
       	defaultFaceUrl: CONFIG.defaultFaceUrl,
       	accountList: [],
+      	rangeList: {
+      		one: {
+      			startdate: "",
+		 		enddate: ""
+      		},
+      		two: {
+      			startdate: "",
+		 		enddate: ""
+      		},
+      		three: {
+      			startdate: "",
+		 		enddate: ""
+      		},
+      	},
+      	lineType: 'one',
       	postLineData: {		//走势图请求参数
 			raceid: "0",
 		 	columns: [],
-		 	startdate: "2018-07-01",
-		 	enddate: "2018-08-01"
+		 	startdate: "",
+		 	enddate: ""
 		},
         chartOpts: {
     		title: {
@@ -795,62 +888,29 @@
     	tabs: {
     		assets: {
     			defaultData: {
-    				toDay: [
-    					{
-    						text: '当日账户',
-    						rate: '当日盈利率',
-							profit: '当日盈亏',
-							asset: '昨日资产'
-    					},
-    					{
-							rate: '--',
-							profit: '--',
-							asset: '--'
-			        	}
-			        ],
-			        week: [
-			        	{
-			        		text: '本周账户',
-							rate: '本周盈利率',
-							profit: '本周盈利',
-							index: '本周排名',
-							tradetimes: '本周操作次数'
-			        	},
-			        	{
-							rate: '--',
-							profit: '--',
-							index: '--',
-							tradetimes: '--'
-			        	}
-			        ],
-			        month: [
-			        	{
-			        		text: '本月账户',
-							rate: '本月盈利率',
-							profit: '本月盈利',
-							index: '本月排名',
-							tradetimes: '本月操作次数'
-			        	},
-			        	{
-							rate: '--',
-							profit: '--',
-							index: '--',
-							tradetimes: '--'
-			        	}
-			        ],
-			        history: [
-			        	{
-			        		text: '资产状况',
-							rate: '总盈利率',
-							profit: '总盈亏',
-							startasset: '起始资产'
-				    	},
-			        	{
-							rate: '--',
-							profit: '--',
-							startasset: '--'
-				    	}
-				    ]
+    				toDay:{
+						rate: '--',
+						profit: '--',
+						asset: '--'
+			        },
+			        week: {
+						rate: '--',
+						profit: '--',
+						index: '--',
+						tradetimes: '--'
+		        	}
+			        ,
+			        month:{
+						rate: '--',
+						profit: '--',
+						index: '--',
+						tradetimes: '--'
+		        	},
+			        history: {
+						rate: '--',
+						profit: '--',
+						startasset: '--'
+			    	}
     			},
     			data: {}
     		},
@@ -990,6 +1050,9 @@
       }
     },
     methods: {
+    	changeLine() {
+    		getLine(this);
+    	},
     	trade(item) {
     		var json = {
                 method: 'startexe',
@@ -1023,7 +1086,7 @@
 			var that = this;
 	 		switch(that.activeTab) {
 	 			case 'assets': 	//我的资产
-	 				if(!that.tabs.assets.data.toDay[1].rate || that.tabs.assets.data.toDay[1].rate == '--' ) {
+	 				if(!that.tabs.assets.data.toDay.rate || that.tabs.assets.data.toDay.rate == '--' ) {
 	 					getAssets(that);
 	 				}
 	 				break;
@@ -1153,32 +1216,41 @@
     created() {
     	var that = this;
     	var raceid = that.$route.query.raceid;
-    	//设置账号
-    	that.accountList = that.$utils.CONFIG.account;
-    	that.hadRace = false;
-    	if(typeof raceid == 'undefined') {
-    		that.account = that.accountList[0];
-    		that.hadRace = true;
-    	}else {
-	    	for(var i = 0; i < that.accountList.length; i++) {
-	    		if(raceid == that.accountList[i].raceid) {
-	    			that.account = that.accountList[i];
-	    			that.hadRace = true;
-	    			break;
-	    		}
-	    	}
-	    	if(!that.hadRace) {
-	    		that.account = that.accountList[0];
-	    	}
-    	}
+    	//设置走势图时间列表
+    	setRangeList(that);
+    	//获取账号
+    	that.$utils.getJson(that.$utils.CONFIG.api.acctList, function(res) {
+          	if(res.succflag == 0) {
+		    	//设置账号
+		    	that.$utils.CONFIG.account = res.data.account;
+		    	that.accountList = that.$utils.CONFIG.account;
+		    	that.hadRace = false;
+		    	if(typeof raceid == 'undefined') {
+		    		that.account = that.accountList[0];
+		    		that.hadRace = true;
+		    	}else {
+			    	for(var i = 0; i < that.accountList.length; i++) {
+			    		if(raceid == that.accountList[i].raceid) {
+			    			that.account = that.accountList[i];
+			    			that.hadRace = true;
+			    			break;
+			    		}
+			    	}
+			    	if(!that.hadRace) {
+			    		that.account = that.accountList[0];
+			    	}
+		    	}
+		    	that.accountRaceId = that.account.raceid;
+		    	that.tabs.holdPos.account = that.tabs.history.account =  that.tabs.sort.account = that.account.accts[0];
+		    	that.tabs.holdPos.accountAcct = that.tabs.history.accountAcct = that.tabs.sort.accountAcct = that.tabs.holdPos.account.acct;
+		    	that.tabs.sort.selectVal = that.tabs.sort.selectOpts[0].value;
 
-    	that.accountRaceId = that.account.raceid;
-    	that.tabs.holdPos.account = that.tabs.history.account =  that.tabs.sort.account = that.account.accts[0];
-    	that.tabs.holdPos.accountAcct = that.tabs.history.accountAcct = that.tabs.sort.accountAcct = that.tabs.holdPos.account.acct;
-    	that.tabs.sort.selectVal = that.tabs.sort.selectOpts[0].value;
-
-    	reset(that);
-    	refreshData(that);
+		    	reset(that);
+		    	refreshData(that);
+          	}else {
+            	that.$utils.showTip('error', '', '', res.message);
+          	}
+        }, function() {}, {}, true, {token: that.$utils.CONFIG.token})
     }
   }
 </script>
@@ -1248,6 +1320,16 @@
 							}
 						}
 					}
+				}
+			}
+			.chart-wrapper {
+				position: relative;
+				.changeLine {
+					position: absolute;
+					left: 0;
+					right: 15px;
+					bottom: 10px;
+					text-align: right;
 				}
 			}
 		}
@@ -1442,6 +1524,19 @@
 				font-size: 20px;
 				font-weight: normal;
 				color: #999;
+			}
+		}
+		.assetsTable {
+			width: 100%;
+			line-height: 48px;
+			margin-bottom: 40px;
+			text-align: center;
+			td {
+				border-top: 1px solid #ebeef5;
+				border-right: 1px solid #ebeef5;
+			}
+			tr:last-child td {
+				border-bottom: 1px solid #ebeef5;
 			}
 		}
 	}

@@ -9,7 +9,7 @@
 		    					{{item.name}}
 		    				</div>
 		    				<div class="search-item-list">
-		    					<span v-for="(data, index) in item.list" @click="changeCondition(data, item.list)" :class="{active: data.isActive}">{{data.name}}</span>
+		    					<span v-for="(data, index) in item.list" @click="changeCondition(data, item)" :class="{active: data.isActive}">{{data.typename}}</span>
 		    				</div>
 		    			</div>
 						<div class="search-item">
@@ -36,54 +36,51 @@
 		    			<div class="list-item-c">
 		    				<h2>{{item.racename}}</h2>
 		    				<p><strong>课程老师：</strong>{{item.hostunit}}</p>
-		    				<p><strong>课程内容：</strong>{{item.type}}</p>
+		    				<p><strong>课程内容：</strong>{{item.content}}</p>
 		    				<p>
 		    					<strong>课程时间：</strong>
-		    					11
+		    					{{item.racestarttime}}-{{item.raceendtime}}
 		    				</p>
 		    				<p>
 		    					<strong>课程状态：</strong>
 								<template v-if="item.racestatus == 41">
-		    						比赛中
+		    						开课中
 		    					</template>
 		    					<template v-else-if="item.racestatus == 40">
-		    						临时闭赛
+		    						临时停课
 		    					</template>
 		    					<template v-else-if="item.racestatus == 4999">
-		    						比赛结束
-		    					</template>
-		    					<template v-else>
-		    						其他状态（等待开赛）
+		    						已结束
 		    					</template>
 		    				</p>
-		    				<p v-if="item.stustatus != 10">
+		    				<p v-if="item.stustatus != 4999">
 		    					<strong>我的状态：</strong>
 		    					<template v-if="item.stustatus == 0">
-		    						未报名
+		    						未交易
 		    					</template>
-		    					<template v-else-if="item.stustatus == 1">
-		    						已报名（未开赛）
-		    					</template>
+		    					<!-- <template v-else-if="item.stustatus == 1">
+		    						已报名（未开课）
+		    					</template> -->
 		    					<template v-else-if="item.stustatus == 2">
-		    						比赛中
+		    						上课中
 		    					</template>
-		    					<template v-else>
-		    						比赛结束
-		    					</template>
+		    					<!-- <template v-else>
+		    						已结束
+		    					</template> -->
 		    				</p>
 		    				<p v-if="item.ranking"><strong>当前排名：</strong>{{item.ranking}}</p>
 		    			</div>
 		    			<div class="list-item-r">
-		    				<el-button class="bt2" @click.stop="jump(item, 'entry')" v-if="item.stustatus != 0">进入我的课程</el-button>
-							<el-button class="bt3" @click.stop="jump(item, 'sort')" v-if="item.stustatus == 2 || item.stustatus == 10">查看课程排名</el-button>
-		    				<el-button type="danger" v-if="item.stustatus == 2" v-for="(acct, index) in item.fuacct" :key="index" @click.stop="trade(item, acct)">{{acct.fuaccttype == 1 ? '竞赛交易' : '期权交易'}}</el-button>
+		    				<el-button class="bt2" @click.stop="jump(item, 'entry')">进入我的课程</el-button>
+							<el-button class="bt3" @click.stop="jump(item, 'sort')">查看课程排名</el-button>
+		    				<el-button type="danger" v-if="item.racestatus == 41" v-for="(acct, index) in item.fuacct" :key="index" @click.stop="trade(item, acct)">{{acct.fuaccttype == 1 ? '竞赛交易' : '期权交易'}}</el-button>
 		    			</div>
 		    		</div>
 		    		<div class="pager-wrapper">
 		    			<el-pagination
 						  background
 						  layout="prev, pager, next"
-						  :total="list.data.page.responsetotal" @current-change="changePage" :page-size="searchVal.page.size">
+						  :total="list.data.page.responsetotal" @current-change="changePage" :page-size="searchVal.page.size" :current-page.sync="list.data.currentPage">
 						</el-pagination>
 		    		</div>
 		    	</div>
@@ -94,7 +91,7 @@
 <script>
 	//赛事列表
 	var getList = function(that) {
-		that.$utils.getJson(that.$utils.CONFIG.api.competitionList, function(res) {
+		that.$utils.getJson(that.$utils.CONFIG.api.taskList, function(res) {
          	if(res.succflag == 0) {
             	that.list.data.list = res.data.list;
             	that.list.data.page = res.page;
@@ -122,45 +119,25 @@
 						condition: [
 							{
 								name: '课程老师',
-								value: 0,
-								list: [
-									{
-										name: '全部',
-										value: '',
-										type: 'hostunit',
-										isActive: false
-									}
-								]
+								keyName: 'hostunit',
+								list: []
 							},
 							{
 								name: '课程类型',
-								value: 1,
-								list: [
-									{
-										name: '全部',
-										value: '',
-										type: 'markettype',
-										isActive: false
-									}
-								]
+								keyName: 'markettype',
+								list: []
 							},
 							{
 								name: '课程状态',
-								value: 2,
-								list: [
-									{
-										name: '全部',
-										value: '',
-										type: 'status',
-										isActive: false
-									}
-								]
+								keyName: 'status',
+								list: []
 							}
 						]
 					},
 					data: {
 						defaultImg: require('../assets/images/img2.png'),
 						list: [],
+						currentPage: 1,
 						page: {
 							start: 0,
 							size: 0,
@@ -185,23 +162,24 @@
 			},
 			changeCondition(data, item) {
 				if(data.isActive) return;
-				item.forEach(function(e, i) {
-					if(data.value == e.value) {
+				item.list.forEach(function(e, i) {
+					if(data.type === e.type) {
 						e.isActive = true;
 					}else {
 						e.isActive = false;
 					}
 				})
 				var that = this;
-				that.searchVal[data.type] = data.value;
-				//that.searchVal.racename = '';
+				that.searchVal[item.keyName] = data.type;
 				that.searchVal.page.start = 0;
+				that.list.data.currentPage = 1;
 				getList(that);
 			},
 			search() {
 				if(!this.searchVal.racename) return;
 				var that = this;
 				that.searchVal.page.start = 0;
+				that.list.data.currentPage = 1;
 				getList(that);
 			},
 			jump(item, type) {
@@ -228,7 +206,9 @@
 			//获取条件
 			that.$utils.getJson(that.$utils.CONFIG.api.cumSetting, function(res) {
 	         	if(res.succflag == 0) {
-	            	console.log(res);
+	            	that.list.search.condition[0].list = res.data.hostunit.list;
+	            	that.list.search.condition[1].list = res.data.markettype.list;
+	            	that.list.search.condition[2].list = res.data.status.list;
 	          	}else {
 	          		that.$utils.showTip('error', '', '', res.message);
 	          	}

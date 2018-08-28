@@ -1,6 +1,6 @@
-//var baseUrl = 'http://192.168.1.213:9080/fests/';
+var baseUrl = 'http://192.168.1.213:9080/fests/';
 //var baseUrl = 'http://192.168.16.42:8080/';
-var baseUrl = 'http://192.168.16.31:8080/fests/';
+//var baseUrl = 'http://192.168.16.31:8080/fests/';
 //var baseUrl = 'http://192.168.16.40:8080/';
 
 const CONFIG = {
@@ -29,7 +29,7 @@ const CONFIG = {
 					accts: [
 						{
 							type: 1,
-							acct: "10001201876175",
+							acct: "1000103600",
 							acctname: "沪深A股交易资金账户"
 						},
 						{
@@ -44,6 +44,11 @@ const CONFIG = {
 					raceid: 2,
 					name: "模拟主账户",
 					accts: [
+						{
+							type: 1,
+							acct: "10001201876175",
+							acctname: "沪深A股交易资金账户"
+						},
 						{
 							type: 2,
 							acct: "10001201803534",
@@ -61,8 +66,7 @@ const CONFIG = {
 		},
 		message: "",
 		succflag: 0,
-		// token: "2ed5b51f59e9fb69f19d5a2c1258ba711ee82c4bab152f2d5369d20c2b3535c0"
-		token: 'ac312617c15ffd3afd1501d5c40741459591019aa7bf44d18588c75f88cbba8c'
+		token: "9bab80c814b0395e83827faabab3fbf916fefa0d9049863c0be41f87637f2f3d"
 	},
 	codeTime: 60,	//验证码倒计时时间
 	pageSize: 10,
@@ -75,6 +79,7 @@ const CONFIG = {
 		editPassword: baseUrl + 'my/editpassword.do', //修改密码
 		editEmail: baseUrl + 'my/editemail.do', //修改邮箱
 		editTel: baseUrl + 'my/edittel.do', //修改手机号
+		loginOut: baseUrl + 'my/logout.do', //退出
 
 		hq: 'http://192.168.1.213:9080/quotescenter/service', //行情
 		myRacelist: baseUrl + 'competition/myracelist.do', //模拟赛列表
@@ -84,9 +89,9 @@ const CONFIG = {
 		competitionSort: baseUrl + 'competition/raceranking.do', //赛事详情
 
 		cumSetting: baseUrl + 'task/cumsetting.do', //条件
-		taskList: baseUrl + 'task/myracelist.do', //教学课程列表
+		taskList: baseUrl + 'task/list.do', //教学课程列表
 		taskDetail: baseUrl + 'task/racedetail.do', //教学课程详情
-		taskRanking: baseUrl + 'task/raceranking.do', //教学课程详情
+		taskRanking: baseUrl + 'task/raceranking.do', //教学课程排名
 
 		msgTypeList: baseUrl + 'msgcenter/typelist.do', //消息类型列表
 		msglist: baseUrl + 'msgcenter/list.do', //消息列表
@@ -100,6 +105,7 @@ const CONFIG = {
 		stockUpd: baseUrl + 'ststock/stockUpd.do', //修改“选股理由”
 		stockDel: baseUrl + 'ststock/stockDel.do', //策略信息删除商品
 
+		acctList: baseUrl + 'my/acctlist.do', //账户列表
 		lineList: baseUrl + 'chart/indexlist.do', //指数列表
 		profit: baseUrl + 'chart/profit.do', //走势图
 		mySummary: baseUrl + 'query/mysummary.do', //我的资产
@@ -108,6 +114,7 @@ const CONFIG = {
 		myTrade: baseUrl + 'query/mytrade.do', //历史成交单
 		myApply: baseUrl + 'query/myapply.do', //历史委托单
 		comment: baseUrl + 'comcenter/mycomment.do', //我的评论
+		replyList: baseUrl + 'comcenter/replylist.do', //回复评论列表
 		commentreply: baseUrl + 'comcenter/commentreply.do', //回复评论
 	},
 	defaultFaceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',

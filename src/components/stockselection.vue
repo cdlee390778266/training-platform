@@ -656,41 +656,50 @@
 		},
 		created() {
 			var that = this;
-			//设置账号
-			that.$utils.CONFIG.account.forEach(function(item, index) {
-				var accountObj = {
-					usage: item.usage,
-					raceid: item.raceid,
-					name: item.name
-				}
-				for(var i = 0; i < item.accts.length; i++) {
-					if(item.accts[i].type == 1) {
-						accountObj.type = item.accts[i].type;
-						accountObj.acct = item.accts[i].acct;
-						accountObj.acctname = item.accts[i].acctname;
-						that.dropdown.accountList.push(accountObj);
-					}
-				}
-			})
-	    	console.log(that.dropdown.accountList);
-	    	that.currenAccount = that.dropdown.accountList[0];
-	    	that.searchVal.account = that.currenAccount.acct;
-			that.searchVal.pool = that.dropdown.poolList[0];
-			that.dropdown.poolList.forEach(function(e, i) {
-				e.account = that.searchVal.account;
-			})
-			//自选股池列表
-			that.$utils.getJson(that.$utils.CONFIG.api.poollist, function(res) {
+			//获取账号列表
+			that.$utils.getJson(that.$utils.CONFIG.api.acctList, function(res) {
               	if(res.succflag == 0) {
-              		if(!res.data.length) return;
-                	that.dropdown.diyList = res.data;
-                	that.searchVal.diy = that.dropdown.diyList[0];
-                	//第一个自选股池列表查询
-                	getDiyTable(that);
+              		that.$utils.CONFIG.account = res.data.account;
+              		console.log(res.data.account);
+					//设置账号
+					that.$utils.CONFIG.account.forEach(function(item, index) {
+						var accountObj = {
+							usage: item.usage,
+							raceid: item.raceid,
+							name: item.name
+						}
+						for(var i = 0; i < item.accts.length; i++) {
+							if(item.accts[i].type == 1) {
+								accountObj.type = item.accts[i].type;
+								accountObj.acct = item.accts[i].acct;
+								accountObj.acctname = item.accts[i].acctname;
+								that.dropdown.accountList.push(accountObj);
+							}
+						}
+					})
+
+			    	that.currenAccount = that.dropdown.accountList[0];
+			    	that.searchVal.account = that.currenAccount.acct;
+					that.searchVal.pool = that.dropdown.poolList[0];
+					that.dropdown.poolList.forEach(function(e, i) {
+						e.account = that.searchVal.account;
+					})
+					//自选股池列表
+					that.$utils.getJson(that.$utils.CONFIG.api.poollist, function(res) {
+		              	if(res.succflag == 0) {
+		              		if(!res.data.length) return;
+		                	that.dropdown.diyList = res.data;
+		                	that.searchVal.diy = that.dropdown.diyList[0];
+		                	//第一个自选股池列表查询
+		                	getDiyTable(that);
+		              	}else {
+		                	that.$utils.showTip('error', '', '', res.message);
+		              	}
+		            }, function() {}, {account: that.searchVal.account}, true, {token: that.$utils.CONFIG.token})
               	}else {
                 	that.$utils.showTip('error', '', '', res.message);
               	}
-            }, function() {}, {account: that.searchVal.account}, true, {token: that.$utils.CONFIG.token})
+            }, function() {}, {}, true, {token: that.$utils.CONFIG.token})
 		}
 	}
 </script>

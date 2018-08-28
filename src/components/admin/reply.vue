@@ -5,21 +5,21 @@
 			<div class="reply-body">
 				<div class="reply-bar">
 					<div>
-						<i :style="'background-image: url(' + reply.data.list[0].faceUrl + ')'" v-if="reply.data.list[0].faceUrl"></i>
+						<i :style="'background-image: url(' + reply.comment.faceUrl + ')'" v-if="reply.comment.faceUrl"></i>
 						<i :style="'background-image: url(' + defaultFaceUrl + ')'" v-else></i>
-						{{reply.data.list[0].observername}}
+						{{reply.comment.observername}}
 					</div>
 					<div class="reply-tContent">
-						{{reply.data.list[0].comment}}
-						<span>{{reply.data.list[0].publishtime}}</span>
+						{{reply.comment.comment}}
+						<span>{{reply.comment.publishtime}}</span>
 					</div>
 				</div>
 				<div class="reply-content">
-					<div class="reply-item" v-for="(item, index) in reply.data.list" v-if="index > 0" :class="{'reply-item-student': reply.data.list[0].observerid != item.observerid, 'reply-item-teacher': reply.data.list[0].observerid == item.observerid}">
+					<div class="reply-item reply-item-student" v-for="(item, index) in reply.list">
 						<div class="reply-item-left">
-							<i v-if="reply.data.list[0].observerid == item.observerid && item.faceUrl" :style="'background-image: url(' + item.faceUrl + ')'"></i>
-							<i v-if="reply.data.list[0].observerid == item.observerid && !item.faceUrl" :style="'background-image: url(' + defaultFaceUrl + ')'"></i>
-							<strong><span>{{item.observername}}</span>回复 {{reply.data.list[0].observername}}</strong>
+							<i :style="'background-image: url(' + item.faceUrl + ')'"></i>
+							<i :style="'background-image: url(' + defaultFaceUrl + ')'"></i>
+							<strong><span>{{item.observername}}</span></strong>
 						</div>
 						<div class="reply-item-right">
 							{{item.comment}}<span>{{item.publishtime}}</span>
@@ -44,43 +44,8 @@
 			return {
 				defaultFaceUrl: this.$utils.CONFIG.defaultFaceUrl,
 				reply: {
-					data: {
-						list: [
-							{
-								id: 0,
-								observerid: 66,
-								observername: '张老师',
-								nexusid: 1,
-								comment: '小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！',
-								publishtime: '2018-08-02',
-								extranum: 100
-							},
-							{
-								id: 0,
-								observerid: 6,
-								observername: '对对对',
-								nexusid: 1,
-								comment: '小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！小王的炒股能力不错！',
-								publishtime: '2018-08-02',
-								extranum: 100
-							},
-							{
-								id: 1010,
-								observerid: 66,
-								observername: '张老师',
-								nexusid: 1,
-								comment: '小王的！',
-								publishtime: '2018-08-02',
-								extranum: 100
-							},
-						],
-						page: {
-							start: 0,
-							size: 20,
-							responsetotal: 1,
-							responsenum: 20
-						}
-					}
+					comment: {},
+					list: []
 				},
 				commentPostData: {},
 				commentForm: {
@@ -100,19 +65,21 @@
 		          	if (valid) {
 		          		that.$utils.getJson(that.$utils.CONFIG.api.commentreply, function(res) {
 				          	if(res.succflag == 0) {
-				          		that.$utils.getJson(that.$utils.CONFIG.api.comment, function(res) {
+
+				          		that.$utils.getJson(that.$utils.CONFIG.api.replyList, function(res) {
 						          	if(res.succflag == 0) {
-						            	that.reply.data = res.data;
-						            	that.reply.page = res.page;
+						            	that.reply.comment = res.data.comment;
+	            						that.reply.list = res.data.list;
 						          	}else {
 						            	that.$utils.showTip('error', '', '', res.message);
 						          	}
-						        }, function() {}, that.commentPostData, true, {token: that.$utils.CONFIG.token})
-				            	this.$refs[formName].resetFields();
+						        }, function() {}, {commentid: that.$route.params.id}, true, {token: that.$utils.CONFIG.token})
+				          		that.$utils.showTip('success', '', '', res.message);
+				            	that.$refs[formName].resetFields();
 				          	}else {
 				            	that.$utils.showTip('error', '', '', res.message);
 				          	}
-				        }, function() {}, {commentid: that.reply.data.list[that.reply.data.list.length - 1].id, comment: that.commentForm.desc}, true, {token: that.$utils.CONFIG.token})
+				        }, function() {}, {commentid: that.reply.comment.commentid, comment: that.commentForm.desc}, true, {token: that.$utils.CONFIG.token})
 		          	} else {
 		            	console.log('error submit!!');
 		            	return false;
@@ -123,16 +90,12 @@
 		created() {
 			var that = this;
 			that.commentPostData = {
-	    		page: {
-					start: "1",
-					size: "20"
-				},
-				nexusid: that.$route.params.id
+				commentid: that.$route.params.id
 	    	}
-	    	that.$utils.getJson(that.$utils.CONFIG.api.comment, function(res) {
+	    	that.$utils.getJson(that.$utils.CONFIG.api.replyList, function(res) {
 	          	if(res.succflag == 0) {
-	            	that.reply.data = res.data;
-	            	that.reply.page = res.page;
+	            	that.reply.comment = res.data.comment;
+	            	that.reply.list = res.data.list;
 	          	}else {
 	            	that.$utils.showTip('error', '', '', res.message);
 	          	}
