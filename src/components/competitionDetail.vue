@@ -29,7 +29,7 @@
 					    		<h2>比赛规则</h2>
 					    		<div>
 					    			<p>起始资金：{{tabs.tabs.detail.data.initfund}}元</p>
-					    			<p>交易品种：{{tabs.tabs.detail.data.racestarttime}}~{{tabs.tabs.detail.data.tradekind}}</p>
+					    			<p>交易品种：{{tabs.tabs.detail.data.tradekind}}</p>
 					    		</div>
 					    	</div>
 					    	<div class="detail-item">
@@ -67,7 +67,8 @@
 							</el-form>
 						</el-dialog>
 				    </el-tab-pane>
-				    <el-tab-pane :label="tabs.tabs.sort.name" name="sort" class="sort" v-if="tabs.tabs.detail.data.entryStatus == 1 && saveRace.fuacct && saveRace.fuacct.length">
+				    <!-- v-if="tabs.tabs.detail.data.entryStatus == 1 && saveRace.fuacct && saveRace.fuacct.length" -->
+				    <el-tab-pane :label="tabs.tabs.sort.name" name="sort" class="sort">
 				    	<div class="sort-head">
 				    		<el-form ref="form"  label-width="80px" :inline="true">
 				    			<el-form-item label="市场类型">
@@ -235,7 +236,6 @@
 	var getPicCode = function(that) {
 		that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
 			if(res.succflag == 0) {
-				console.log(res)
 				that.signUp.codeUrl = res.data.image;
 			}else {
 				that.$utils.showTip('error', 'error', '-1022');

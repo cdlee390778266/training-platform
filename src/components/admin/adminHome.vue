@@ -126,8 +126,11 @@
 										</el-form-item>
 									</el-form>
 						    	</div>
-						    	<div class="tab-chart" v-if="tabs.holdPos.chart.chartData">
-						    		<ve-ring :data="tabs.holdPos.chart.chartData"  ref="veRing" :legend="tabs.holdPos.chart.options.legend"></ve-ring>
+						    	<div class="tab-chart">
+						    		<ve-ring :data="tabs.holdPos.chart.chartData"  ref="veRing" :legend="tabs.holdPos.chart.options.legend" v-show="tabs.holdPos.chart.chartData.rows && tabs.holdPos.chart.chartData.rows.length"></ve-ring>
+						    		<div class="emptyRing" v-show="!(tabs.holdPos.chart.chartData.rows && tabs.holdPos.chart.chartData.rows.length)">
+						    			<img :src="tabs.holdPos.defaultRingImage">
+						    		</div>
 						    	</div>
 						    	<div class="holdPos-bar">
 						    		持仓明细
@@ -233,7 +236,7 @@
 												</el-option>
 											</el-select>
 										</el-form-item>
-									  <el-form-item class="tabs-checkbox">
+									  <el-form-item class="tabs-checkbox history-radio">
 									  	<el-radio v-model="tabs.history.form.tableType" label="0">历史成交</el-radio>
 	  									<el-radio v-model="tabs.history.form.tableType" label="1">历史委托</el-radio>
 									  </el-form-item>
@@ -313,7 +316,7 @@
 									</el-pagination>
 						    	</div>
 						    </el-tab-pane>
-						    <el-tab-pane label="赛事排名" name="sort" class="sort">
+						    <el-tab-pane label="赛事排名" name="sort" class="sort" v-if="!isMainAccount">
 						    	<div class="sort-head">
 						    		<el-form :inline="true">
 						    		<el-form-item label="市场类型">
@@ -389,7 +392,7 @@
 						    </el-tab-pane>
 						</el-tabs>
 					</div>
-					<div class="ahome-right">
+					<div class="ahome-right" v-if="comment && comment.length">
 						<h1>教师点评</h1>
 						<ul class="comment">
 							<li v-for="(item, index) in comment">
@@ -447,7 +450,7 @@
 		var month  = date.getMonth()+1 < 10 ? 0  + '' + (date.getMonth()+1) : date.getMonth()+1;
 		var day    = date.getDate() < 10 ? 0  + '' + date.getDate() : date.getDate();
 
-		var enddate = year+"-"+month+"-"+day;
+		var enddate = year+""+month+""+day;
 		var startdate = '';
 		switch (type) {
 			case 'one': //近一个月
@@ -466,7 +469,7 @@
 			year = year - 1;
 		}
 		month = month < 10 ? 0  + '' + (month) : month;
-		startdate = year+"-"+month+"-"+day;
+		startdate = year+""+month+""+day;
 
 		return {
 			startdate: startdate,
@@ -519,6 +522,7 @@
         	that.$utils.getJson(that.$utils.CONFIG.api.profit, function(res) {
 	          	if(res.succflag == 0) {
 	            	that.chartOpts.data = res.data;
+	            	that.chartOpts.title.text = res.data.title;
 	          	}else {
 	            	that.$utils.showTip('error', '', '', res.message);
 	          	}
@@ -644,8 +648,6 @@
 			acct: that.tabs.holdPos.account.acct,
 			type: that.tabs.holdPos.account.type
 		}
-		console.log('postData:')
-		console.log(postData)
 		//饼状图
     	that.$utils.getJson(that.$utils.CONFIG.api.hold, function(res) {
           	if(res.succflag == 0) {
@@ -668,7 +670,6 @@
 				size: that.$utils.CONFIG.pageSize
 			}
 		}
-		console.log(postData)
 		//获取持仓行情列表
 		that.$utils.getJson(that.$utils.CONFIG.api.myHold, function(res) {
           	if(res.succflag == 0) {
@@ -701,7 +702,6 @@
 			}
 		}
 		var api = that.tabs.history.form.tableType == 1 ? that.$utils.CONFIG.api.myApply : that.$utils.CONFIG.api.myTrade;
-		console.log(postData)
 		that.$utils.getJson(api, function(res) {
           	if(res.succflag == 0) {
             	that.tabs.history.tableData = res.data.list;
@@ -721,7 +721,6 @@
 				sort: 'DESC'
 			}
 		}
-		console.log(postData);
 		that.$utils.getJson(that.$utils.CONFIG.api.competitionSort, function(res) {
           	if(res.succflag == 0) {
             	that.tabs.sort.tableData = res.data;
@@ -736,6 +735,10 @@
  		getLine(that);
  		//我的评论
  		getComment(that);
+
+ 		if(that.isMainAccount && that.activeTab == 'sort') {
+ 			that.activeTab = 'holdPos';
+ 		}
  		switch(that.activeTab) {
  			case 'assets': 	//我的资产
  				getAssets(that);
@@ -744,13 +747,12 @@
  				getHold(that);
  				break;
  			case 'history': //我的交易记录
- 				getHistory(that);
+ 				if(!that.isMainAccount) getHistory(that);
  				break;
  			case 'sort': //赛事排名
  				getSort(that);
  				break;
  		}
- 		console.log(that.activeTab)
 	}
 	export default {
 	components: {
@@ -820,6 +822,7 @@
             }
 		],
 		hadRace: false,
+		isMainAccount: false,
 		accountRaceId: '',
       	account: {},
       	defaultFaceUrl: CONFIG.defaultFaceUrl,
@@ -858,7 +861,7 @@
 		    yAxis : [{ 
 	            axisLabel: {
 	                formatter: function(value) {
-	                	return value*100 + '%';
+	                	return parseInt(value*100) + '%';
 	                }
 	            }
 	        }],
@@ -875,7 +878,6 @@
 		    ],
 		    tooltip: {
 		    	formatter: function(params) {
-		    		console.log(params);
                 	return params.name + '<br/>' + params.marker + params.seriesName + ': ' + (params.data[1]*100).toFixed(2) + '%' ;
                 }
 		    },
@@ -917,6 +919,7 @@
     		holdPos: {
     			account: {},
     			accountAcct: '',
+    			defaultRingImage: require('../../assets/images/ring.png'),
     			chart: {
     				options: {
     					legend: {
@@ -1065,7 +1068,7 @@
 	        this.$utils.handleExe(json, function(){}, function(){})
     	},
     	jumpToDetail(raceid) {
-    		this.$router.push({ path: '/competition/detail/detail/', query: {usagecode: raceid}});
+    		this.$router.push({ path: '/competition/detail/detail', query: {data: JSON.stringify({usagecode: raceid})}});
     	},
     	objectSpanMethod({ row, column, rowIndex, columnIndex }) {
 	        if (columnIndex === 0) {
@@ -1145,6 +1148,7 @@
 	    	that.accountRaceId = that.account.raceid;
     		that.tabs.holdPos.account = that.tabs.history.account =  that.tabs.sort.account = that.account.accts[0];
     		that.tabs.holdPos.accountAcct = that.tabs.history.accountAcct = that.tabs.sort.accountAcct = that.tabs.holdPos.account.acct;
+    		that.isMainAccount = that.account.usage == 0 ? true : false;
     		reset(that);
     		refreshData(that);
     	},
@@ -1244,6 +1248,7 @@
 		    	that.tabs.holdPos.account = that.tabs.history.account =  that.tabs.sort.account = that.account.accts[0];
 		    	that.tabs.holdPos.accountAcct = that.tabs.history.accountAcct = that.tabs.sort.accountAcct = that.tabs.holdPos.account.acct;
 		    	that.tabs.sort.selectVal = that.tabs.sort.selectOpts[0].value;
+		    	that.isMainAccount = that.account.usage == 0 ? true : false;
 
 		    	reset(that);
 		    	refreshData(that);
@@ -1375,7 +1380,7 @@
 					color: #7d858d;
 				}
 				.tab-head {
-					margin-top: 10px;
+					margin-top: 20px;
 					margin-bottom: 10px;
 					text-align: center;
 					form {
@@ -1461,6 +1466,10 @@
 					margin-bottom: 20px;
 					margin-right: 50px;
 				}
+				.emptyRing {
+					text-align: center;
+					margin: 40px auto;
+				}
 			}
 			.comment {
 				color: #666;
@@ -1537,6 +1546,13 @@
 			}
 			tr:last-child td {
 				border-bottom: 1px solid #ebeef5;
+			}
+		}
+		.history-radio {
+			margin-left: 10px;
+			margin-right: 20px !important;
+			.el-radio+.el-radio {
+				margin-left: 10px;
 			}
 		}
 	}

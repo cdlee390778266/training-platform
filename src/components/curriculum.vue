@@ -29,7 +29,7 @@
 		    			<span>课程总数</span>
 		    		</div>
 		    	</div>
-		    	<div class="list">
+		    	<div class="list" v-if="list.data.list && list.data.list.length">
 		    		<div class="list-item" v-for="(item, index) in list.data.list" @click="jump(item, 'detail')">
 		    			<div class="list-item-l" :style="'background-image: url(' + item.url + ');'" v-if="item.url"></div>
 		    			<div class="list-item-l" :style="'background-image: url(' + list.data.defaultImg + ');'" v-else></div>
@@ -84,6 +84,9 @@
 						</el-pagination>
 		    		</div>
 		    	</div>
+				<div class="empty" v-else>
+					没有符合条件的赛事
+				</div>
 			</div>
 		</div>
 	</div>
@@ -161,16 +164,20 @@
 	            this.$utils.handleExe(json, function(){}, function(){})
 			},
 			changeCondition(data, item) {
-				if(data.isActive) return;
-				item.list.forEach(function(e, i) {
-					if(data.type === e.type) {
-						e.isActive = true;
-					}else {
-						e.isActive = false;
-					}
-				})
 				var that = this;
-				that.searchVal[item.keyName] = data.type;
+				if(!data.isActive) {
+					item.list.forEach(function(e, i) {
+						if(data.type === e.type) {
+							e.isActive = true;
+						}else {
+							e.isActive = false;
+						}
+					})
+					that.searchVal[item.keyName] = data.type;
+				}else {
+					data.isActive = false;
+					that.searchVal[item.keyName] = '';
+				}
 				that.searchVal.page.start = 0;
 				that.list.data.currentPage = 1;
 				getList(that);
@@ -379,6 +386,7 @@
 								line-height: 30px;
 								margin-right: 10px;
 								text-align: center;
+								cursor: pointer;
 								&.active {
 									color: #fff;
 									border-radius: 20px;
@@ -515,6 +523,15 @@
 	          margin-bottom: 25px;
 	        }
 	      }
+	    }
+	    .empty {
+	    	text-align: center;
+	    	line-height: 200px;
+	    	margin-top: 10px;
+	    	font-size: 16px;
+	    	color: #999;
+	    	border: 1px solid #dde1e6;
+	    	background: #fff;
 	    }
 	}
 </style>

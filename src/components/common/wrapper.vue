@@ -158,7 +158,6 @@
       	methods: {
 	        toggleMenu(key, keyPath) {
 	          this.isCollapse = !this.isCollapse;
-	          console.log(key, keyPath);
 	        },
 	        handle(item) {
 				if(item.handle == 'jumpToUrl') {

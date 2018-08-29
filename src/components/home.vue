@@ -3,7 +3,7 @@
 		<ql-head></ql-head>
 		<div class="home-body">
 			<ul id="home-wrapper">
-				<li v-for="item in home" @click="handle(item)"><img :src="item.icon" class="homeImg" width="64px">{{item.text}}</li>
+				<li v-for="item in home" @click="handle(item)"><img :src="item.icon" class="homeImg" width="80">{{item.text}}</li>
 			</ul>
 		</div>
 	</div>
@@ -51,6 +51,13 @@
   						handle: 'jumpToUrl',
   						handleData: '/live' ,
   						isExternalLink: false
+  					},
+  					{
+  						text: '教学课程',
+  						icon: require('../assets/images/icons/exe-icon6.png'),
+  						handle: 'jumpToUrl',
+  						handleData: '/curriculum' ,
+  						isExternalLink: false
   					}
   				]
 			}
@@ -91,7 +98,7 @@
 		            if(scale<0.5){
 		                scale=0.5;
 		            }
-		            aimg[i].width=scale*128;
+		            aimg[i].width=scale*160;
 		       }
 		   }
 		}
@@ -100,15 +107,18 @@
 
 <style scoped lang="scss">
   .home {
+  	min-height: 788px;
+  	background: url(../assets/images/bg.png);
+  	background-size: cover;
   	.home-body {
 		position: relative;
-		padding-top: 412px;
+		padding-top: 600px;
 		height: 260px;
   		ul {
   			text-align: center;
   			li {
   				display: inline-block;
-  				margin: 0 20px;
+  				margin: 0 30px;
   				cursor: pointer;
   				img {
   					display: block;

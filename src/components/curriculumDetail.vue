@@ -23,7 +23,7 @@
 					    	<div class="detail-item">
 					    		<h2>课程规则</h2>
 					    		<div>
-					    			<p>起始资金：{{tabs.tabs.detail.data.initfund}}元</p>
+					    			<p>起始资金：{{tabs.tabs.detail.data.initfund ? tabs.tabs.detail.data.initfund + '元' : ''}}</p>
 					    			<p>交易品种：{{tabs.tabs.detail.data.tradekind}}</p>
 					    		</div>
 					    	</div>

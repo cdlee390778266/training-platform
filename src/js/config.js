@@ -14,7 +14,7 @@ const CONFIG = {
 		data: {
 			student: {
 				studentid: "",
-				name: "",
+				name: "打酱油",
 				college: null,
 				depart: "",
 				major: "",
@@ -41,7 +41,7 @@ const CONFIG = {
 				},
 				{
 					usage: 0,
-					raceid: 2,
+					raceid: 20,
 					name: "模拟主账户",
 					accts: [
 						{
@@ -66,7 +66,7 @@ const CONFIG = {
 		},
 		message: "",
 		succflag: 0,
-		token: "9bab80c814b0395e83827faabab3fbf916fefa0d9049863c0be41f87637f2f3d"
+		token: "e54f88d35c258f5865e76ad74ea2059ead9b53145beb378ce5dcc1fb953275dc"
 	},
 	codeTime: 60,	//验证码倒计时时间
 	pageSize: 10,
@@ -117,13 +117,15 @@ const CONFIG = {
 		replyList: baseUrl + 'comcenter/replylist.do', //回复评论列表
 		commentreply: baseUrl + 'comcenter/commentreply.do', //回复评论
 	},
-	defaultFaceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+	defaultFaceUrl: require('../assets/images/comment-face.png'),
 	ajaxCount: 0,
 	success: {
 		"1": "加载数据成功",
 		'101': "注册成功",
 		'102': "",
 		'103': "",
+		'104': "已退出",
+		'105': ""
 	},
 	error: {
 		'-1': '加载数据失败，请检查网络！',
@@ -134,6 +136,8 @@ const CONFIG = {
 		'-1021': '邮箱不正确！',
 		'-1022': '获取验证码失败！',
 		'-1030': '至少选中一条数据！',
+		'-1040': '',
+		'-1050': '非法操作！',
 	}
 }
 

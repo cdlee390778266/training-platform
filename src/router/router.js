@@ -5,6 +5,7 @@ const Home  = () => import('../components/home')
 
 const Wrapper  = () => import('../components/common/wrapper.vue')
 const Competition  = () => import('../components/competition.vue')
+const News  = () => import('../components/news.vue')
 const CompetitionDeail  = () => import('../components/competitionDetail.vue')
 const StockSelection  = () => import('../components/stockselection.vue')
 const Live  = () => import('../components/live.vue')
@@ -65,6 +66,12 @@ const router = new Router({
           name: 'competition',
           component: Competition,
           meta: { title: '投资竞赛'}
+        },
+        {
+          path: '/news',
+          name: 'news',
+          component: News,
+          meta: { title: '新闻'}
         },
         {
           path: '/competition/detail/:type',

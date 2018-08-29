@@ -225,7 +225,6 @@
 	        this.imageUrl = URL.createObjectURL(file.raw);
 	      },
 	      beforeAvatarUpload(file) {
-	      	console.log(file);
 	        //const isJPG = file.type === 'image/jpeg';
 	        const isLt2M = file.size / 1024 / 1024 < 2;
 
@@ -371,14 +370,10 @@
 						}
 					}, function() {}, postData, true, {token: that.$utils.CONFIG.token})
 	          } else {
-	            console.log('error submit!!');
 	            return false;
 	          }
 	        });
 	      }
-	    },
-	    created() {
-	    	console.log(this.$route.params);
 	    }
 	}
 </script>

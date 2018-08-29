@@ -32,7 +32,6 @@ export default {
         }
     }
     this.$utils.getLoginData(function(res) {
-        alert('登录信息：' + res);
         var res = JSON.parse(res);
         that.$utils.CONFIG.loginData = res;
         that.$utils.CONFIG.token = that.$utils.CONFIG.loginData.token;
@@ -50,14 +49,13 @@ export default {
             }
         }
     }, function(error) {
-        alert(error);
+        // alert(error);
     })
 
     this.$utils.getUniversityCode(function(res) {
         that.$utils.CONFIG.universitycode = res;
-        alert('院校ID：' + res);
     }, function(error) {
-        alert(error);
+        // alert(error);
     })
 
   }
@@ -124,6 +122,18 @@ body {
 .el-pagination {
   text-align: center;
   margin: 40px auto;
+}
+
+.el-button--danger:hover {
+  opacity: 0.9;
+}
+
+.el-table__empty-text {
+  background: url('./assets/images/nodata.png') no-repeat center 30px;
+  background-size: 80px 80px;
+  height: 180px;
+  padding-top: 120px;
+  color: #999;
 }
 .fade-enter-active, .fade-leave-active {
   transition: opacity .5s;

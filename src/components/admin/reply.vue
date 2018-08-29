@@ -19,10 +19,10 @@
 						<div class="reply-item-left">
 							<i :style="'background-image: url(' + item.faceUrl + ')'"></i>
 							<i :style="'background-image: url(' + defaultFaceUrl + ')'"></i>
-							<strong><span>{{item.observername}}</span></strong>
+							<strong><span>{{item.observername}}</span>回复{{reply.comment.observername}}</strong></strong>
 						</div>
 						<div class="reply-item-right">
-							{{item.comment}}<span>{{item.publishtime}}</span>
+							{{item.comment}}<span>{{item.time}}</span>
 						</div>
 					</div>
 					<el-form :model="commentForm" :rules="commentRules" ref="commentForm">
@@ -81,7 +81,6 @@
 				          	}
 				        }, function() {}, {commentid: that.reply.comment.commentid, comment: that.commentForm.desc}, true, {token: that.$utils.CONFIG.token})
 		          	} else {
-		            	console.log('error submit!!');
 		            	return false;
 		          	}
 		        });
@@ -155,6 +154,8 @@
 							background-size: cover;
 						}
 						strong {
+							position: relative;
+							top: -4px;
 							color: #a4a4a4;
 							span {
 								color: #666;

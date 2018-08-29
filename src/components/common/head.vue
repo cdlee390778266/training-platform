@@ -65,7 +65,7 @@
                         </template>
                       </template>
                     </el-dropdown-item>
-                    <el-dropdown-item>
+                    <el-dropdown-item divided>
                       <div @click="loginOut">退出</div>
                     </el-dropdown-item>
                   </el-dropdown-menu>
@@ -122,7 +122,7 @@
               isLink: true
   					},
   					{
-  						text: '个人中心',
+  						text: this.$utils.CONFIG.loginData.data.student.name ? this.$utils.CONFIG.loginData.data.student.name : '游客',
   						icon: require('../../assets/images/icons/head-icon2.png'),
               linkUrl: '/admin/home',
   						data: [
@@ -186,16 +186,6 @@
               }
               this.$utils.handleExe(json, function(){}, function(){})
             }
-          },
-          submitForm(formName) {
-            this.$refs[formName].validate((valid) => {
-              if (valid) {
-                alert('submit!');
-              } else {
-                console.log('error submit!!');
-                return false;
-              }
-            });
           },
           getCode() {
             if (!this.email.emailForm.email) {
@@ -266,12 +256,12 @@
                   var json = {
                     method: 'startexe',
                     data: {
-                      type:'quotes',
-                      exeName: 'loginOut',
-                      account: ''
+                      type:'loginOut',
+                      exeName: 'loginOut'
                     }
                   }
-                  this.$utils.handleExe(json, function(){}, function(){})
+                  that.$utils.handleExe(json, function(){}, function(){});
+                  that.$utils.showTip('success', 'success', '104');
                 }else {
                   that.$utils.showTip('error', '', '', res.message);
                 }

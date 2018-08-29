@@ -448,7 +448,6 @@
 							that.$utils.getJson(that.$utils.CONFIG.api.poollist, function(res) {
 				              	if(res.succflag == 0) {
 				                	that.dropdown.diyList = res.data;
-				                	console.log(that.dropdown.diyList);
 				              		if(!res.data.length) return;
 				                	that.searchVal.diy = that.dropdown.diyList[0];
 				                	//第一个自选股池列表查询
@@ -462,7 +461,6 @@
 							that.$utils.getJson(that.$utils.CONFIG.api.poollist, function(res) {
 				              	if(res.succflag == 0) {
 				                	that.dropdown.diyList = res.data;
-				                	console.log(that.dropdown.diyList);
 				              		if(!res.data.length) return;
 				                	that.searchVal.diy = that.dropdown.diyList[0];
 				              	}else {
@@ -595,7 +593,6 @@
 							that.$utils.getJson(that.$utils.CONFIG.api.stoprecList, function(res) {
 				              	if(res.succflag == 0) {
 				                	row.handleList = res.data.reverse();
-				                	console.log(row.handleList);
 				              	}else {
 				                	that.$utils.showTip('error', '', '', res.message);
 				              	}
@@ -660,7 +657,6 @@
 			that.$utils.getJson(that.$utils.CONFIG.api.acctList, function(res) {
               	if(res.succflag == 0) {
               		that.$utils.CONFIG.account = res.data.account;
-              		console.log(res.data.account);
 					//设置账号
 					that.$utils.CONFIG.account.forEach(function(item, index) {
 						var accountObj = {

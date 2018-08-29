@@ -82,7 +82,7 @@
 			</div>
 			<span slot="footer" class="dialog-footer">
 				<el-button type="primary" @click="goDetail" v-show="currentMsg.id != 1">查看详情</el-button>
-				<el-button @click="dialogVisible = false">关 闭</el-button>
+				<!-- <el-button @click="dialogVisible = false">关 闭</el-button> -->
 			</span>
 		</el-dialog>
 	</div>
@@ -153,7 +153,6 @@
 				getMsgList(that, postData);
 	      	},
 	      	handleMsg(row, event, column) {
-	      		console.log(row);
 	      		var that = this;
 	      		that.saveRow = row;
 	      		switch(parseInt(this.currentMsg.id)) {

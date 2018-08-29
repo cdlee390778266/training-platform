@@ -194,13 +194,18 @@
 			}
 		},
 		created() {
-			var jqueryArr = location.href.split('?')[1].split('&');
-			for(var i = 0; i < jqueryArr.length; i++) {
-				var arr = jqueryArr[i].split('=');
-				if(arr[0] == 'UniverCode') {
-					this.univerCode = arr[1];
-					break;
+			var jqueryArr = location.href.split('?');
+			if(jqueryArr.length > 1) {
+				jqueryArr = jqueryArr[1].split('&');
+				for(var i = 0; i < jqueryArr.length; i++) {
+					var arr = jqueryArr[i].split('=');
+					if(arr[0] == 'UniverCode') {
+						this.univerCode = arr[1];
+						break;
+					}
 				}
+			}else {
+				this.$utils.showTip('error', 'error', '-1050');
 			}
 		}
 	}

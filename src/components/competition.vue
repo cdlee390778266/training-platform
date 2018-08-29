@@ -2,12 +2,16 @@
 	<div class="competition">
 		<swiper :options="swiperOption" ref="mySwiper">
 		    <swiper-slide v-for="(item, index) in ads" :key="index">
-		    	<img :src="item.url" class="img-responsive">
+		    	<div style="background: #3972f1" class="ad">
+			    	<div class="ql-wrapper">
+			    		<img :src="item.url" width="800px">
+			    	</div>
+			    </div>
 		    </swiper-slide>
 		</swiper>
 		<div class="ql-wrapper">
 			<el-row class="activity">
-				<el-col :span="6" v-for="(item, index) in activity" :key="index" :style="'background-image: url(' + item.url + ');'">
+				<el-col :span="6" v-for="(item, index) in activity" :key="index" :style="'background-image: url(' + item.url + ');'"  @click.native="goLink(item)">
 					<span>{{item.name}}</span>
 				</el-col>
 			</el-row>
@@ -15,14 +19,14 @@
 				<el-col :span="6" v-for="(item, index) in lattice" :key="index">
 					<div>
 						<h2>{{item.name}}</h2>
-						<strong>{{item.value}}</strong>
+						<strong :class="{'fall': item.isFall}">{{item.value}}</strong>
 					</div>
 				</el-col>
 			</el-row>
 			<div class="competition-body">
 				<el-tabs v-model="tabs.activeTab">
 				    <el-tab-pane :label="tabs.tabs.simulation.name" name="simulation">
-				    	<el-row :gutter="20">
+				    	<el-row :gutter="20" v-if="tabs.tabs.simulation.dataList && tabs.tabs.simulation.dataList.length">
 							<el-col :span="12" v-for="(item, index) in tabs.tabs.simulation.dataList" :key="index">
 								<div class="simulation-item" @click="jump(item, 'entry')">
 									<div class="simulation-bar">{{item.racename  | strLen(32)}} <a @click.stop="jump(item, 'detail')">查看详情</a></div>
@@ -58,6 +62,9 @@
 								</div>
 							</el-col>
 						</el-row>
+						<div class="empty" v-else>
+							未参加任何赛事
+						</div>
 				    </el-tab-pane>
 				    <el-tab-pane :label="tabs.tabs.list.name" name="list">
 				    	<div class="search">
@@ -87,7 +94,7 @@
 				    			<span>比赛总数</span>
 				    		</div>
 				    	</div>
-				    	<div class="list">
+				    	<div class="list" v-if="tabs.tabs.list.data.list && tabs.tabs.list.data.list.length">
 				    		<div class="list-item" v-for="(item, index) in tabs.tabs.list.data.list" @click="jump(item, 'detail')">
 				    			<div class="list-item-l" :style="'background-image: url(' + item.url + ');'" v-if="item.url"></div>
 				    			<div class="list-item-l" :style="'background-image: url(' + tabs.tabs.list.data.defaultImg + ');'" v-else></div>
@@ -159,6 +166,9 @@
 								</el-pagination>
 				    		</div>
 				    	</div>
+				    	<div class="empty" v-else>
+							没有符合条件的赛事
+						</div>
 
 				    	<!-- 报名弹窗 -->
 						<el-dialog title="赛事报名" :visible.sync="signUp.dialogFormVisible" class="signUp" width="600px" center>
@@ -194,9 +204,11 @@
             	res.data.forEach( function(e, i) {
             		if(shHqPostData.body.stockcode[0] === e.code) {
             			that.lattice[0].value = e.now + '(' + ((e.now-e.close)/e.close*100).toFixed(2) + '%)';
+            			that.lattice[0].isFall = e.now-e.close < 0 ? true : false;
             		}
             		if(shHqPostData.body.stockcode[1] === e.code) {
             			that.lattice[3].value = e.now + '(' + ((e.now-e.close)/e.close*100).toFixed(2) + '%)';
+            			that.lattice[3].isFall = e.now-e.close < 0 ? true : false;
             		}
             	});
           	}
@@ -215,9 +227,11 @@
             	res.data.forEach( function(e, i) {
             		if(scHqPostData.body.stockcode[0] === e.code) {
             			that.lattice[1].value = e.now + '(' + ((e.now-e.close)/e.close*100).toFixed(2) + '%)';
+            			that.lattice[1].isFall = e.now-e.close < 0 ? true : false;
             		}
             		if(scHqPostData.body.stockcode[1] === e.code) {
             			that.lattice[2].value = e.now + '(' + ((e.now-e.close)/e.close*100).toFixed(2) + '%)';
+            			that.lattice[2].isFall = e.now-e.close < 0 ? true : false;
             		}
             	});
           	}
@@ -254,7 +268,6 @@
 	var getPicCode = function(that) {
 		that.$utils.getJson(that.$utils.CONFIG.api.code, function(res){
 			if(res.succflag == 0) {
-				console.log(res)
 				that.signUp.codeUrl = res.data.image;
 			}else {
 				that.$utils.showTip('error', 'error', '-1022');
@@ -270,7 +283,6 @@
 				timer: '',
 				swiperOption: {
 			        centeredSlides: true,
-			        loop: true,
 			        autoplay: {
 			            delay: 5000
 			        }
@@ -281,44 +293,32 @@
 						name: '',
 						url: require('../assets/images/ad1.png'),
 						link: ''
-					},
-					{
-						id: 1,
-						name: '',
-						url: require('../assets/images/ad1.png'),
-						link: ''
-					},
-					{
-						id: 2,
-						name: '',
-						url: require('../assets/images/ad1.png'),
-						link: ''
 					}
 				],
 				activity: [
 					{
 						id: '0',
-						name: '人脸识别迎重磅利好 2股望受益',
-						url: require('../assets/images/img1.png'),
-						link: ''
+						name: '深圳稳租金大招：限价租赁房“一年一调”，年租金涨幅不超5％',
+						url: require('../assets/images/ac1.png'),
+						link: 'https://wallstreetcn.com/articles/3396949'
 					},
 					{
 						id: '1',
-						name: '人脸识别迎重磅利好 2股望受益',
-						url: require('../assets/images/img1.png'),
-						link: ''
+						name: '中弘股份上演地天板走势 昨夜称与加多宝协议真实有效',
+						url: require('../assets/images/ac2.png'),
+						link: 'https://wallstreetcn.com/articles/3396868'
 					},
 					{
 						id: '2',
-						name: '人脸识别迎重磅利好 2股望受益',
-						url: require('../assets/images/img1.png'),
-						link: ''
+						name: '腾讯、中国人寿业绩不达预期 内地投资者史上最快速度出逃港股',
+						url: require('../assets/images/ac3.png'),
+						link: 'https://awtmt.com/articles/3396900?from=wscn'
 					},
 					{
 						id: '3',
-						name: '人脸识别迎重磅利好 2股望受益',
-						url: require('../assets/images/img1.png'),
-						link: ''
+						name: '不仅是中国 全球汽车销售都在放缓',
+						url: require('../assets/images/ac4.png'),
+						link: 'https://wallstreetcn.com/articles/3396840'
 					}
 				],
 				lattice: [
@@ -354,7 +354,7 @@
 					},
 				},
 				tabs: {
-					activeTab: 'list',
+					activeTab: 'simulation',
 					tabs: {
 						simulation: {
 							name: '我的模拟赛事',
@@ -489,6 +489,10 @@
 			}
 		},
 		methods: {
+			goLink(item) {
+				if(!item.link) return;
+				this.$router.push({path: '/news', query: {link: item.link}});
+			},
 			trade(item, acct) {
 				var json = {
 	                method: 'startexe',
@@ -501,16 +505,20 @@
 	            this.$utils.handleExe(json, function(){}, function(){})
 			},
 			changeCondition(data, item) {
-				if(data.isActive) return;
-				item.forEach(function(e, i) {
-					if(data.value == e.value) {
-						e.isActive = true;
-					}else {
-						e.isActive = false;
-					}
-				})
 				var that = this;
-				that.searchVal[data.type] = data.value;
+				if(!data.isActive) {
+					item.forEach(function(e, i) {
+						if(data.value == e.value) {
+							e.isActive = true;
+						}else {
+							e.isActive = false;
+						}
+					})
+					that.searchVal[data.type] = data.value;
+				}else {
+					data.isActive = false;
+					that.searchVal[data.type] = '';
+				}
 				//that.searchVal.racename = '';
 				that.searchVal.page.start = 0;
 				getList(that);
@@ -597,6 +605,11 @@
 		.swiper-container {
 			width: 100%;
 			min-width: 1200px;
+			.ad {
+				padding-top: 20px;
+				padding-bottom: 20px;
+				text-align: center;
+			}
 		}
 		.activity {
 			margin-top: 10px;
@@ -604,10 +617,12 @@
 				position: relative;
 				height: 196px;
 				background-size: cover;
+				cursor: pointer;
+				overflow: hidden;
 				span {
 					position: absolute;
 					left: 0;
-					bottom: 0;
+					bottom: -50px;
 					right: 0;
 					height: 50px;
 					line-height: 50px;
@@ -615,6 +630,14 @@
 					color: #fff;
 					font-size: 16px;
 					background: rgba(27, 27, 27, .6);
+					opacity: 0;
+					transition: all .4s;
+				}
+				&:hover {
+					span {
+						bottom: 0;
+						opacity: 1;
+					}
 				}
 			}
 		}
@@ -636,6 +659,9 @@
 					strong {
 						font-size: 14px;
 						color: #e20026;
+					}
+					.fall {
+						color: #6bca24;
 					}
 				}
 			}
@@ -752,6 +778,7 @@
 								line-height: 30px;
 								margin-right: 10px;
 								text-align: center;
+								cursor: pointer;
 								&.active {
 									color: #fff;
 									border-radius: 20px;
@@ -888,6 +915,15 @@
 	          margin-bottom: 25px;
 	        }
 	      }
+	    }
+	    .empty {
+	    	text-align: center;
+	    	line-height: 200px;
+	    	margin-top: 10px;
+	    	font-size: 16px;
+	    	color: #999;
+	    	border: 1px solid #dde1e6;
+	    	background: #fff;
 	    }
 	}
 </style>
