@@ -1,4 +1,5 @@
 var baseUrl = 'http://192.168.1.213:9080/fests/';
+//var baseUrl = 'http://192.168.1.21:8080/fests/'; //发布
 //var baseUrl = 'http://192.168.16.42:8080/';
 //var baseUrl = 'http://192.168.16.31:8080/fests/';
 //var baseUrl = 'http://192.168.16.40:8080/';
@@ -66,7 +67,7 @@ const CONFIG = {
 		},
 		message: "",
 		succflag: 0,
-		token: "e54f88d35c258f5865e76ad74ea2059ead9b53145beb378ce5dcc1fb953275dc"
+		token: "fda0e20ec756f664689aab1043db80bf88f59c1465e62c006dbeb8cb8e52d869"
 	},
 	codeTime: 60,	//验证码倒计时时间
 	pageSize: 10,

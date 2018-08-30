@@ -5,11 +5,9 @@
 				<el-button size="small" @click="goBack">
 				<i class="el-icon-arrow-left"></i></el-button>{{tabs.tabs.detail.data.racename}}
 			</h1>
-			<swiper :options="swiperOption" ref="mySwiper">
-			    <swiper-slide v-for="(item, index) in ads" :key="index">
-			    	<img :src="item.url" class="img-responsive">
-			    </swiper-slide>
-			</swiper>
+			<div>
+				<img :src="ad.url" class="img-responsive">
+			</div>
 			<div class="competitionDetail-body">
 				<el-tabs v-model="tabs.activeTab">
 				    <el-tab-pane :label="tabs.tabs.detail.name" name="detail" class="detail">
@@ -249,32 +247,14 @@
 		data() {
 			return {
 				swiperOption: {
-			        centeredSlides: true,
-			        loop: true,
-			        autoplay: {
-			            delay: 5000
-			        }
+			        centeredSlides: true
 		        },
-				ads: [
-					{
-						id: 0,
-						name: '',
-						url: require('../assets/images/ad1.png'),
-						link: ''
-					},
-					{
-						id: 1,
-						name: '',
-						url: require('../assets/images/ad1.png'),
-						link: ''
-					},
-					{
-						id: 2,
-						name: '',
-						url: require('../assets/images/ad1.png'),
-						link: ''
-					}
-				],
+				ad: {
+					id: 0,
+					name: '',
+					url: require('../assets/images/ad2.png'),
+					link: ''
+				},
 				saveRace: {},
 				isCodeLoading: false,
 				saveSignData: {},

@@ -94,7 +94,7 @@
 					      <template slot-scope="scope">
 					        <div class="expand-item" v-if="scope.row.handleList.length">
 					        	<div class="expand-item-left">
-					        		<div v-for="(item, index) in scope.row.handleList" :key="index" >
+					        		<div v-for="(item, index) in scope.row.handleList" :key="index" v-if="index < 3">
 					        			<div class="expand-item-tag">
 							        		<span :class="{'': item.opertype == 'I', 'del': item.opertype == 'D', 'update': item.opertype == 'U'}">{{ item.opertype == 'I' ? '加入' : item.opertype == 'D' ? '删除' : '更新'}}</span>
 							        	</div>
@@ -182,7 +182,7 @@
 							prop="remark"
 							label="添加理由">
 								<template slot-scope="scope">
-									<el-input v-model="scope.row.remark" placeholder="请输入内容"></el-input>
+									<el-input v-model="scope.row.remark" placeholder="请输入内容" maxlength="500"></el-input>
 								</template>
 							</el-table-column>
 						</el-table>
@@ -195,7 +195,7 @@
 					<el-dialog title="编辑选股理由" :visible.sync="modify.dialogVisible" class="modify" width="600px">
 						<el-form :model="modify.modifyForm.stock" :rules="modify.modifyRules" ref="modify">
 				          <el-form-item prop="remark">
-				            <el-input type="textarea" v-model="modify.modifyForm.stock.remark" placeholder="请输入选股理由"></el-input>
+				            <el-input type="textarea" v-model="modify.modifyForm.stock.remark" placeholder="请输入选股理由" maxlength="500"></el-input>
 				          </el-form-item>
 				        </el-form>
 						<span slot="footer" class="dialog-footer">
@@ -222,7 +222,7 @@
 							prop="remark"
 							label="删除理由">
 								<template slot-scope="scope">
-									<el-input v-model="scope.row.remark" placeholder="请输入内容"></el-input>
+									<el-input v-model="scope.row.remark" placeholder="请输入内容" maxlength="500"></el-input>
 								</template>
 							</el-table-column>
 						</el-table>

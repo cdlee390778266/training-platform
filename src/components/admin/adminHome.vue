@@ -1,6 +1,6 @@
 <template>
 	<div class="ahome">
-		<ql-head :nav="nav"></ql-head>
+		<div class="ahome-head"><ql-head :nav="nav"></ql-head></div>
 		<div class="ql-wrapper">
 			<div v-if="hadRace">
 				<div class="ahome-top">
@@ -39,7 +39,7 @@
 							<p><strong>账号类型</strong>{{account.usage == 0 ? '常规账户' : '竞赛账户'}}</p>
 							<p><strong>加入时间</strong>2018-4-23</p>
 							<div class="handle">
-							  	<span class="link" @click="jumpToDetail(account.raceid)">赛事详情</span>
+							  	<span class="link" @click="jumpToDetail(account.raceid)" v-if="account.usage != 0">赛事详情</span>
 							  	<span v-for="item in account.accts" @click="trade(item)">{{item.type == 1 ? '股票市场' : '期权市场'}}</span>
 							</div>
 						</div>
@@ -139,63 +139,54 @@
 						    	<div class="tab-body">
 						    		<el-table
 								    :data="tabs.holdPos.tableData"
+								    :key="tabs.holdPos.account.type"
 								    style="width: 100%">
 									    <el-table-column
 									      prop="code"
-									      label="股票代码"
-									      sortable>
+									      label="股票代码">
 									    </el-table-column>
 									    <el-table-column
 									      prop="name"
 									      label="股票名称"
-									      sortable>
+									      width="140">
 									    </el-table-column>
 									    <el-table-column
 									      prop="holdtype"
 									      label="持仓类别"
-									      sortable
-									      v-if="tabs.holdPos.tableData[0] && tabs.holdPos.tableData[0].holdtype">
+									      v-if="tabs.holdPos.account.type != 1">
 									    </el-table-column>
 									    <el-table-column
 									      prop="type"
 									      label="合约类型"
-									      sortable
-									      v-if="tabs.holdPos.tableData[0] && tabs.holdPos.tableData[0].type">
+									      v-if="tabs.holdPos.account.type != 1">
 									    </el-table-column>
 									    <el-table-column
 									      prop="hold"
-									      sortable
 									      label="持仓量">
 									    </el-table-column>
 									    <el-table-column
 									      prop="cost"
-									      sortable
 									      label="成本价">
 									    </el-table-column>
 									    <el-table-column
 									      prop="marketvalue"
-									      sortable
 									      label="证券市值">
 									    </el-table-column>
 									    <el-table-column
 									      prop="now"
-									      sortable
 									      label="现价">
 									    </el-table-column>
 									    <el-table-column
 									      prop="costbalance"
-									      sortable
 									      label="持仓成本">
 									    </el-table-column>
 									    <el-table-column
 									      prop="incomebalance"
-									      sortable
 									      label="盈亏金额">
 									    </el-table-column>
 									    <el-table-column
-									      sortable
 									      label="盈亏比率"
-									      v-if="tabs.holdPos.tableData[0] && tabs.holdPos.tableData[0].incomerate">
+									      v-if="tabs.holdPos.account.type == 1">
 									      	<template slot-scope="props">
 									      		{{ props.row.incomerate }}%
 									      	</template>
@@ -203,14 +194,13 @@
 									    <el-table-column
 									      prop="exerciseincome"
 									      label="行权盈亏"
-									      sortable
-									      v-if="tabs.holdPos.tableData[0] && tabs.holdPos.tableData[0].exerciseincome">
+									      v-if="tabs.holdPos.account.type != 1">
 									    </el-table-column>
 									    <el-table-column
 									      prop="dutyusedbail"
 									      label="保证金占用"
-									      sortable
-									      v-if="tabs.holdPos.tableData[0] && tabs.holdPos.tableData[0].dutyusedbail">
+									      v-if="tabs.holdPos.account.type != 1"
+									      >
 									    </el-table-column>
 								  	</el-table>
 								  	<el-pagination
@@ -652,6 +642,9 @@
     	that.$utils.getJson(that.$utils.CONFIG.api.hold, function(res) {
           	if(res.succflag == 0) {
             	that.tabs.holdPos.chart.chartData = res.data;
+            	that.$nextTick(_ => {
+		          that.$refs['veRing'].echarts.resize()
+		        })
           	}else {
             	that.$utils.showTip('error', '', '', res.message);
           	}
@@ -886,7 +879,7 @@
 		    },
 		    data: {}
     	},
-    	activeTab: 'holdPos',
+    	activeTab: 'assets',
     	tabs: {
     		assets: {
     			defaultData: {
@@ -924,8 +917,8 @@
     				options: {
     					legend: {
 							orient: 'vertical',
-							right: 200,
-							top: '35%',
+							right: 60,
+							top: '10%',
 							textStyle: {
 								color: '#666'
 							}
@@ -964,7 +957,7 @@
     			accountAcct: {},
 		        form: {
 		          tableType: '0',
-		          daterange: ''
+		          daterange: [(new Date().getTime()) - 1000 * 60 * 60 * 24 * 7, new Date()]
 		        },
 		        dateRangeOptions: {
 		          shortcuts: [{
@@ -1554,6 +1547,9 @@
 			.el-radio+.el-radio {
 				margin-left: 10px;
 			}
+		}
+		.ahome-head {
+			padding-top: 36px;
 		}
 	}
 </style>

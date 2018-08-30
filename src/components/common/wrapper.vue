@@ -38,7 +38,7 @@
 		  		<router-view/>
 		  	</div>
 		</div> -->
-		<router-view/>
+		<div class="main"><router-view /></div>
 	</div>
 </template>
 <script>
@@ -178,6 +178,9 @@
 </script>
 
 <style scoped lang="scss">
+	.main {
+		padding-top: 36px;
+	}
 	.ql-container {
 		.ql-menu {
 			position: absolute;

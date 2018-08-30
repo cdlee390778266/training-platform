@@ -183,7 +183,7 @@
 				getList(that);
 			},
 			search() {
-				if(!this.searchVal.racename) return;
+				//if(!this.searchVal.racename) return;
 				var that = this;
 				that.searchVal.page.start = 0;
 				that.list.data.currentPage = 1;

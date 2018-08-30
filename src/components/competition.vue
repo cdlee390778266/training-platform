@@ -524,7 +524,7 @@
 				getList(that);
 			},
 			search() {
-				if(!this.searchVal.racename) return;
+				//if(!this.searchVal.racename) return;
 				var that = this;
 				that.searchVal.page.start = 0;
 				getList(that);
@@ -564,8 +564,9 @@
 	                }
 	                that.$utils.getJson(that.$utils.CONFIG.api.signUp, function(res) {
 	                  if(res.succflag == 0) {
-	                  	that.saveSignData.stustatus = 1;
+	                  	that.$utils.showTip('success', '', '', res.message);
 	                  	that.signUp.dialogFormVisible = false;
+	                  	getList(that);
 	                  }else {
 	                    that.$utils.showTip('error', '', '', res.message);
 	                  }
