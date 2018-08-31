@@ -306,6 +306,7 @@
 						font-size: 12px;
 						color: #5091fa;
 						float: right;
+						cursor: pointer;
 					}
 				}
 				.simulation-img {

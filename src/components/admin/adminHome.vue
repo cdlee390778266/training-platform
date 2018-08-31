@@ -173,28 +173,34 @@
 									      label="证券市值">
 									    </el-table-column>
 									    <el-table-column
-									      prop="now"
 									      label="现价">
+									      <template slot-scope="scope">
+									        <span :class="{rise: scope.row.now > scope.row.cost, fall: scope.row.now < scope.row.cost}">{{ scope.row.now }}</span>
+									      </template>
 									    </el-table-column>
 									    <el-table-column
 									      prop="costbalance"
 									      label="持仓成本">
 									    </el-table-column>
 									    <el-table-column
-									      prop="incomebalance"
 									      label="盈亏金额">
+									      <template slot-scope="scope">
+									    	<span :class="{rise: scope.row.incomebalance > 0, fall: scope.row.incomebalance < 0}">{{ scope.row.incomebalance }}</span>
+									      </template>
 									    </el-table-column>
 									    <el-table-column
 									      label="盈亏比率"
 									      v-if="tabs.holdPos.account.type == 1">
-									      	<template slot-scope="props">
-									      		{{ props.row.incomerate }}%
-									      	</template>
+										    <template slot-scope="scope">
+										    	<span :class="{rise: scope.row.incomerate > 0, fall: scope.row.incomerate < 0}">{{ scope.row.incomerate }}%</span>
+										    </template>
 									    </el-table-column>
 									    <el-table-column
-									      prop="exerciseincome"
 									      label="行权盈亏"
 									      v-if="tabs.holdPos.account.type != 1">
+									      	<template slot-scope="scope">
+										    	<span :class="{rise: scope.row.exerciseincome > 0, fall: scope.row.exerciseincome < 0}">{{ scope.row.exerciseincome }}</span>
+										    </template>
 									    </el-table-column>
 									    <el-table-column
 									      prop="dutyusedbail"
@@ -1223,8 +1229,13 @@
 		    	that.accountList = that.$utils.CONFIG.account;
 		    	that.hadRace = false;
 		    	if(typeof raceid == 'undefined') {
-		    		that.account = that.accountList[0];
-		    		that.hadRace = true;
+		    		for(var i = 0; i < that.accountList.length; i++) {
+			    		if(that.accountList[i].usage == 0) {
+			    			that.account = that.accountList[i];
+			    			that.hadRace = true;
+			    			break;
+			    		}
+			    	}
 		    	}else {
 			    	for(var i = 0; i < that.accountList.length; i++) {
 			    		if(raceid == that.accountList[i].raceid) {

@@ -20,7 +20,8 @@ const CONFIG = {
 				depart: "",
 				major: "",
 				grade: "",
-				class: ""
+				class: "",
+				email: ''
 			},
 			account: [
 				{
@@ -67,7 +68,7 @@ const CONFIG = {
 		},
 		message: "",
 		succflag: 0,
-		token: "fda0e20ec756f664689aab1043db80bf88f59c1465e62c006dbeb8cb8e52d869"
+		token: "8c276f561298a5d53774291f3cd80b8fdc803b68175b2af020f01950d76b967c"
 	},
 	codeTime: 60,	//验证码倒计时时间
 	pageSize: 10,

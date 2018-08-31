@@ -699,6 +699,7 @@
 						font-size: 12px;
 						color: #5091fa;
 						float: right;
+						cursor: pointer;
 					}
 				}
 				.simulation-img {
@@ -740,6 +741,7 @@
 					a {
 						color: #5091fa;
 						margin-left: 20px;
+						cursor: pointer;
 					}
 					.el-button--danger {
 						float: right;
@@ -834,10 +836,33 @@
 					margin-top: 10px;
 					padding: 20px;
 					border: 1px solid #dde1e6;
+					//box-shadow: 0 0 2px 2px #ddd;
 					background: #fff;
+
 					.list-item-l {
+						position: relative;
 						width: 360px;
+						overflow: hidden;
 						background-size: cover;
+						&:after {
+							content: "";
+						    width: 150%;
+						    height: 150%;
+						    position: absolute;
+						    top: 50%;
+						    left: 50%;
+						    background: radial-gradient(rgba(255,255,255,0.1) 15%, transparent 15%) 0 0, radial-gradient(rgba(255,255,255,0.1) 15%, transparent 15%) 16px 16px, radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 0 1px, radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 16px 17px;
+						    background-size: 32px 32px;
+						    background-color: rgba(0,0,0,0.5);
+						    opacity: 0;
+						    z-index: 1;
+						    transform: translate(-50%, -50%) scale(0);
+						    transition: all 0.56s ease 0s;
+						}
+						&:hover:after {
+							opacity: 1;
+    						transform: translate(-50%, -50%) scale(1);
+						}
 					}
 					.list-item-c {
 						padding-left: 20px;

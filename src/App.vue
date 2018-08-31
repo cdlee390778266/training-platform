@@ -124,8 +124,8 @@ body {
   margin: 40px auto;
 }
 
-.el-button--danger:hover {
-  opacity: 0.9;
+.el-button:hover {
+  opacity: 0.8;
 }
 
 .el-table__empty-text {
@@ -134,6 +134,12 @@ body {
   height: 180px;
   padding-top: 120px;
   color: #999;
+}
+.rise {
+  color: #e20026;
+}
+.fall {
+  color: #6bca24;
 }
 .fade-enter-active, .fade-leave-active {
   transition: opacity .5s;

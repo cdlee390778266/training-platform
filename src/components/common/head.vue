@@ -1,78 +1,80 @@
 <template>
-  	<div class="header">
-      <div class="ql-wrapper">
-        <div class="ql-nav">
-          <ul class="ql-nav-ul">
-            <li v-for="item in nav">
-              <template v-if="item.handle =='startExe'">
-                <div @click="handle(item)">
-                  <i class="ql-nav-icon" :class="item.iconClass"></i>
-                    <span>{{item.text}}</span>
-                </div>
-              </template>
-              <template v-if="item.handle =='jumpToUrl'">
-                <router-link :to="item.handleData" v-if="!item.isExternalLink">
-                  <i class="ql-nav-icon" :class="item.iconClass"></i>
-                      <span>{{item.text}}</span>
-                </router-link>
-                <a :href="item.handleData" v-else>
-                  <i class="ql-nav-icon" :class="item.iconClass"></i>
-                    <span>{{item.text}}</span>
-                </a>
-              </template>
-              <template v-if="item.handle == 'dropdown'">
-                <el-dropdown>
-                  <span class="el-dropdown-link">
+    <div>
+    	<div class="header">
+        <div class="ql-wrapper">
+          <div class="ql-nav">
+            <ul class="ql-nav-ul">
+              <li v-for="item in nav">
+                <template v-if="item.handle =='startExe'">
+                  <div @click="handle(item)">
                     <i class="ql-nav-icon" :class="item.iconClass"></i>
-                    <strong>{{item.text}}<i class="el-icon-arrow-down el-icon-caret-bottom"></i></strong>
-                  </span>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item v-for="(data, index) in item.handleData" :key="index">
-                      <router-link :to="data.handleData" v-if="!data.isExternalLink">
-                          <span>{{data.text}}</span>
-                      </router-link>
-                      <a :href="data.handleData" v-else>
-                          <span>{{data.text}}</span>
-                      </a>
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
+                      <span>{{item.text}}</span>
+                  </div>
+                </template>
+                <template v-if="item.handle =='jumpToUrl'">
+                  <router-link :to="item.handleData" v-if="!item.isExternalLink">
+                    <i class="ql-nav-icon" :class="item.iconClass"></i>
+                        <span>{{item.text}}</span>
+                  </router-link>
+                  <a :href="item.handleData" v-else>
+                    <i class="ql-nav-icon" :class="item.iconClass"></i>
+                      <span>{{item.text}}</span>
+                  </a>
+                </template>
+                <template v-if="item.handle == 'dropdown'">
+                  <el-dropdown>
+                    <span class="el-dropdown-link">
+                      <i class="ql-nav-icon" :class="item.iconClass"></i>
+                      <strong>{{item.text}}<i class="el-icon-arrow-down el-icon-caret-bottom"></i></strong>
+                    </span>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item v-for="(data, index) in item.handleData" :key="index">
+                        <router-link :to="data.handleData" v-if="!data.isExternalLink">
+                            <span>{{data.text}}</span>
+                        </router-link>
+                        <a :href="data.handleData" v-else>
+                            <span>{{data.text}}</span>
+                        </a>
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </template>
+              </li>
+            </ul>
+          </div>
+      		<ul>
+      			<li v-for="(item, index) in header" :key="index">
+              <template v-if="item.isLink">
+      				    <router-link :to="item.data"><img :src="item.icon"/>{{item.text}}</router-link>
               </template>
-            </li>
-          </ul>
+              <template v-if="!item.isLink">
+                  <el-dropdown>
+                    <span class="el-dropdown-link">
+                      <router-link :to="item.linkUrl"><img :src="item.icon"/>{{item.text}}</router-link>
+                    </span>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item v-for="(data, index) in item.data" :key="index" v-if="!data.isHide">
+                        <template v-if="data.isLink">
+                          <router-link :to="data.data">{{data.text}}</router-link>
+                        </template>
+                        <template v-if="!data.isLink">
+                          <template v-if="data.isBindEmail">
+                            <span @click="email.dialogFormVisible = true">{{data.text}}</span>
+                          </template>
+                          <template v-else>
+                            <span>{{data.text}}</span>
+                          </template>
+                        </template>
+                      </el-dropdown-item>
+                      <el-dropdown-item divided>
+                        <div @click="loginOut">退出</div>
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+              </template>
+      			</li>
+      		</ul>
         </div>
-    		<ul>
-    			<li v-for="(item, index) in header" :key="index">
-            <template v-if="item.isLink">
-    				    <router-link :to="item.data"><img :src="item.icon"/>{{item.text}}</router-link>
-            </template>
-            <template v-if="!item.isLink">
-                <el-dropdown>
-                  <span class="el-dropdown-link">
-                    <router-link :to="item.linkUrl"><img :src="item.icon"/>{{item.text}}</router-link>
-                  </span>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item v-for="(data, index) in item.data" :key="index">
-                      <template v-if="data.isLink">
-                        <router-link :to="data.data">{{data.text}}</router-link>
-                      </template>
-                      <template v-if="!data.isLink">
-                        <template v-if="data.isBindEmail">
-                          <span @click="email.dialogFormVisible = true">{{data.text}}</span>
-                        </template>
-                        <template v-else>
-                          <span>{{data.text}}</span>
-                        </template>
-                      </template>
-                    </el-dropdown-item>
-                    <el-dropdown-item divided>
-                      <div @click="loginOut">退出</div>
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
-            </template>
-    			</li>
-    		</ul>
       </div>
       <!-- 绑定邮箱弹窗 -->
       <el-dialog title="绑定邮箱" :visible.sync="email.dialogFormVisible" class="bindEmail" width="600px">
@@ -97,7 +99,7 @@
           </el-form-item>
         </el-form>
       </el-dialog>
-  	</div>
+    </div>
 </template>
 <script>
     var saveCode = '';
@@ -135,10 +137,11 @@
                   text: '绑定邮箱',
                   data:'/admin/setting/email',
                   isBindEmail: true,
-                  isLink: false
+                  isLink: false,
+                  isHide: this.$utils.CONFIG.loginData.data.student.email ? true : false
                 },
                 {
-                  text: '账号设置',
+                  text: '个人设置',
                   data:'/admin/setting',
                   isLink: true
                 }
