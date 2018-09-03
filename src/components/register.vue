@@ -108,7 +108,7 @@
 					],
 					code: [
 						{ required: true, message: '请输入验证码', trigger: 'blur' },
-						{ validator: checkCode, trigger: 'blur' }
+						{ min: 4, max: 4, message: '请输入4位验证码', trigger: 'blur' }
 					],
 					pass: [
 						{ required: true, message: '请设置密码', trigger: 'blur' },
@@ -176,7 +176,7 @@
 						}
 						that.$utils.getJson(that.$utils.CONFIG.api.register, function(res) {
 							if(res.succflag == 0) {
-								that.$utils.showTip('success', '', '', res.message);
+								that.$utils.showTip('success', 'success', '106');
 								that.$refs['registerForm'].resetFields();
 							}else {
 								that.$utils.showTip('error', '', '', res.message);
@@ -207,6 +207,9 @@
 			}else {
 				this.$utils.showTip('error', 'error', '-1050');
 			}
+		},
+		destroyed: function () {
+			clearInterval(this.timer)
 		}
 	}
 </script>

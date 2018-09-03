@@ -1,4 +1,5 @@
 var baseUrl = 'http://192.168.1.213:9080/fests/';
+//var baseUrl = 'http://qlcdyf.vicp.net:8080/fests/';
 //var baseUrl = 'http://192.168.1.21:8080/fests/'; //发布
 //var baseUrl = 'http://192.168.16.42:8080/';
 //var baseUrl = 'http://192.168.16.31:8080/fests/';
@@ -15,7 +16,7 @@ const CONFIG = {
 		data: {
 			student: {
 				studentid: "",
-				name: "打酱油",
+				name: "今晚打老虎",
 				college: null,
 				depart: "",
 				major: "",
@@ -68,7 +69,7 @@ const CONFIG = {
 		},
 		message: "",
 		succflag: 0,
-		token: "8c276f561298a5d53774291f3cd80b8fdc803b68175b2af020f01950d76b967c"
+		token: "bce8a68fd57f6aabd071a053f0b0be922ae39baeb871522ee98ed82062e5fdac"
 	},
 	codeTime: 60,	//验证码倒计时时间
 	pageSize: 10,
@@ -127,7 +128,8 @@ const CONFIG = {
 		'102': "",
 		'103': "",
 		'104': "已退出",
-		'105': ""
+		'105': "",
+		'106': "注册成功"
 	},
 	error: {
 		'-1': '加载数据失败，请检查网络！',
@@ -140,6 +142,7 @@ const CONFIG = {
 		'-1030': '至少选中一条数据！',
 		'-1040': '',
 		'-1050': '非法操作！',
+		'-1060': '注册失败'
 	}
 }
 

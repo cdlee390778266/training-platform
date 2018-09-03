@@ -71,9 +71,11 @@
 		    				<p v-if="item.ranking"><strong>当前排名：</strong>{{item.ranking}}</p>
 		    			</div>
 		    			<div class="list-item-r">
-		    				<el-button class="bt2" @click.stop="jump(item, 'entry')">进入我的课程</el-button>
-							<el-button class="bt3" @click.stop="jump(item, 'sort')">查看课程排名</el-button>
-		    				<el-button type="danger" v-if="item.racestatus == 41" v-for="(acct, index) in item.fuacct" :key="index" @click.stop="trade(item, acct)">{{acct.fuaccttype == 1 ? '竞赛交易' : '期权交易'}}</el-button>
+		    				<div>
+			    				<el-button class="bt2" @click.stop="jump(item, 'entry')">进入我的课程</el-button>
+								<el-button class="bt3" @click.stop="jump(item, 'sort')">查看课程排名</el-button>
+			    				<el-button type="danger" v-if="item.racestatus == 41" v-for="(acct, index) in item.fuacct" :key="index" @click.stop="trade(item, acct)">{{acct.fuaccttype == 1 ? '竞赛交易' : '期权交易'}}</el-button>
+			    			</div>
 		    			</div>
 		    		</div>
 		    		<div class="pager-wrapper">
@@ -462,9 +464,14 @@
 						}
 					}
 					.list-item-r {
+						display: table;
 						width: 140px;
-						padding-top: 40px;
+						height: 254px;
 						text-align: center;
+						& > div {
+							display: table-cell;
+							vertical-align: middle;
+						}
 						a, button {
 							display: inline-block;
 							width: 110px;

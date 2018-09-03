@@ -38,12 +38,20 @@ Utils.getTipText = function(type , code) {
  * @param      {<string>}  code        提示代码
  */
 Utils.showTip = function(type, textType, code, text) {
-	Message({
-      showClose: true,
-      message: text ? text : Utils.getTipText(textType, code),
-      type: type ? type: 'success'
+	MessageBox({
+		title: '消息',
+		showClose: true,
+		message: text ? text : Utils.getTipText(textType, code),
+		type: type ? type: 'success'
     })
 }
+// Utils.showTip = function(type, textType, code, text) {
+// 	Message({
+//       showClose: true,
+//       message: text ? text : Utils.getTipText(textType, code),
+//       type: type ? type: 'success'
+//     })
+// }
 
 /**
  * Hides the tip. 关闭提示框

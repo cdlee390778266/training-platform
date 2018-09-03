@@ -372,10 +372,6 @@
 									      label="总收益(元)">
 									    </el-table-column>
 									    <el-table-column
-									      prop="nativeassetvalue"
-									      label="单位净值">
-									    </el-table-column>
-									    <el-table-column
 									      prop="operatetimes"
 									      label="操作次数">
 									    </el-table-column>
@@ -1024,10 +1020,6 @@
 			        {
 			          value: 'TI',
 			          label: '总收益'
-			        },
-			        {
-			          value: 'NAV',
-			          label: '单位净值'
 			        },
 			        {
 			          value: 'OT',

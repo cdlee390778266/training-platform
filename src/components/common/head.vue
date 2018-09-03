@@ -50,7 +50,7 @@
               <template v-if="!item.isLink">
                   <el-dropdown>
                     <span class="el-dropdown-link">
-                      <router-link :to="item.linkUrl"><img :src="item.icon"/>{{item.text}}</router-link>
+                      <a><img :src="item.icon"/>{{item.text}}</a>
                     </span>
                     <el-dropdown-menu slot="dropdown">
                       <el-dropdown-item v-for="(data, index) in item.data" :key="index" v-if="!data.isHide">
@@ -67,7 +67,7 @@
                         </template>
                       </el-dropdown-item>
                       <el-dropdown-item divided>
-                        <div @click="loginOut">退出</div>
+                        <div @click="loginOut" class="loginOut">退出</div>
                       </el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
@@ -129,8 +129,8 @@
               linkUrl: '/admin/home',
   						data: [
                 {
-                  text: '个人信息',
-                  data:'/admin/userinfo',
+                  text: '个人中心',
+                  data:'/admin/home',
                   isLink: true
                 },
                 {
@@ -242,6 +242,8 @@
                   if(res.succflag == 0) {
                     that.$utils.showTip('success', '', '', res.message);
                     that.email.dialogFormVisible = false;
+                    that.$utils.CONFIG.loginData.data.student.email = that.email.emailForm.email;
+                    that.header[1].data[1].isHide = true;
                     that.$refs['bindEmailForm'].resetFields();
                   }else {
                     that.$utils.showTip('error', '', '', res.message);
@@ -265,11 +267,16 @@
                   }
                   that.$utils.handleExe(json, function(){}, function(){});
                   that.$utils.showTip('success', 'success', '104');
+                  that.$utils.CONFIG.loginData.token = '';
+                  that.$router.push('/home');
                 }else {
                   that.$utils.showTip('error', '', '', res.message);
                 }
               }, function() {}, {}, false, {token: that.$utils.CONFIG.token})
           }
+      },
+      destroyed: function () {
+        clearInterval(this.timer)
       }
   	}
 </script>
@@ -395,6 +402,9 @@
           }
         }
       }
+    }
+    .loginOut {
+      color: #f0b310;
     }
     .bindEmail {
       .el-dialog__header {

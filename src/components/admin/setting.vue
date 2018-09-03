@@ -17,6 +17,42 @@
   						  <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">保存</el-button>
 						</el-upload>
 				    </el-tab-pane> -->
+				    <el-tab-pane label="个人信息" name="userinfo" class="userinfo">
+				    	<ul>
+							<li>
+								<strong>学号:</strong>
+								<span class="ellipsis">{{tabs.userinfo.data.studentid}}</span>
+							</li>
+							<li>
+								<strong>真实姓名:</strong>
+								<span class="ellipsis">{{tabs.userinfo.data.name}}</span>
+							</li>
+							<li>
+								<strong>学院:</strong>
+								<span class="ellipsis">{{tabs.userinfo.data.college}}</span>
+							</li>
+							<li>
+								<strong>学系:</strong>
+								<span class="ellipsis">{{tabs.userinfo.data.depart}}</span>
+							</li>
+							<li>
+								<strong>年级:</strong>
+								<span class="ellipsis">{{tabs.userinfo.data.grade}}</span>
+							</li>
+							<li>
+								<strong>专业方向:</strong>
+								<span class="ellipsis">{{tabs.userinfo.data.major}}</span>
+							</li>
+							<li>
+								<strong>邮箱:</strong>
+								<span class="ellipsis">{{tabs.userinfo.data.email}}</span>
+							</li>
+							<li>
+								<strong>手机号码:</strong>
+								<span class="ellipsis">{{tabs.userinfo.data.tel}}</span>
+							</li>
+						</ul>
+				    </el-tab-pane>
 				    <el-tab-pane label="修改密码" name="pwd">
 				    	<el-form :model="tabs.pwd.pwdForm" status-icon :rules="tabs.pwd.pwdRules" ref="pwdForm" label-width="100px" class="demo-ruleForm">
 				    	  <el-form-item label="原密码" prop="oldPass">
@@ -145,11 +181,25 @@
 				}
 		      };
 			return {
-				activeName: 'pwd',
+				activeName: 'userinfo',
 				tabs: {
 					face: {
 						faceUrl: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
 
+					},
+					userinfo: {
+						faceUrl: 'https://img.mukewang.com/user/5afe3d350001596a02430243-100-100.jpg',
+						data: {
+							studentid: '',
+							name: '',
+							college: '',
+							depart: '',
+							major: '',
+							grade: '',
+							class: '',
+							tel: '',
+							email: ''
+						 }
 					},
 					pwd: {
 						pwdForm: {
@@ -374,6 +424,16 @@
 	          }
 	        });
 	      }
+	    },
+	    created() {
+	    	var that = this;
+	    	that.$utils.getJson(that.$utils.CONFIG.api.getUserInfo, function(res) {
+				if(res.succflag == 0) {
+					that.tabs.userinfo.data = res.data;
+				}else {
+					that.$utils.showTip('error', '', '', res.message);
+				}
+			}, function() {}, {}, true, {token: that.$utils.CONFIG.token})
 	    }
 	}
 </script>
@@ -426,6 +486,32 @@
 		    top: 4px;
 		    right: 5px;
 		    background: #e30129;
+		}
+		.userinfo {
+			width: 600px;
+			margin: 100px auto;
+			color: #969595;
+			li {
+				display: flex;
+				line-height: 40px;
+				margin-bottom: 40px;
+				strong {
+					display: inline-block;
+					width: 100px;
+					text-align: right;
+				}
+				span {
+					display: inline-block;
+					width: 480px;
+					height: 40px;
+					line-height: 40px;
+					padding-left: 30px;
+					padding-right: 30px;
+					margin-left: 30px;
+					border: 1px solid #e3e9ee;
+					border-radius: 4px;
+				}
+			}
 		}
 	}
 </style>

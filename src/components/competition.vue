@@ -94,6 +94,7 @@
 				    			<span>比赛总数</span>
 				    		</div>
 				    	</div>
+
 				    	<div class="list" v-if="tabs.tabs.list.data.list && tabs.tabs.list.data.list.length">
 				    		<div class="list-item" v-for="(item, index) in tabs.tabs.list.data.list" @click="jump(item, 'detail')">
 				    			<div class="list-item-l" :style="'background-image: url(' + item.url + ');'" v-if="item.url"></div>
@@ -152,10 +153,12 @@
 				    				<p><strong>比赛时间：</strong>{{item.racestarttime}}--{{item.raceendtime}}</p>
 				    			</div>
 				    			<div class="list-item-r">
-				    				<el-button class="bt2" @click.stop="jump(item, 'entry')" v-if="item.stustatus != 0">进入我的比赛</el-button>
-									<el-button class="bt3" @click.stop="jump(item, 'sort')" v-if="item.stustatus == 2 || item.stustatus == 10">查看赛事排名</el-button>
-				    				<el-button class="bt4" @click.stop="openDialog(item)" v-if="item.stustatus == 0">立即参加</el-button>
-				    				<el-button type="danger" v-if="item.stustatus == 2" v-for="(acct, index) in item.fuacct" :key="index" @click.stop="trade(item, acct)">{{acct.fuaccttype == 1 ? '竞赛交易' : '期权交易'}}</el-button>
+				    				<div>
+					    				<el-button class="bt2" @click.stop="jump(item, 'entry')" v-if="item.stustatus != 0">进入我的比赛</el-button>
+										<el-button class="bt3" @click.stop="jump(item, 'sort')" v-if="item.stustatus == 2 || item.stustatus == 10">查看赛事排名</el-button>
+					    				<el-button class="bt4" @click.stop="openDialog(item)" v-if="item.stustatus == 0">立即参加</el-button>
+					    				<el-button type="danger" v-if="item.stustatus == 2" v-for="(acct, index) in item.fuacct" :key="index" @click.stop="trade(item, acct)">{{acct.fuaccttype == 1 ? '竞赛交易' : '期权交易'}}</el-button>
+					    			</div>
 				    			</div>
 				    		</div>
 				    		<div class="pager-wrapper">
@@ -166,6 +169,7 @@
 								</el-pagination>
 				    		</div>
 				    	</div>
+
 				    	<div class="empty" v-else>
 							没有符合条件的赛事
 						</div>
@@ -838,6 +842,11 @@
 					border: 1px solid #dde1e6;
 					//box-shadow: 0 0 2px 2px #ddd;
 					background: #fff;
+					transition: all .4s;
+
+					&:hover {
+						box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+					}
 
 					.list-item-l {
 						position: relative;
@@ -857,7 +866,8 @@
 						    opacity: 0;
 						    z-index: 1;
 						    transform: translate(-50%, -50%) scale(0);
-						    transition: all 0.56s ease 0s;
+						    transition: all 0.4s ease 0s;
+						    cursor: pointer;
 						}
 						&:hover:after {
 							opacity: 1;
@@ -879,9 +889,14 @@
 						}
 					}
 					.list-item-r {
+						display: table;
 						width: 140px;
-						padding-top: 40px;
+						height: 254px;
 						text-align: center;
+						& > div {
+							display: table-cell;
+							vertical-align: middle;
+						}
 						a, button {
 							display: inline-block;
 							width: 110px;

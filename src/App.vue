@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-      <transition name="fade">
-          <router-view class="appWrapper"/>
+      <transition name="el-zoom-in-top">
+          <router-view/>
       </transition>
   </div>
 </template>

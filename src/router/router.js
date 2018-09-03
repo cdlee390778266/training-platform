@@ -1,28 +1,28 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import Utils from '../js/utils.js'
 
-const Home  = () => import('../components/home')
+const Home  = () => import(/* webpackChunkName: "common" */ '../components/home')
+const Register  = () => import(/* webpackChunkName: "common" */ '../components/register.vue')
+const GetPwd  = () => import(/* webpackChunkName: "common" */ '../components/getPwd.vue')
+const ActiveAccount  = () => import(/* webpackChunkName: "common" */ '../components/activeAccount.vue')
 
 const Wrapper  = () => import('../components/common/wrapper.vue')
-const Competition  = () => import('../components/competition.vue')
-const News  = () => import('../components/news.vue')
-const CompetitionDeail  = () => import('../components/competitionDetail.vue')
-const StockSelection  = () => import('../components/stockselection.vue')
-const Live  = () => import('../components/live.vue')
-const Base  = () => import('../components/base.vue')
-const Curriculum  = () => import('../components/curriculum.vue')
-const CurriculumDetail  = () => import('../components/curriculumDetail.vue')
+const Competition  = () => import(/* webpackChunkName: "Competition" */ '../components/competition.vue')
+const CompetitionDeail  = () => import(/* webpackChunkName: "Competition" */ '../components/competitionDetail.vue')
+const News  = () => import(/* webpackChunkName: "Competition" */ '../components/news.vue')
+const StockSelection  = () => import(/* webpackChunkName: "wrapper" */ '../components/stockselection.vue')
+const Live  = () => import(/* webpackChunkName: "iframe" */ '../components/live.vue')
+const Base  = () => import(/* webpackChunkName: "iframe" */ '../components/base.vue')
+const Curriculum  = () => import(/* webpackChunkName: "Curriculum" */ '../components/curriculum.vue')
+const CurriculumDetail  = () => import(/* webpackChunkName: "Curriculum" */ '../components/curriculumDetail.vue')
 
 const AdminWrapper  = () => import('../components/admin/adminWrapper.vue')
 const MsgCenter  = () => import('../components/msgCenter.vue')
-const AdminHome  = () => import('../components/admin/adminHome.vue')
-const Reply  = () => import('../components/admin/reply.vue')
-const UserInfo  = () => import('../components/admin/userInfo.vue')
-const Setting  = () => import('../components/admin/setting.vue')
-
-const Register  = () => import('../components/register.vue')
-const GetPwd  = () => import('../components/getPwd.vue')
-const ActiveAccount  = () => import('../components/activeAccount.vue')
+const AdminHome  = () => import(/* webpackChunkName: "admin" */ '../components/admin/adminHome.vue')
+const Reply  = () => import(/* webpackChunkName: "admin" */ '../components/admin/reply.vue')
+const UserInfo  = () => import(/* webpackChunkName: "admin" */ '../components/admin/userInfo.vue')
+const Setting  = () => import(/* webpackChunkName: "admin" */ '../components/admin/setting.vue')
 
 Vue.use(Router)
 
@@ -152,25 +152,25 @@ const router = new Router({
       path: '**',
       redirect: '/home'
     }
-    // {
-    //   path: '/quotation',
-    //   name: 'quotation',
-    //   component: Quotation,
-    //   meta: { title: '行情导出'},
-    //   beforeEnter: (to, from, next) => {
-    //     if(Utils.getUser().name) next()
-    //   }
-    // },
   ],
   scrollBehavior (to, from, savedPosition) {
     return { x: 0, y: 0 }
   }
 })
 
+var canGoArr = ['register', 'getpwd', 'activeaccount'];
+
 router.beforeEach((to, from, next) => {
-  /* 路由发生变化修改页面title */
-  document.title = to.meta.title || '高校金融实训平台'
-  next()
+  if(Utils.CONFIG.loginData.token || canGoArr.includes(to.name)) {
+    /* 路由发生变化修改页面title */
+    document.title = to.meta.title || '高校金融实训平台'
+    next()
+  }else {
+    if(to.name == 'home') {
+      next();
+    }
+    Utils.showTip('error', 'error', '-1050');
+  }
 })
 
 export default router;
