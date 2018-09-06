@@ -84,6 +84,7 @@
 			}
 		},
 		created() {
+			this.$utils.refreshLoginData(this);
 			document.onmousemove=function(ev){
 		       var oevent= ev||event;
 		       var aimg= document.getElementsByClassName('homeImg');

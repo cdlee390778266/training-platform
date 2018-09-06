@@ -1,9 +1,9 @@
-var baseUrl = 'http://192.168.1.213:9080/fests/';
+var baseUrl = 'http://112.19.171.231:8080/fests/';
+//var baseUrl = 'http://192.168.1.213:9080/fests/';
 //var baseUrl = 'http://qlcdyf.vicp.net:8080/fests/';
 //var baseUrl = 'http://192.168.1.21:8080/fests/'; //发布
 //var baseUrl = 'http://192.168.16.42:8080/';
 //var baseUrl = 'http://192.168.16.31:8080/fests/';
-//var baseUrl = 'http://192.168.16.40:8080/';
 
 const CONFIG = {
 	cookieKey: 'user',
@@ -69,7 +69,7 @@ const CONFIG = {
 		},
 		message: "",
 		succflag: 0,
-		token: "bce8a68fd57f6aabd071a053f0b0be922ae39baeb871522ee98ed82062e5fdac"
+		token: "fd45fed3ea2dfcfa1051fc2c6ac6ac3c509ba9dbd5aaebfdbcf9ac351e16a173"
 	},
 	codeTime: 60,	//验证码倒计时时间
 	pageSize: 10,
@@ -84,7 +84,8 @@ const CONFIG = {
 		editTel: baseUrl + 'my/edittel.do', //修改手机号
 		loginOut: baseUrl + 'my/logout.do', //退出
 
-		hq: 'http://192.168.1.213:9080/quotescenter/service', //行情
+		//hq: 'http://192.168.1.213:9080/quotescenter/service', //行情
+		hq: 'http://112.19.171.231:9120/quotescenter/service', //行情
 		myRacelist: baseUrl + 'competition/myracelist.do', //模拟赛列表
 		competitionList: baseUrl + 'competition/list.do', //赛事列表
 		signUp: baseUrl + 'competition/signup.do', //赛事报名

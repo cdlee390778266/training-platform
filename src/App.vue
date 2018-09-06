@@ -31,33 +31,7 @@ export default {
           break;
         }
     }
-    this.$utils.getLoginData(function(res) {
-        var res = JSON.parse(res);
-        that.$utils.CONFIG.loginData = res;
-        that.$utils.CONFIG.token = that.$utils.CONFIG.loginData.token;
-        that.$utils.CONFIG.account = that.$utils.CONFIG.loginData.data.account;
-        for(var i = 0; i < that.$utils.CONFIG.account.length; i++) {
-            if(that.$utils.CONFIG.account[i].usage == 0) {
-              for(var j = 0; j < that.$utils.CONFIG.account[i].accts.length; j++) {
-                if(that.$utils.CONFIG.account[i].accts[j].type == 1) {
-                  that.$utils.CONFIG.mainAccount1 = that.$utils.CONFIG.account[i].accts[j];
-                }else if(that.$utils.CONFIG.account[i].accts[j].type == 2) {
-                  that.$utils.CONFIG.mainAccount2 = that.$utils.CONFIG.account[i].accts[j];
-                }
-              }
-              break;
-            }
-        }
-    }, function(error) {
-        // alert(error);
-    })
-
-    this.$utils.getUniversityCode(function(res) {
-        that.$utils.CONFIG.universitycode = res;
-    }, function(error) {
-        // alert(error);
-    })
-
+    this.$utils.refreshLoginData(this);
   }
 }
 </script>
