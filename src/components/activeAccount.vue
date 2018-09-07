@@ -166,7 +166,7 @@
 <style lang="scss">
 	.activeAccount {
 		.activeAccount-box {
-			width: 800px;
+			width: 1200px;
 			padding: 40px 60px 100px 60px;
 			margin: 100px auto;
 			background: #fff;
@@ -175,29 +175,49 @@
 				color: #7d858d;
 			}
 			.activeAccount-form {
-				padding: 100px 85px;
+				padding: 100px 0px;
 				font-size: 16px;
+				width: 430px;
+				margin: 0 auto;
 				.el-form-item__label {
 					color: #999;
 					font-size: 16px;
 				}
+				.el-form-item {
+					margin-bottom: 18px;
+				}
 				.el-input {
 					font-size: 16px;
+					input {
+						width: 300px;
+					}
 				}
 				.el-input__inner {
 					border: 1px solid #e3e3e3;
 				}
+				.el-input__suffix {
+					right: 15px;
+				}
 				.code {
 					.el-input {
-						width: 252px;
+						width: 180px;
     					margin-right: 10px;
+    					input {
+    						width: 100%;
+    					}
 					}
 					.el-button {
-						width: 122px;
-						background: #f6f6f6;
+						width: 106px;
 						color: #999;
 						font-size: 16px;
+						padding-left: 0;
+						padding-right: 0;
+						text-align: center;
 						border: 1px solid #e3e3e3;
+						background: #f6f6f6;
+					}
+					.el-input__suffix {
+						right: 5px;
 					}
 				}
 				.activeAccount-submit {
@@ -209,6 +229,52 @@
 						font-size: 16px;
 						background: linear-gradient(to right, #dd0a36 , #ff6530);
 					}
+				}
+				.el-form-item__error {
+					position: absolute;
+					left: 320px;
+					top: 3px;
+					height: 36px;
+					line-height: 36px;
+					word-break:keep-all;
+					white-space:nowrap;
+					padding: 0 25px;
+					color: #999999;
+					border-radius: 10px;
+					box-shadow: 0 2px 12px 5px #e8edf2;
+					&:before {
+						content: '';
+						position: absolute;
+						left: 10px;
+						top: 15px;
+						display: block;
+						width: 7px;
+						height: 7px;
+						background: url('../assets/images/icons/error-icon.png') no-repeat;
+					}
+					&:after {
+						content: '';
+						position: absolute;
+						left: -3px;
+    					top: 11px;
+						display: block;
+						width: 0px;
+						height: 0px;
+						border-right: 8px  solid transparent;
+						border-top: 8px  solid transparent;
+						border-left: 8px  solid #fff;
+						border-bottom: 8px  solid #fff;
+						transform: rotate(45deg);
+					}
+				}
+				.el-form-item.is-error .el-input__validateIcon {
+					color: #fb6333;
+				}
+				.el-form-item.is-success .el-input__validateIcon {
+					color: #90c321;
+				}
+				.el-input__inner:focus {
+					border: 1px solid #fb6333 !important;
 				}
 			}
 		}

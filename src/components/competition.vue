@@ -26,42 +26,55 @@
 			<div class="competition-body">
 				<el-tabs v-model="tabs.activeTab">
 				    <el-tab-pane :label="tabs.tabs.simulation.name" name="simulation">
-				    	<el-row :gutter="20" v-if="tabs.tabs.simulation.dataList && tabs.tabs.simulation.dataList.length">
-							<el-col :span="12" v-for="(item, index) in tabs.tabs.simulation.dataList" :key="index">
-								<div class="simulation-item" @click="jump(item, 'entry')">
-									<div class="simulation-bar">{{item.racename  | strLen(32)}} <a @click.stop="jump(item, 'detail')">查看详情</a></div>
-									<div class="simulation-img" :style="'background-image: url(' + item.url + ');'" v-if="item.url"></div>
-									<div class="simulation-img" :style="'background-image: url(' + tabs.tabs.simulation.defaultImg + ');'" v-else></div>
-									<el-row :gutter="20" class="simulation-text">
-										<template v-if="item.racestatus != 41">
-											<el-col :span="8">
-												<strong class="simulation-text-type1">{{item.dayupdown}}</strong>
-												<span>日涨跌幅</span>
-											</el-col>
-											<el-col :span="8" >
-												<strong class="simulation-text-type2">{{item.dayincome}}</strong>
-												<span>昨日收益</span>
-											</el-col>
-											<el-col :span="8">
-												<strong class="simulation-text-type3">{{item.totalincomerate}}</strong>
-												<span>总收益</span>
-											</el-col>
-										</template>
-										<template v-else>
-											<el-col :span="24">
-												<p>{{item.raceDesc | strLen(115)}}</p>
-											</el-col>
-										</template>
-									</el-row>
-									<div class="simulation-trade">
-										当前排名：<span>{{item.ranking}}</span>
-										<a @click.stop="jump(item, 'sort')">查看排行榜</a>
+				    	<div v-if="tabs.tabs.simulation.dataList && tabs.tabs.simulation.dataList.length">
+					    	<el-row :gutter="20">
+								<el-col :span="12" v-for="(item, index) in tabs.tabs.simulation.dataList" :key="index">
+									<div class="simulation-item" @click="jump(item, 'entry')">
+										<div class="simulation-bar">{{item.racename  | strLen(32)}} <a @click.stop="jump(item, 'detail')">查看详情</a></div>
+										<div class="simulation-img" :style="'background-image: url(' + item.bannerpic + ');'" v-if="item.bannerpic"></div>
+										<div class="simulation-img" :style="'background-image: url(' + tabs.tabs.simulation.defaultImg + ');'" v-else></div>
+										<el-row :gutter="20" class="simulation-text">
+											<template v-if="item.racestatus != 41">
+												<el-col :span="6">
+													<strong class="simulation-text-type1">{{item.profit.toFixed(2)}}</strong>
+													<span>昨日收益</span>
+												</el-col>
+												<el-col :span="6" >
+													<strong class="simulation-text-type2">{{(item.profitrate*100).toFixed(2)}}%</strong>
+													<span>昨日收益率</span>
+												</el-col>
+												<el-col :span="6">
+													<strong class="simulation-text-type1">{{item.totalprofit.toFixed(2)}}</strong>
+													<span>总收益</span>
+												</el-col>
+												<el-col :span="6">
+													<strong class="simulation-text-type2">{{(item.totalprofitrate*100).toFixed(2)}}%</strong>
+													<span>总收益率</span>
+												</el-col>
+											</template>
+											<template v-else>
+												<el-col :span="24">
+													<p>{{item.racedesc | strLen(115)}}</p>
+												</el-col>
+											</template>
+										</el-row>
+										<div class="simulation-trade">
+											当前排名：<span>{{item.ranking}}</span>
+											<a @click.stop="jump(item, 'sort')">查看排行榜</a>
 
-										<el-button type="danger" v-for="(acct, index) in item.fuacct" :key="index" @click.stop="trade(item, acct)">{{acct.fuaccttype == 1 ? '竞赛交易' : '期权交易'}}</el-button>
+											<el-button type="danger" v-for="(acct, index) in item.fuacct" :key="index" @click.stop="trade(item, acct)">{{acct.fuaccttype == 1 ? '竞赛交易' : '期权交易'}}</el-button>
+										</div>
 									</div>
-								</div>
-							</el-col>
-						</el-row>
+								</el-col>
+							</el-row>
+							<div class="pager-wrapper">
+				    			<el-pagination
+								  background
+								  layout="prev, pager, next"
+								  :total="tabs.tabs.simulation.page.responsetotal" @current-change="changePage" :page-size="tabs.tabs.simulation.pageSize">
+								</el-pagination>
+				    		</div>
+						</div>
 						<div class="empty" v-else>
 							未参加任何赛事
 						</div>
@@ -71,10 +84,10 @@
 				    		<div class="search-l">
 				    			<div class="search-item" v-for="(item, index) in tabs.tabs.list.search.condition">
 				    				<div class="search-item-type">
-				    					{{item.name}}
+				    					{{item.title}}
 				    				</div>
 				    				<div class="search-item-list">
-				    					<span v-for="(data, index) in item.list" @click="changeCondition(data, item.list)" :class="{active: data.isActive}">{{data.name}}</span>
+				    					<span v-for="(data, index) in item.rows" @click="changeCondition(data, item.rows, item.key)" :class="{active: data.isActive}">{{data.typename}}</span>
 				    				</div>
 				    			</div>
 								<div class="search-item">
@@ -97,12 +110,12 @@
 
 				    	<div class="list" v-if="tabs.tabs.list.data.list && tabs.tabs.list.data.list.length">
 				    		<div class="list-item" v-for="(item, index) in tabs.tabs.list.data.list" @click="jump(item, 'detail')">
-				    			<div class="list-item-l" :style="'background-image: url(' + item.url + ');'" v-if="item.url"></div>
+				    			<div class="list-item-l" :style="'background-image: url(' + item.bannerpic + ');'" v-if="item.bannerpic"></div>
 				    			<div class="list-item-l" :style="'background-image: url(' + tabs.tabs.list.data.defaultImg + ');'" v-else></div>
 				    			<div class="list-item-c">
 				    				<h2>{{item.racename}}</h2>
 				    				<p><strong>主办方：</strong>{{item.hostunit}}</p>
-				    				<p><strong>比赛性质：</strong>{{item.type}}</p>
+				    				<!-- <p><strong>比赛性质：</strong>{{item.type}}</p> -->
 				    				<p>
 				    					<strong>报名状态：</strong>
 				    					<template v-if="item.entrystatus == 41">
@@ -114,7 +127,7 @@
 				    					<template v-else-if="item.entrystatus == 4999">
 				    						报名结束
 				    					</template>
-				    					<template v-else>
+				    					<template v-else-if="item.entrystatus == 0">
 				    						其他状态
 				    					</template>
 				    				</p>
@@ -129,24 +142,24 @@
 				    					<template v-else-if="item.racestatus == 4999">
 				    						比赛结束
 				    					</template>
-				    					<template v-else>
+				    					<template v-else-if="item.racestatus == 4999">
 				    						其他状态（等待开赛）
 				    					</template>
 				    				</p>
-				    				<p v-if="item.stustatus != 10">
+				    				<p v-if="item.racestatus != 4999 && item.userstatus != 10">
 				    					<strong>我的状态：</strong>
-				    					<template v-if="item.stustatus == 0">
+				    					<template v-if="item.userstatus == 0">
 				    						未报名
 				    					</template>
-				    					<template v-else-if="item.stustatus == 1">
+				    					<template v-else-if="item.userstatus == 1">
 				    						已报名（未开赛）
 				    					</template>
-				    					<template v-else-if="item.stustatus == 2">
+				    					<template v-else-if="item.userstatus == 2">
 				    						比赛中
 				    					</template>
-				    					<template v-else>
+				    					<!-- <template v-else>
 				    						比赛结束
-				    					</template>
+				    					</template> -->
 				    				</p>
 				    				<p v-if="item.ranking"><strong>当前排名：</strong>{{item.ranking}}</p>
 				    				<p class="mt10"><strong>报名时间：</strong>{{item.entrystarttime}}--{{item.entryendtime}}</p>
@@ -154,10 +167,10 @@
 				    			</div>
 				    			<div class="list-item-r">
 				    				<div>
-					    				<el-button class="bt2" @click.stop="jump(item, 'entry')" v-if="item.stustatus != 0">进入我的比赛</el-button>
-										<el-button class="bt3" @click.stop="jump(item, 'sort')" v-if="item.stustatus == 2 || item.stustatus == 10">查看赛事排名</el-button>
-					    				<el-button class="bt4" @click.stop="openDialog(item)" v-if="item.stustatus == 0">立即参加</el-button>
-					    				<el-button type="danger" v-if="item.stustatus == 2" v-for="(acct, index) in item.fuacct" :key="index" @click.stop="trade(item, acct)">{{acct.fuaccttype == 1 ? '竞赛交易' : '期权交易'}}</el-button>
+					    				<el-button class="bt2" @click.stop="jump(item, 'entry')" v-if="item.userstatus != 0">进入我的比赛</el-button>
+										<el-button class="bt3" @click.stop="jump(item, 'sort')" v-if="item.userstatus >= 30 && item.userstatus <= 39">查看赛事排名</el-button>
+					    				<el-button class="bt4" @click.stop="openDialog(item)" v-if="item.userstatus == 0">立即参加</el-button>
+					    				<el-button type="danger" v-if="item.userstatus >= 20 && item.userstatus <= 29" v-for="(acct, index) in item.fuacct" :key="index" @click.stop="trade(item, acct)">{{acct.fuaccttype == 1 ? '竞赛交易' : '期权交易'}}</el-button>
 					    			</div>
 				    			</div>
 				    		</div>
@@ -243,13 +256,25 @@
 	}
 	//我的模拟赛事
 	var getRacelist = function(that) {
-		 that.$utils.getJson(that.$utils.CONFIG.api.myRacelist, function(res) {
+		var postData = {
+			kindcode: '', //市场类型
+			userstatus: '31', //报名状态
+			racestatus: '', //赛事状态
+			joinnum: '', //人数
+			racename: '',
+			page: {
+				start: "0",
+				size: that.$utils.CONFIG.pageSize
+			}
+		}
+		 that.$utils.getJson(that.$utils.CONFIG.api.competitionList, function(res) {
          	if(res.succflag == 0) {
-            	that.tabs.tabs.simulation.dataList = res.data;
+            	that.tabs.tabs.simulation.dataList = res.data.list;
+            	that.tabs.tabs.simulation.page = res.page;
           	}else {
           		that.$utils.showTip('error', '', '', res.message);
           	}
-        }, function() {}, {}, true, {token: that.$utils.CONFIG.token})
+        }, function() {}, postData, true, {token: that.$utils.CONFIG.token})
 	}
 	//赛事列表
 	var getList = function(that) {
@@ -348,14 +373,15 @@
 					}
 				],
 				searchVal: {
-					markettype: '',
-					visitamount: '',
-					status: '',
+					kindcode: '', //市场类型
+					userstatus: '', //报名状态
+					racestatus: '', //赛事状态
+					joinnum: '', //人数
 					racename: '',
 					page: {
 						start: "0",
 						size: this.$utils.CONFIG.pageSize
-					},
+					}
 				},
 				tabs: {
 					activeTab: 'simulation',
@@ -363,99 +389,25 @@
 						simulation: {
 							name: '我的模拟赛事',
 							defaultImg: require('../assets/images/img3.png'),
-							dataList: []
+							dataList: [],
+							pageSize: this.$utils.CONFIG.pageSize,
+							page: {
+								start: 0,
+								size: 0,
+								responsenum: 0,
+								responsetotal: 0
+							}
 						},
 						list: {
 							name: '赛事列表',
 							search: {
 								condition: [
 									{
-										name: '市场类型',
-										value: 0,
-										list: [
+										"title":"",
+										"rows":[
 											{
-												name: '全部',
-												value: '',
-												type: 'markettype',
-												isActive: false
-											},
-											{
-												name: '股票',
-												value: '0',
-												type: 'markettype',
-												isActive: false
-											},
-											{
-												name: '期权',
-												value: '1',
-												type: 'markettype',
-												isActive: false
-											}
-										]
-									},
-									{
-										name: '参赛人数',
-										value: 1,
-										list: [
-											{
-												name: '全部',
-												value: '',
-												type: 'visitamount',
-												isActive: false
-											},
-											{
-												name: '100以内',
-												value: '-100',
-												type: 'visitamount',
-												isActive: false
-											},
-											{
-												name: '100-500',
-												value: '100-500',
-												type: 'visitamount',
-												isActive: false
-											},
-											{
-												name: '500-1000',
-												value: '500-1000',
-												type: 'visitamount',
-												isActive: false
-											},
-											{
-												name: '1000以上',
-												value: '1000-',
-												type: 'visitamount',
-												isActive: false
-											}
-										]
-									},
-									{
-										name: '赛事状态',
-										value: 2,
-										list: [
-											{
-												name: '全部',
-												value: '',
-												type: 'status',
-												isActive: false
-											},
-											{
-												name: '报名中',
-												value: '0',
-												type: 'status',
-												isActive: false
-											},
-											{
-												name: '比赛中',
-												value: '1',
-												type: 'status',
-												isActive: false
-											},
-											{
-												name: '已结束',
-												value: '2',
-												type: 'status',
-												isActive: false
+												"type": "",
+												"typename": ""
 											}
 										]
 									}
@@ -508,20 +460,20 @@
 	            }
 	            this.$utils.handleExe(json, function(){}, function(){})
 			},
-			changeCondition(data, item) {
+			changeCondition(data, item, key) {
 				var that = this;
 				if(!data.isActive) {
 					item.forEach(function(e, i) {
-						if(data.value == e.value) {
+						if(data.type == e.type) {
 							e.isActive = true;
 						}else {
 							e.isActive = false;
 						}
 					})
-					that.searchVal[data.type] = data.value;
+					that.searchVal[key] = data.type;
 				}else {
 					data.isActive = false;
-					that.searchVal[data.type] = '';
+					that.searchVal[key] = '';
 				}
 				//that.searchVal.racename = '';
 				that.searchVal.page.start = 0;
@@ -530,7 +482,19 @@
 			search() {
 				//if(!this.searchVal.racename) return;
 				var that = this;
+
+				//重置条件
+				that.tabs.tabs.list.search.condition.forEach(function(a) {
+					a.rows.forEach(function(b) {
+						b.isActive = false;
+					})
+				})
+				that.searchVal.kindcode = '';
+				that.searchVal.userstatus = '';
+				that.searchVal.racestatus = '';
+				that.searchVal.joinnum = '';
 				that.searchVal.page.start = 0;
+
 				getList(that);
 			},
 			jump(item, type) {
@@ -594,10 +558,18 @@
             	getHq(that);
             }, 3000)
 
-            //模拟赛
-           	getRacelist(that);
-            //赛事列表
-           	getList(that);
+            //筛选条件
+            that.$utils.getJson(that.$utils.CONFIG.api.raceCondition, function(res) {
+              if(res.succflag == 0) {
+              	that.tabs.tabs.list.search.condition = res.data.list;
+              	//模拟赛
+	           	getRacelist(that);
+	            //赛事列表
+	           	getList(that);
+              }else {
+                that.$utils.showTip('error', '', '', res.message);
+              }
+            }, function() {}, {}, true, {token: that.$utils.CONFIG.token})
 		},
 		destroyed: function () {
 			clearInterval(this.timer)
@@ -769,7 +741,7 @@
 					padding: 40px 20px 0 40px;
 					.search-item {
 						display: flex;
-						margin-bottom: 40px;
+						margin-bottom: 30px;
 						.search-item-type {
 							width: 88px;
 							line-height: 30px;
